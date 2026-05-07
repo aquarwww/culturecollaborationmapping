@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文化×游戏 联动 Mapping 地图</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg-primary: #0a0e1a;
+  --bg-secondary: #111827;
+  --bg-card: #1a2035;
+  --bg-card-hover: #1e2a45;
+  --border: #2a3555;
+  --text-primary: #e8eaf0;
+  --text-secondary: #8892a8;
+  --accent-blue: #3b82f6;
+  --accent-purple: #8b5cf6;
+  --accent-cyan: #06b6d4;
+  --accent-green: #10b981;
+  --accent-orange: #f59e0b;
+  --accent-red: #ef4444;
+  --accent-pink: #ec4899;
+  --grade-s: #fbbf24;
+  --grade-a: #34d399;
+  --grade-b: #60a5fa;
+  --grade-c: #a78bfa;
+  --grade-d: #9ca3af;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+  border-bottom: 1px solid var(--border);
+  min-height: 56px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-icon {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.header h1 {
+  font-size: 18px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #e0e7ff, #c4b5fd);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.header-stats {
+  display: flex;
+  gap: 24px;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--accent-cyan);
+}
+
+.stat-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* Main Content */
+.main-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 260px;
+  min-width: 260px;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.filter-section {
+  margin-bottom: 20px;
+}
+
+.filter-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.filter-title .icon {
+  font-size: 14px;
+}
+
+.filter-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.filter-item:hover {
+  background: var(--bg-card-hover);
+}
+
+.filter-item.active {
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--accent-blue);
+}
+
+.filter-checkbox {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.filter-item.active .filter-checkbox {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+}
+
+.filter-item.active .filter-checkbox::after {
+  content: '✓';
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+.filter-count {
+  margin-left: auto;
+  font-size: 11px;
+  background: var(--bg-card);
+  padding: 2px 7px;
+  border-radius: 10px;
+  color: var(--text-secondary);
+}
+
+.time-slider {
+  padding: 0 10px;
+}
+
+.time-range-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 6px;
+}
+
+input[type="range"] {
+  width: 100%;
+  -webkit-appearance: none;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  outline: none;
+  margin: 8px 0;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  background: var(--accent-blue);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.grade-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0 10px;
+}
+
+.grade-badge {
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  opacity: 0.6;
+}
+
+.grade-badge.active { opacity: 1; }
+.grade-s { background: rgba(251, 191, 36, 0.2); color: var(--grade-s); border: 1px solid rgba(251, 191, 36, 0.3); }
+.grade-a { background: rgba(52, 211, 153, 0.2); color: var(--grade-a); border: 1px solid rgba(52, 211, 153, 0.3); }
+.grade-b { background: rgba(96, 165, 250, 0.2); color: var(--grade-b); border: 1px solid rgba(96, 165, 250, 0.3); }
+.grade-c { background: rgba(167, 139, 250, 0.2); color: var(--grade-c); border: 1px solid rgba(167, 139, 250, 0.3); }
+.grade-d { background: rgba(156, 163, 175, 0.2); color: var(--grade-d); border: 1px solid rgba(156, 163, 175, 0.3); }
+
+/* Center Panel */
+.center-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.graph-container {
+  flex: 1;
+  position: relative;
+  background: radial-gradient(ellipse at center, #111d35 0%, #0a0e1a 70%);
+  overflow: hidden;
+}
+
+.graph-container svg {
+  width: 100%;
+  height: 100%;
+}
+
+.graph-tooltip {
+  position: absolute;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 13px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 100;
+  min-width: 220px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+.graph-tooltip.visible { opacity: 1; }
+
+.tooltip-title {
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 8px;
+  color: var(--accent-cyan);
+}
+
+.tooltip-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 4px 0;
+  color: var(--text-secondary);
+}
+
+.tooltip-row span:last-child {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.graph-legend {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(26, 32, 53, 0.9);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 11px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0;
+  color: var(--text-secondary);
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+/* Bottom Panel */
+.bottom-panel {
+  height: 300px;
+  min-height: 300px;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
+
+.bottom-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  padding: 0 16px;
+}
+
+.bottom-tab {
+  padding: 10px 20px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bottom-tab:hover {
+  color: var(--text-primary);
+}
+
+.bottom-tab.active {
+  color: var(--accent-blue);
+  border-bottom-color: var(--accent-blue);
+}
+
+.bottom-content {
+  flex: 1;
+  overflow: auto;
+  padding: 16px;
+}
+
+.tab-panel {
+  display: none;
+  height: 100%;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+/* Trend Chart */
+.chart-wrapper {
+  height: 100%;
+  position: relative;
+}
+
+/* Radar */
+.radar-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  height: 100%;
+}
+
+.radar-card {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.radar-card h4 {
+  font-size: 13px;
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+}
+
+/* Matrix */
+.matrix-container {
+  height: 100%;
+}
+
+/* Case Cards */
+.case-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 12px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.case-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.case-card:hover {
+  border-color: var(--accent-blue);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+.case-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.case-game {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.case-grade {
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.case-theme {
+  font-size: 12px;
+  color: var(--accent-cyan);
+  margin-bottom: 4px;
+}
+
+.case-event {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.case-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.case-meta span {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.7);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-overlay.visible {
+  display: flex;
+}
+
+.modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+.modal-close {
+  float: right;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.modal h2 {
+  font-size: 20px;
+  margin-bottom: 16px;
+  color: var(--accent-cyan);
+}
+
+.modal-section {
+  margin-bottom: 16px;
+}
+
+.modal-section h4 {
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+.modal-section p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+.modal-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.modal-tag {
+  padding: 4px 12px;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 20px;
+  font-size: 12px;
+  color: var(--accent-blue);
+}
+
+.modal-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.metric-box {
+  background: var(--bg-secondary);
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+}
+
+.metric-box .val {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent-cyan);
+}
+
+.metric-box .lbl {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #3a4a6a; }
+
+/* Search */
+.search-box {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 8px 12px 8px 32px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 13px;
+  outline: none;
+}
+
+.search-box input:focus {
+  border-color: var(--accent-blue);
+}
+
+.search-box::before {
+  content: '🔍';
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+}
+
+/* Reset button */
+.reset-btn {
+  width: 100%;
+  padding: 8px;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 8px;
+  color: var(--accent-blue);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 8px;
+}
+
+.reset-btn:hover {
+  background: rgba(59, 130, 246, 0.2);
+}
+</style>
+</head>
+<body>
+
+<div class="app-container">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <div class="logo-icon">🎮</div>
+      <h1>文化×游戏 联动 Mapping 地图</h1>
+    </div>
+    <div class="header-stats">
+      <div class="stat-item">
+        <div class="stat-value" id="stat-cases">30</div>
+        <div class="stat-label">联动案例</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="stat-games">12</div>
+        <div class="stat-label">覆盖游戏</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="stat-themes">10</div>
+        <div class="stat-label">文化主题</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="stat-avg">A</div>
+        <div class="stat-label">平均评级</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="搜索游戏/文化主题..." />
+      </div>
+
+      <div class="filter-section">
+        <div class="filter-title"><span class="icon">🎭</span> 文化主题</div>
+        <div id="themeFilters"></div>
+      </div>
+
+      <div class="filter-section">
+        <div class="filter-title"><span class="icon">🎮</span> 游戏品类</div>
+        <div id="genreFilters"></div>
+      </div>
+
+      <div class="filter-section">
+        <div class="filter-title"><span class="icon">📅</span> 时间范围</div>
+        <div class="time-slider">
+          <input type="range" id="yearStart" min="2022" max="2025" value="2022" step="1">
+          <input type="range" id="yearEnd" min="2022" max="2025" value="2025" step="1">
+          <div class="time-range-label">
+            <span id="yearStartLabel">2022</span>
+            <span id="yearEndLabel">2025</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-section">
+        <div class="filter-title"><span class="icon">⭐</span> 效果评级</div>
+        <div class="grade-legend" id="gradeFilters"></div>
+      </div>
+
+      <button class="reset-btn" onclick="resetFilters()">重置所有筛选</button>
+    </div>
+
+    <!-- Center -->
+    <div class="center-panel">
+      <div class="graph-container" id="graphContainer">
+        <div class="graph-tooltip" id="graphTooltip"></div>
+        <div class="graph-legend">
+          <div style="font-weight:600;margin-bottom:6px;color:var(--text-primary);">图例说明</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--accent-purple)"></div> 文化主题节点</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--accent-blue)"></div> 游戏产品节点</div>
+          <div class="legend-item" style="margin-top:6px;"><span style="color:var(--text-secondary)">线条粗细 = 联动深度</span></div>
+          <div class="legend-item"><span style="color:var(--text-secondary)">节点大小 = 市场热度</span></div>
+          <div style="margin-top:8px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">评级颜色</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--grade-s)"></div> S级</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--grade-a)"></div> A级</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--grade-b)"></div> B级</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--grade-c)"></div> C级</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--grade-d)"></div> D级</div>
+        </div>
+      </div>
+
+      <!-- Bottom Panel -->
+      <div class="bottom-panel">
+        <div class="bottom-tabs">
+          <div class="bottom-tab active" data-tab="trend">📈 热度趋势</div>
+          <div class="bottom-tab" data-tab="radar">🎯 效果对比</div>
+          <div class="bottom-tab" data-tab="matrix">🔲 空白机会</div>
+          <div class="bottom-tab" data-tab="cases">📋 案例详情</div>
+        </div>
+        <div class="bottom-content">
+          <div class="tab-panel active" id="panel-trend">
+            <div class="chart-wrapper"><canvas id="trendChart"></canvas></div>
+          </div>
+          <div class="tab-panel" id="panel-radar">
+            <div class="radar-grid">
+              <div class="radar-card"><h4>各文化主题综合评分</h4><canvas id="radarChart1"></canvas></div>
+              <div class="radar-card"><h4>各品类文化适配度</h4><canvas id="radarChart2"></canvas></div>
+            </div>
+          </div>
+          <div class="tab-panel" id="panel-matrix">
+            <div class="matrix-container"><canvas id="matrixChart"></canvas></div>
+          </div>
+          <div class="tab-panel" id="panel-cases">
+            <div class="case-list" id="caseList"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<script>
+// ==================== 30条高质量 Mock 数据 ====================
+const mockData = [
+  // 原神 - 5条
+  { id:1, game:"原神", genre:"开放世界", theme:"神话传说", event:"须弥地区·印度教神话体系", year:2022, quarter:"Q3",
+    grade:"S", revenue_boost:35, dau_boost:28, social_buzz:95, user_rating:9.2, depth:5,
+    desc:"须弥地区以印度教与佛教神话为基础构建世界观，草神纳西妲原型取自智慧之神，地区探索融入轮回、因果等东方哲学概念。",
+    tags:["世界观构建","角色设计","地图探索"], source:"米哈游官方数据/Sensor Tower" },
+  { id:2, game:"原神", genre:"开放世界", theme:"历史文化", event:"枫丹地区·法国大革命美学", year:2023, quarter:"Q3",
+    grade:"S", revenue_boost:42, dau_boost:32, social_buzz:92, user_rating:9.4, depth:5,
+    desc:"枫丹以法国为原型，融入工业革命、法律审判等历史元素，水下探索机制与蒸汽朋克美学结合，开创沉浸式文化叙事。",
+    tags:["美术风格","叙事设计","新机制"], source:"Sensor Tower/SocialBeta" },
+  { id:3, game:"原神", genre:"开放世界", theme:"非遗文化", event:"海灯节·中国非遗花灯", year:2023, quarter:"Q1",
+    grade:"A", revenue_boost:22, dau_boost:18, social_buzz:85, user_rating:8.8, depth:4,
+    desc:"海灯节以中国传统花灯、烟花文化为主题，结合璃月地区的中式建筑与民俗活动，单日收入突破1500万美元。",
+    tags:["节庆活动","文化传播","限时玩法"], source:"Sensor Tower" },
+  { id:4, game:"原神", genre:"开放世界", theme:"音乐艺术", event:"风花节·欧洲古典音乐", year:2022, quarter:"Q1",
+    grade:"A", revenue_boost:18, dau_boost:15, social_buzz:78, user_rating:8.5, depth:3,
+    desc:"风花节融入欧洲吟游诗人文化和古典音乐元素，推出音游小游戏和交响乐原声带，B站相关视频播放量超2亿。",
+    tags:["音乐联动","小游戏","社区创作"], source:"B站数据/七麦数据" },
+  { id:5, game:"原神", genre:"开放世界", theme:"自然生态", event:"纳塔地区·中南美洲自然崇拜", year:2024, quarter:"Q3",
+    grade:"S", revenue_boost:38, dau_boost:30, social_buzz:90, user_rating:9.1, depth:5,
+    desc:"纳塔地区融合中南美洲自然崇拜与恐龙元素，竞技场文化和火元素美学获得全球玩家高度认可，首周收入破纪录。",
+    tags:["世界观构建","战斗系统","开放世界"], source:"Sensor Tower/Data.ai" },
+
+  // 王者荣耀 - 4条
+  { id:6, game:"王者荣耀", genre:"MOBA", theme:"非遗文化", event:"敦煌联动·飞天皮肤系列", year:2022, quarter:"Q2",
+    grade:"S", revenue_boost:30, dau_boost:25, social_buzz:92, user_rating:9.0, depth:4,
+    desc:"与敦煌研究院合作，推出「遇见飞天」「遇见神鹿」等系列皮肤，将壁画元素融入角色设计，全网话题曝光超50亿。",
+    tags:["IP联动","皮肤设计","文化传承"], source:"腾讯财报/DataEye" },
+  { id:7, game:"王者荣耀", genre:"MOBA", theme:"戏曲文化", event:"梨园风华·京剧国粹系列", year:2023, quarter:"Q1",
+    grade:"A", revenue_boost:20, dau_boost:14, social_buzz:82, user_rating:8.7, depth:4,
+    desc:"推出京剧主题皮肤，甄姬「游园惊梦」融合昆曲身段，上官婉儿「梁祝」加入京剧唱腔，获文旅部点赞推荐。",
+    tags:["国粹传承","角色皮肤","政府背书"], source:"DataEye/新华网" },
+  { id:8, game:"王者荣耀", genre:"MOBA", theme:"历史文化", event:"三分之地·三国文化深度还原", year:2022, quarter:"Q4",
+    grade:"B", revenue_boost:12, dau_boost:10, social_buzz:65, user_rating:7.8, depth:3,
+    desc:"三分之地赛季加强三国历史叙事，增加历史背景科普，但因玩法创新不足，玩家评价褒贬不一。",
+    tags:["赛季主题","历史科普","玩法更新"], source:"TapTap/QuestMobile" },
+  { id:9, game:"王者荣耀", genre:"MOBA", theme:"神话传说", event:"西游系列·齐天大圣至尊宝", year:2024, quarter:"Q2",
+    grade:"A", revenue_boost:25, dau_boost:20, social_buzz:88, user_rating:8.9, depth:4,
+    desc:"推出至尊宝传说皮肤和西游主题赛季，融合经典IP的情怀营销，单皮肤收入预估破亿，社交平台UGC爆发。",
+    tags:["经典IP","传说皮肤","情怀营销"], source:"DataEye/Sensor Tower" },
+
+  // 阴阳师 - 3条
+  { id:10, game:"阴阳师", genre:"卡牌RPG", theme:"神话传说", event:"日本百鬼夜行·妖怪文化", year:2022, quarter:"Q1",
+    grade:"A", revenue_boost:20, dau_boost:16, social_buzz:80, user_rating:8.6, depth:5,
+    desc:"以日本平安时代妖怪文化为核心，持续推出百鬼夜行系列式神，将古典怪谈与现代审美结合，维持核心玩家粘性。",
+    tags:["世界观核心","持续运营","文化考据"], source:"网易财报/七麦数据" },
+  { id:11, game:"阴阳师", genre:"卡牌RPG", theme:"非遗文化", event:"皮影戏联动·皮影式神", year:2023, quarter:"Q2",
+    grade:"B", revenue_boost:10, dau_boost:8, social_buzz:60, user_rating:7.5, depth:3,
+    desc:"推出皮影戏主题式神皮肤和限时玩法，美术表现获好评但联动深度不足，仅停留在视觉层面。",
+    tags:["限时活动","美术创新","深度不足"], source:"TapTap/NGA" },
+  { id:12, game:"阴阳师", genre:"卡牌RPG", theme:"文学经典", event:"源氏物语·紫式部联动", year:2024, quarter:"Q1",
+    grade:"B", revenue_boost:14, dau_boost:11, social_buzz:68, user_rating:7.9, depth:4,
+    desc:"以《源氏物语》为蓝本推出紫式部角色，还原平安时代宫廷文学氛围，文学爱好者群体好评但大众认知门槛偏高。",
+    tags:["文学IP","角色设计","小众文化"], source:"TapTap/Sensor Tower" },
+
+  // 和平精英 - 2条
+  { id:13, game:"和平精英", genre:"射击", theme:"建筑文化", event:"古建筑地图·故宫合作", year:2023, quarter:"Q3",
+    grade:"B", revenue_boost:11, dau_boost:9, social_buzz:70, user_rating:7.6, depth:3,
+    desc:"联合故宫博物院推出古建筑主题地图，在射击场景中融入传统建筑元素，视觉效果好但与射击玩法融合度有限。",
+    tags:["地图设计","IP联名","场景创新"], source:"QuestMobile/腾讯财报" },
+  { id:14, game:"和平精英", genre:"射击", theme:"潮流文化", event:"街头涂鸦×潮牌联名", year:2024, quarter:"Q1",
+    grade:"C", revenue_boost:7, dau_boost:5, social_buzz:55, user_rating:6.8, depth:2,
+    desc:"与潮牌联名推出涂鸦主题皮肤和载具，但联动停留在表面换肤层面，缺乏玩法深度，核心玩家反响平淡。",
+    tags:["品牌联名","皮肤","深度不足"], source:"DataEye" },
+
+  // 光与夜之恋 - 2条
+  { id:15, game:"光与夜之恋", genre:"恋爱养成", theme:"音乐艺术", event:"古典乐章·维也纳之夜", year:2023, quarter:"Q4",
+    grade:"A", revenue_boost:28, dau_boost:22, social_buzz:85, user_rating:9.0, depth:4,
+    desc:"以维也纳古典音乐为主题的限时活动，角色化身音乐家，融入交响乐演出机制，女性玩家群体热情高涨，付费率提升显著。",
+    tags:["女性向","沉浸叙事","音乐元素"], source:"七麦数据/TapTap" },
+  { id:16, game:"光与夜之恋", genre:"恋爱养成", theme:"文学经典", event:"红楼梦境·中式美学", year:2024, quarter:"Q2",
+    grade:"A", revenue_boost:24, dau_boost:18, social_buzz:80, user_rating:8.8, depth:4,
+    desc:"以《红楼梦》为灵感的中式美学活动，角色服饰还原古典审美，诗词系统引发创作热潮，微博话题阅读量超10亿。",
+    tags:["中式美学","文学联动","社交传播"], source:"微博数据/Sensor Tower" },
+
+  // 逆水寒 - 3条
+  { id:17, game:"逆水寒", genre:"MMO", theme:"历史文化", event:"北宋汴京·清明上河图还原", year:2023, quarter:"Q3",
+    grade:"S", revenue_boost:40, dau_boost:35, social_buzz:90, user_rating:9.3, depth:5,
+    desc:"手游版以《清明上河图》为蓝本1:1还原北宋汴京，融入宋代市井文化、商贸体系，上线首月流水超15亿，成为现象级。",
+    tags:["历史还原","开放世界","文化考据"], source:"网易财报/Sensor Tower" },
+  { id:18, game:"逆水寒", genre:"MMO", theme:"非遗文化", event:"宋韵非遗·活字印刷互动", year:2024, quarter:"Q1",
+    grade:"A", revenue_boost:15, dau_boost:12, social_buzz:75, user_rating:8.5, depth:4,
+    desc:"推出活字印刷、宋锦织造等非遗互动玩法，玩家可在游戏中体验完整的传统技艺流程，获央视文化类节目报道。",
+    tags:["非遗体验","互动玩法","媒体报道"], source:"央视网/TapTap" },
+  { id:19, game:"逆水寒", genre:"MMO", theme:"戏曲文化", event:"宋代杂剧·瓦舍勾栏", year:2023, quarter:"Q4",
+    grade:"B", revenue_boost:10, dau_boost:8, social_buzz:62, user_rating:7.7, depth:3,
+    desc:"加入宋代瓦舍勾栏戏曲表演系统，玩家可观赏杂剧、说书等节目，文化氛围浓厚但互动性和复玩价值有待提升。",
+    tags:["文化氛围","NPC系统","复玩性"], source:"TapTap/NGA" },
+
+  // 明日方舟 - 3条
+  { id:20, game:"明日方舟", genre:"策略塔防", theme:"工业文化", event:"维多利亚·工业革命美学", year:2022, quarter:"Q3",
+    grade:"A", revenue_boost:22, dau_boost:17, social_buzz:82, user_rating:8.7, depth:4,
+    desc:"维多利亚章节以英国工业革命为背景，融入阶级冲突、蒸汽朋克等元素，叙事深度获玩家高度评价，相关二创大量产出。",
+    tags:["世界观叙事","美术风格","二创繁荣"], source:"鹰角网络/B站数据" },
+  { id:21, game:"明日方舟", genre:"策略塔防", theme:"自然生态", event:"萨米·北欧极地生态", year:2023, quarter:"Q2",
+    grade:"A", revenue_boost:19, dau_boost:15, social_buzz:79, user_rating:8.6, depth:4,
+    desc:"萨米地区以北欧极地生态为主题，融入萨米文化和自然崇拜元素，Roguelike玩法与荒野求生氛围高度契合。",
+    tags:["地区设计","Roguelike","生态叙事"], source:"Sensor Tower/TapTap" },
+  { id:22, game:"明日方舟", genre:"策略塔防", theme:"历史文化", event:"叙拉古·意大利黑手党", year:2024, quarter:"Q2",
+    grade:"B", revenue_boost:16, dau_boost:13, social_buzz:73, user_rating:8.2, depth:4,
+    desc:"叙拉古章节以意大利西西里为原型，融入家族政治与地下社会元素，剧情口碑优秀但部分玩家认为题材偏阴暗。",
+    tags:["叙事深度","争议题材","角色塑造"], source:"TapTap/NGA" },
+
+  // 崩坏：星穹铁道 - 3条
+  { id:23, game:"崩坏：星穹铁道", genre:"回合RPG", theme:"神话传说", event:"仙舟罗浮·中国仙侠体系", year:2023, quarter:"Q2",
+    grade:"S", revenue_boost:45, dau_boost:38, social_buzz:95, user_rating:9.5, depth:5,
+    desc:"仙舟罗浮以中国仙侠文化为核心，融合道教神仙体系与科幻设定，丹恒·饮月角色卡池创下回合RPG品类收入记录。",
+    tags:["仙侠文化","角色设计","品类标杆"], source:"Sensor Tower/Data.ai" },
+  { id:24, game:"崩坏：星穹铁道", genre:"回合RPG", theme:"潮流文化", event:"匹诺康尼·赛博朋克乐园", year:2024, quarter:"Q1",
+    grade:"A", revenue_boost:30, dau_boost:24, social_buzz:88, user_rating:9.0, depth:4,
+    desc:"匹诺康尼融合赛博朋克与梦境美学，以美国拉斯维加斯为灵感，推出爵士乐主题和霓虹美学，全球话题度极高。",
+    tags:["赛博美学","音乐融合","全球化"], source:"Sensor Tower/SocialBeta" },
+  { id:25, game:"崩坏：星穹铁道", genre:"回合RPG", theme:"建筑文化", event:"翁瓦克·太空建筑美学", year:2024, quarter:"Q3",
+    grade:"B", revenue_boost:18, dau_boost:14, social_buzz:72, user_rating:8.3, depth:3,
+    desc:"翁瓦克以恐龙和原始部落为灵感，太空殖民建筑融合原始图腾，美术表现亮眼但文化辨识度不如前作地区。",
+    tags:["建筑设计","美术表现","新地区"], source:"Sensor Tower/TapTap" },
+
+  // 绝区零 - 2条
+  { id:26, game:"绝区零", genre:"动作", theme:"潮流文化", event:"新艾利都·街头潮流文化", year:2024, quarter:"Q3",
+    grade:"A", revenue_boost:32, dau_boost:26, social_buzz:88, user_rating:8.8, depth:4,
+    desc:"以街头潮流文化为核心，融合涂鸦、嘻哈、潮玩等亚文化元素，角色设计和UI风格获年轻玩家追捧，TikTok相关内容超10亿播放。",
+    tags:["Z世代","潮流设计","社交传播"], source:"Sensor Tower/TikTok" },
+  { id:27, game:"绝区零", genre:"动作", theme:"音乐艺术", event:"邦布乐队·电子音乐", year:2024, quarter:"Q4",
+    grade:"B", revenue_boost:14, dau_boost:11, social_buzz:70, user_rating:8.0, depth:3,
+    desc:"推出电子音乐主题活动和邦布乐队系统，音乐融合战斗节奏设计获好评，但活动内容量略显单薄。",
+    tags:["音乐战斗","限时活动","内容量"], source:"TapTap/B站" },
+
+  // 第五人格 - 2条
+  { id:28, game:"第五人格", genre:"非对称竞技", theme:"文学经典", event:"爱伦·坡×哥特文学", year:2022, quarter:"Q4",
+    grade:"A", revenue_boost:18, dau_boost:14, social_buzz:76, user_rating:8.4, depth:4,
+    desc:"以爱伦·坡哥特文学为灵感推出赛季主题，黑猫、乌鸦等经典意象融入地图和角色，暗黑美学与游戏调性高度契合。",
+    tags:["文学IP","美术风格","调性契合"], source:"网易数据/TapTap" },
+  { id:29, game:"第五人格", genre:"非对称竞技", theme:"建筑文化", event:"古堡迷踪·欧洲哥特建筑", year:2023, quarter:"Q1",
+    grade:"C", revenue_boost:6, dau_boost:4, social_buzz:45, user_rating:6.5, depth:2,
+    desc:"新增哥特式古堡地图，建筑细节考究但对游戏玩法影响有限，老玩家审美疲劳，新增用户转化效果一般。",
+    tags:["地图更新","审美疲劳","转化不佳"], source:"TapTap/DataEye" },
+
+  // 鸣潮 - 1条
+  { id:30, game:"鸣潮", genre:"开放世界", theme:"自然生态", event:"声骸系统·自然音景生态", year:2024, quarter:"Q2",
+    grade:"D", revenue_boost:5, dau_boost:3, social_buzz:40, user_rating:6.0, depth:2,
+    desc:"声骸系统试图以自然音景为核心构建生态体系，但上线初期系统复杂度高、引导不足，文化表达被机制问题掩盖，口碑受损。",
+    tags:["声音设计","系统复杂","引导不足"], source:"TapTap/Sensor Tower" }
+];
+
+// ==================== 数据处理工具 ====================
+const themes = [...new Set(mockData.map(d => d.theme))];
+const genres = [...new Set(mockData.map(d => d.genre))];
+const games = [...new Set(mockData.map(d => d.game))];
+const grades = ['S','A','B','C','D'];
+const gradeColors = { S:'#fbbf24', A:'#34d399', B:'#60a5fa', C:'#a78bfa', D:'#9ca3af' };
+const themeColors = {
+  '神话传说':'#ec4899','非遗文化':'#f59e0b','历史文化':'#ef4444','建筑文化':'#8b5cf6',
+  '音乐艺术':'#06b6d4','戏曲文化':'#10b981','文学经典':'#f97316','潮流文化':'#3b82f6',
+  '自然生态':'#22c55e','工业文化':'#64748b'
+};
+
+let activeThemes = new Set(themes);
+let activeGenres = new Set(genres);
+let activeGrades = new Set(grades);
+let yearRange = [2022, 2025];
+let searchQuery = '';
+
+function getFilteredData() {
+  return mockData.filter(d =>
+    activeThemes.has(d.theme) &&
+    activeGenres.has(d.genre) &&
+    activeGrades.has(d.grade) &&
+    d.year >= yearRange[0] && d.year <= yearRange[1] &&
+    (searchQuery === '' || d.game.includes(searchQuery) || d.theme.includes(searchQuery) || d.event.includes(searchQuery))
+  );
+}
+
+// ==================== 初始化筛选器 ====================
+function initFilters() {
+  const themeContainer = document.getElementById('themeFilters');
+  themes.forEach(t => {
+    const count = mockData.filter(d => d.theme === t).length;
+    const div = document.createElement('div');
+    div.className = 'filter-item active';
+    div.dataset.value = t;
+    div.innerHTML = `<div class="filter-checkbox"></div><span>${t}</span><span class="filter-count">${count}</span>`;
+    div.onclick = () => toggleFilter(div, t, activeThemes);
+    themeContainer.appendChild(div);
+  });
+
+  const genreContainer = document.getElementById('genreFilters');
+  genres.forEach(g => {
+    const count = mockData.filter(d => d.genre === g).length;
+    const div = document.createElement('div');
+    div.className = 'filter-item active';
+    div.dataset.value = g;
+    div.innerHTML = `<div class="filter-checkbox"></div><span>${g}</span><span class="filter-count">${count}</span>`;
+    div.onclick = () => toggleFilter(div, g, activeGenres);
+    genreContainer.appendChild(div);
+  });
+
+  const gradeContainer = document.getElementById('gradeFilters');
+  grades.forEach(g => {
+    const span = document.createElement('span');
+    span.className = `grade-badge grade-${g.toLowerCase()} active`;
+    span.textContent = g + '级';
+    span.onclick = () => {
+      span.classList.toggle('active');
+      if (activeGrades.has(g)) activeGrades.delete(g); else activeGrades.add(g);
+      updateAll();
+    };
+    gradeContainer.appendChild(span);
+  });
+
+  document.getElementById('yearStart').oninput = function() {
+    yearRange[0] = +this.value;
+    if (yearRange[0] > yearRange[1]) { yearRange[1] = yearRange[0]; document.getElementById('yearEnd').value = yearRange[1]; }
+    document.getElementById('yearStartLabel').textContent = yearRange[0];
+    document.getElementById('yearEndLabel').textContent = yearRange[1];
+    updateAll();
+  };
+  document.getElementById('yearEnd').oninput = function() {
+    yearRange[1] = +this.value;
+    if (yearRange[1] < yearRange[0]) { yearRange[0] = yearRange[1]; document.getElementById('yearStart').value = yearRange[0]; }
+    document.getElementById('yearStartLabel').textContent = yearRange[0];
+    document.getElementById('yearEndLabel').textContent = yearRange[1];
+    updateAll();
+  };
+
+  document.getElementById('searchInput').oninput = function() {
+    searchQuery = this.value.trim();
+    updateAll();
+  };
+}
+
+function toggleFilter(el, val, set) {
+  el.classList.toggle('active');
+  if (set.has(val)) set.delete(val); else set.add(val);
+  updateAll();
+}
+
+function resetFilters() {
+  activeThemes = new Set(themes);
+  activeGenres = new Set(genres);
+  activeGrades = new Set(grades);
+  yearRange = [2022, 2025];
+  searchQuery = '';
+  document.getElementById('searchInput').value = '';
+  document.getElementById('yearStart').value = 2022;
+  document.getElementById('yearEnd').value = 2025;
+  document.getElementById('yearStartLabel').textContent = '2022';
+  document.getElementById('yearEndLabel').textContent = '2025';
+  document.querySelectorAll('.filter-item').forEach(el => el.classList.add('active'));
+  document.querySelectorAll('.grade-badge').forEach(el => el.classList.add('active'));
+  updateAll();
+}
+
+// ==================== 力导向图 ====================
+let simulation, svgG, link, nodeG;
+
+function initGraph() {
+  const container = document.getElementById('graphContainer');
+  const width = container.clientWidth;
+  const height = container.clientHeight;
+
+  const svg = d3.select(container).append('svg').attr('width', width).attr('height', height);
+
+  // 背景网格
+  const defs = svg.append('defs');
+  defs.append('pattern').attr('id','grid').attr('width',40).attr('height',40)
+    .attr('patternUnits','userSpaceOnUse')
+    .append('path').attr('d','M 40 0 L 0 0 0 40').attr('fill','none')
+    .attr('stroke','rgba(42,53,85,0.3)').attr('stroke-width',0.5);
+  svg.append('rect').attr('width',width).attr('height',height).attr('fill','url(#grid)');
+
+  svgG = svg.append('g');
+
+  // 缩放
+  const zoom = d3.zoom().scaleExtent([0.3, 3]).on('zoom', e => svgG.attr('transform', e.transform));
+  svg.call(zoom);
+
+  link = svgG.append('g').attr('class','links');
+  nodeG = svgG.append('g').attr('class','nodes');
+
+  simulation = d3.forceSimulation()
+    .force('link', d3.forceLink().id(d => d.id).distance(120))
+    .force('charge', d3.forceManyBody().strength(-300))
+    .force('center', d3.forceCenter(width / 2, height / 2))
+    .force('collision', d3.forceCollide().radius(d => d.r + 10));
+
+  updateGraph();
+}
+
+function updateGraph() {
+  const data = getFilteredData();
+
+  // 构建节点和边
+  const themeMap = {};
+  const gameMap = {};
+  const nodes = [];
+  const links = [];
+
+  data.forEach(d => {
+    if (!themeMap[d.theme]) {
+      const cases = data.filter(x => x.theme === d.theme);
+      const heat = cases.reduce((s,c) => s + c.social_buzz, 0) / cases.length;
+      themeMap[d.theme] = { id: 'theme_' + d.theme, label: d.theme, type: 'theme', r: 18 + heat/8, color: themeColors[d.theme] || '#888', heat };
+      nodes.push(themeMap[d.theme]);
+    }
+    if (!gameMap[d.game]) {
+      const cases = data.filter(x => x.game === d.game);
+      const heat = cases.reduce((s,c) => s + c.social_buzz, 0) / cases.length;
+      const bestGrade = grades.find(g => cases.some(c => c.grade === g)) || 'D';
+      gameMap[d.game] = { id: 'game_' + d.game, label: d.game, type: 'game', r: 14 + heat/10, color: gradeColors[bestGrade], heat };
+      nodes.push(gameMap[d.game]);
+    }
+    links.push({
+      source: 'theme_' + d.theme,
+      target: 'game_' + d.game,
+      depth: d.depth,
+      grade: d.grade,
+      event: d.event
+    });
+  });
+
+  // 去重link
+  const linkKey = l => l.source + '-' + l.target;
+  const uniqueLinks = [];
+  const seen = new Set();
+  links.forEach(l => {
+    const k = (typeof l.source === 'string' ? l.source : l.source.id) + '-' + (typeof l.target === 'string' ? l.target : l.target.id);
+    if (!seen.has(k)) { seen.add(k); uniqueLinks.push(l); }
+    else {
+      const existing = uniqueLinks.find(u => {
+        const ek = (typeof u.source === 'string' ? u.source : u.source.id) + '-' + (typeof u.target === 'string' ? u.target : u.target.id);
+        return ek === k;
+      });
+      if (existing && l.depth > existing.depth) existing.depth = l.depth;
+    }
+  });
+
+  // 更新
+  const linkSel = link.selectAll('line').data(uniqueLinks, d => (typeof d.source==='string'?d.source:d.source.id)+'-'+(typeof d.target==='string'?d.target:d.target.id));
+  linkSel.exit().transition().duration(300).attr('opacity', 0).remove();
+  const linkEnter = linkSel.enter().append('line')
+    .attr('stroke', d => gradeColors[d.grade] || '#444')
+    .attr('stroke-opacity', 0.4)
+    .attr('stroke-width', d => d.depth * 1.2);
+  const allLinks = linkEnter.merge(linkSel);
+
+  const nodeSel = nodeG.selectAll('g.node').data(nodes, d => d.id);
+  nodeSel.exit().transition().duration(300).attr('opacity', 0).remove();
+
+  const nodeEnter = nodeSel.enter().append('g').attr('class','node').attr('cursor','pointer');
+  nodeEnter.append('circle');
+  nodeEnter.append('text')
+    .attr('text-anchor','middle')
+    .attr('dy', d => d.r + 14)
+    .attr('fill','#ccc')
+    .attr('font-size','11px');
+
+  const allNodes = nodeEnter.merge(nodeSel);
+  allNodes.select('circle')
+    .transition().duration(500)
+    .attr('r', d => d.r)
+    .attr('fill', d => d.color)
+    .attr('fill-opacity', d => d.type === 'theme' ? 0.8 : 0.6)
+    .attr('stroke', d => d.color)
+    .attr('stroke-width', 2)
+    .attr('stroke-opacity', 0.4);
+
+  allNodes.select('text').text(d => d.label);
+
+  // Tooltip
+  const tooltip = document.getElementById('graphTooltip');
+  allNodes.on('mouseover', function(event, d) {
+    d3.select(this).select('circle').transition().duration(200)
+      .attr('r', d.r * 1.3).attr('fill-opacity', 1).attr('stroke-width', 4);
+    const relatedCases = data.filter(c => d.type === 'theme' ? c.theme === d.label : c.game === d.label);
+    const avgRating = (relatedCases.reduce((s,c) => s + c.user_rating, 0) / relatedCases.length).toFixed(1);
+    const avgRevenue = (relatedCases.reduce((s,c) => s + c.revenue_boost, 0) / relatedCases.length).toFixed(0);
+    tooltip.innerHTML = `
+      <div class="tooltip-title">${d.type === 'theme' ? '🎭' : '🎮'} ${d.label}</div>
+      <div class="tooltip-row"><span>联动案例数</span><span>${relatedCases.length}</span></div>
+      <div class="tooltip-row"><span>平均评分</span><span>${avgRating}</span></div>
+      <div class="tooltip-row"><span>平均收入提升</span><span>${avgRevenue}%</span></div>
+      <div class="tooltip-row"><span>市场热度</span><span>${d.heat.toFixed(0)}</span></div>
+    `;
+    tooltip.classList.add('visible');
+    const rect = document.getElementById('graphContainer').getBoundingClientRect();
+    tooltip.style.left = (event.clientX - rect.left + 15) + 'px';
+    tooltip.style.top = (event.clientY - rect.top - 10) + 'px';
+  })
+  .on('mousemove', function(event) {
+    const rect = document.getElementById('graphContainer').getBoundingClientRect();
+    tooltip.style.left = (event.clientX - rect.left + 15) + 'px';
+    tooltip.style.top = (event.clientY - rect.top - 10) + 'px';
+  })
+  .on('mouseout', function(event, d) {
+    d3.select(this).select('circle').transition().duration(200)
+      .attr('r', d.r).attr('fill-opacity', d.type === 'theme' ? 0.8 : 0.6).attr('stroke-width', 2);
+    tooltip.classList.remove('visible');
+  });
+
+  // 拖拽
+  allNodes.call(d3.drag()
+    .on('start', (event, d) => { if (!event.active) simulation.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+    .on('drag', (event, d) => { d.fx = event.x; d.fy = event.y; })
+    .on('end', (event, d) => { if (!event.active) simulation.alphaTarget(0); d.fx = null; d.fy = null; })
+  );
+
+  simulation.nodes(nodes);
+  simulation.force('link').links(uniqueLinks);
+  simulation.alpha(0.8).restart();
+
+  simulation.on('tick', () => {
+    allLinks
+      .attr('x1', d => d.source.x)
+      .attr('y1', d => d.source.y)
+      .attr('x2', d => d.target.x)
+      .attr('y2', d => d.target.y);
+    allNodes.attr('transform', d => `translate(${d.x},${d.y})`);
+  });
+
+  // 更新统计
+  const filteredGames = [...new Set(data.map(d => d.game))];
+  const filteredThemes = [...new Set(data.map(d => d.theme))];
+  document.getElementById('stat-cases').textContent = data.length;
+  document.getElementById('stat-games').textContent = filteredGames.length;
+  document.getElementById('stat-themes').textContent = filteredThemes.length;
+  const gradeOrder = {S:5,A:4,B:3,C:2,D:1};
+  const avgGrade = data.reduce((s,d) => s + gradeOrder[d.grade], 0) / (data.length || 1);
+  const avgG = avgGrade >= 4.5 ? 'S' : avgGrade >= 3.5 ? 'A' : avgGrade >= 2.5 ? 'B' : avgGrade >= 1.5 ? 'C' : 'D';
+  document.getElementById('stat-avg').textContent = avgG;
+}
+
+// ==================== 底部Tab切换 ====================
+document.querySelectorAll('.bottom-tab').forEach(tab => {
+  tab.onclick = function() {
+    document.querySelectorAll('.bottom-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    this.classList.add('active');
+    document.getElementById('panel-' + this.dataset.tab).classList.add('active');
+    if (this.dataset.tab === 'cases') updateCaseList();
+  };
+});
+
+// ==================== 热度趋势图 ====================
+let trendChart;
+function initTrendChart() {
+  const ctx = document.getElementById('trendChart').getContext('2d');
+  trendChart = new Chart(ctx, {
+    type: 'line',
+    data: { labels: [], datasets: [] },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position:'top', labels:{ color:'#8892a8', font:{size:11}, boxWidth:12, padding:15 } }
+      },
+      scales: {
+        x: { ticks:{color:'#8892a8'}, grid:{color:'rgba(42,53,85,0.3)'} },
+        y: { ticks:{color:'#8892a8'}, grid:{color:'rgba(42,53,85,0.3)'}, title:{display:true, text:'案例数量 / 平均热度', color:'#8892a8'} }
+      }
+    }
+  });
+  updateTrendChart();
+}
+
+function updateTrendChart() {
+  const data = getFilteredData();
+  const periods = ['2022-Q1','2022-Q2','2022-Q3','2022-Q4','2023-Q1','2023-Q2','2023-Q3','2023-Q4','2024-Q1','2024-Q2','2024-Q3','2024-Q4','2025-Q1'];
+  const topThemes = themes.slice(0, 5);
+
+  const datasets = topThemes.map((t, i) => {
+    const colors = ['#ec4899','#f59e0b','#ef4444','#8b5cf6','#06b6d4'];
+    return {
+      label: t,
+      data: periods.map(p => {
+        const [y, q] = p.split('-');
+        const cases = data.filter(d => d.theme === t && d.year === +y && d.quarter === q);
+        return cases.length > 0 ? cases.reduce((s,c) => s + c.social_buzz, 0) / cases.length : null;
+      }),
+      borderColor: colors[i],
+      backgroundColor: colors[i] + '20',
+      tension: 0.4,
+      fill: false,
+      pointRadius: 4,
+      pointHoverRadius: 6,
+      spanGaps: true
+    };
+  });
+
+  trendChart.data.labels = periods;
+  trendChart.data.datasets = datasets;
+  trendChart.update();
+}
+
+// ==================== 雷达图 ====================
+let radarChart1, radarChart2;
+function initRadarCharts() {
+  const ctx1 = document.getElementById('radarChart1').getContext('2d');
+  radarChart1 = new Chart(ctx1, {
+    type: 'radar',
+    data: { labels: [], datasets: [] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { r: { ticks:{color:'#8892a8',backdropColor:'transparent'}, grid:{color:'rgba(42,53,85,0.5)'}, pointLabels:{color:'#ccc',font:{size:10}} } }
+    }
+  });
+
+  const ctx2 = document.getElementById('radarChart2').getContext('2d');
+  radarChart2 = new Chart(ctx2, {
+    type: 'radar',
+    data: { labels: [], datasets: [] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { r: { ticks:{color:'#8892a8',backdropColor:'transparent'}, grid:{color:'rgba(42,53,85,0.5)'}, pointLabels:{color:'#ccc',font:{size:10}} } }
+    }
+  });
+
+  updateRadarCharts();
+}
+
+function updateRadarCharts() {
+  const data = getFilteredData();
+
+  // 雷达图1：各文化主题综合评分
+  const themeLabels = [...new Set(data.map(d => d.theme))];
+  const themeScores = themeLabels.map(t => {
+    const cases = data.filter(d => d.theme === t);
+    return {
+      revenue: cases.reduce((s,c) => s + c.revenue_boost, 0) / cases.length,
+      dau: cases.reduce((s,c) => s + c.dau_boost, 0) / cases.length,
+      buzz: cases.reduce((s,c) => s + c.social_buzz, 0) / cases.length,
+      rating: cases.reduce((s,c) => s + c.user_rating, 0) / cases.length * 10,
+      depth: cases.reduce((s,c) => s + c.depth, 0) / cases.length * 20,
+    };
+  });
+
+  radarChart1.data.labels = ['收入提升','DAU提升','社交热度','用户评分','联动深度'];
+  radarChart1.data.datasets = themeLabels.slice(0,4).map((t,i) => ({
+    label: t,
+    data: [themeScores[i].revenue, themeScores[i].dau, themeScores[i].buzz, themeScores[i].rating, themeScores[i].depth],
+    borderColor: Object.values(themeColors)[i],
+    backgroundColor: Object.values(themeColors)[i] + '20',
+    pointBackgroundColor: Object.values(themeColors)[i],
+  }));
+  radarChart1.update();
+
+  // 雷达图2：各品类文化适配度
+  const genreLabels = [...new Set(data.map(d => d.genre))];
+  const dims = ['收入','DAU','热度','评分','深度'];
+  radarChart2.data.labels = dims;
+  radarChart2.data.datasets = genreLabels.slice(0,4).map((g,i) => {
+    const cases = data.filter(d => d.genre === g);
+    const colors = ['#3b82f6','#10b981','#f59e0b','#ef4444'];
+    return {
+      label: g,
+      data: [
+        cases.reduce((s,c) => s + c.revenue_boost, 0) / cases.length,
+        cases.reduce((s,c) => s + c.dau_boost, 0) / cases.length,
+        cases.reduce((s,c) => s + c.social_buzz, 0) / cases.length,
+        cases.reduce((s,c) => s + c.user_rating, 0) / cases.length * 10,
+        cases.reduce((s,c) => s + c.depth, 0) / cases.length * 20,
+      ],
+      borderColor: colors[i],
+      backgroundColor: colors[i] + '20',
+      pointBackgroundColor: colors[i],
+    };
+  });
+  radarChart2.update();
+}
+
+// ==================== 空白机会矩阵 ====================
+let matrixChart;
+function initMatrixChart() {
+  const ctx = document.getElementById('matrixChart').getContext('2d');
+  matrixChart = new Chart(ctx, {
+    type: 'bubble',
+    data: { datasets: [] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: true, labels: { color:'#8892a8', font:{size:11} } },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => {
+              const d = ctx.raw;
+              return `${d.theme} × ${d.genre}: ${d.count}条案例, 热度${d.buzz.toFixed(0)}`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: { title:{display:true,text:'市场热度（社交传播度）',color:'#8892a8'}, ticks:{color:'#8892a8'}, grid:{color:'rgba(42,53,85,0.3)'}, min:0, max:100 },
+        y: { title:{display:true,text:'平均收入提升 %',color:'#8892a8'}, ticks:{color:'#8892a8'}, grid:{color:'rgba(42,53,85,0.3)'}, min:0, max:50 }
+      }
+    }
+  });
+  updateMatrixChart();
+}
+
+function updateMatrixChart() {
+  const data = getFilteredData();
+  const allThemes = [...new Set(data.map(d => d.theme))];
+  const allGenres = [...new Set(data.map(d => d.genre))];
+
+  const datasets = allThemes.map((t, i) => {
+    const pts = allGenres.map(g => {
+      const cases = data.filter(d => d.theme === t && d.genre === g);
+      if (cases.length === 0) return null;
+      const avgBuzz = cases.reduce((s,c) => s + c.social_buzz, 0) / cases.length;
+      const avgRev = cases.reduce((s,c) => s + c.revenue_boost, 0) / cases.length;
+      return { x: avgBuzz, y: avgRev, r: 4 + cases.length * 4, theme: t, genre: g, count: cases.length, buzz: avgBuzz };
+    }).filter(Boolean);
+
+    return {
+      label: t,
+      data: pts,
+      backgroundColor: (themeColors[t] || '#888') + '80',
+      borderColor: themeColors[t] || '#888',
+    };
+  });
+
+  matrixChart.data.datasets = datasets;
+  matrixChart.update();
+}
+
+// ==================== 案例列表 ====================
+function updateCaseList() {
+  const data = getFilteredData();
+  const container = document.getElementById('caseList');
+  container.innerHTML = data.sort((a,b) => b.social_buzz - a.social_buzz).map(d => `
+    <div class="case-card" onclick="showModal(${d.id})">
+      <div class="case-header">
+        <span class="case-game">${d.game}</span>
+        <span class="case-grade grade-${d.grade.toLowerCase()}">${d.grade}级</span>
+      </div>
+      <div class="case-theme">${d.theme} · ${d.year} ${d.quarter}</div>
+      <div class="case-event">${d.event}</div>
+      <div class="case-meta">
+        <span>💰 +${d.revenue_boost}%</span>
+        <span>📈 DAU +${d.dau_boost}%</span>
+        <span>🔥 热度 ${d.social_buzz}</span>
+        <span>⭐ ${d.user_rating}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ==================== Modal ====================
+function showModal(id) {
+  const d = mockData.find(x => x.id === id);
+  if (!d) return;
+  const modal = document.getElementById('modalContent');
+  modal.innerHTML = `
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h2>${d.game} · ${d.event}</h2>
+    <div class="modal-section">
+      <h4>效果评级</h4>
+      <span class="case-grade grade-${d.grade.toLowerCase()}" style="font-size:16px;padding:4px 16px;">${d.grade}级</span>
+    </div>
+    <div class="modal-section">
+      <h4>核心指标</h4>
+      <div class="modal-metrics">
+        <div class="metric-box"><div class="val">+${d.revenue_boost}%</div><div class="lbl">收入提升</div></div>
+        <div class="metric-box"><div class="val">+${d.dau_boost}%</div><div class="lbl">DAU提升</div></div>
+        <div class="metric-box"><div class="val">${d.social_buzz}</div><div class="lbl">社交热度</div></div>
+        <div class="metric-box"><div class="val">${d.user_rating}</div><div class="lbl">用户评分</div></div>
+        <div class="metric-box"><div class="val">${d.depth}/5</div><div class="lbl">联动深度</div></div>
+        <div class="metric-box"><div class="val">${d.year} ${d.quarter}</div><div class="lbl">时间</div></div>
+      </div>
+    </div>
+    <div class="modal-section">
+      <h4>详细描述</h4>
+      <p>${d.desc}</p>
+    </div>
+    <div class="modal-section">
+      <h4>标签</h4>
+      <div class="modal-tags">${d.tags.map(t => `<span class="modal-tag">${t}</span>`).join('')}</div>
+    </div>
+    <div class="modal-section">
+      <h4>数据来源</h4>
+      <p style="color:var(--text-secondary)">${d.source}</p>
+    </div>
+  `;
+  document.getElementById('modalOverlay').classList.add('visible');
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('visible');
+}
+
+document.getElementById('modalOverlay').onclick = function(e) {
+  if (e.target === this) closeModal();
+};
+
+// ==================== 总更新 ====================
+function updateAll() {
+  updateGraph();
+  updateTrendChart();
+  updateRadarCharts();
+  updateMatrixChart();
+  if (document.getElementById('panel-cases').classList.contains('active')) updateCaseList();
+}
+
+// ==================== 初始化 ====================
+window.addEventListener('load', () => {
+  initFilters();
+  initGraph();
+  initTrendChart();
+  initRadarCharts();
+  initMatrixChart();
+  updateCaseList();
+});
+
+window.addEventListener('resize', () => {
+  const container = document.getElementById('graphContainer');
+  const svg = container.querySelector('svg');
+  if (svg) {
+    svg.setAttribute('width', container.clientWidth);
+    svg.setAttribute('height', container.clientHeight);
+    simulation.force('center', d3.forceCenter(container.clientWidth / 2, container.clientHeight / 2));
+    simulation.alpha(0.3).restart();
+  }
+});
+</script>
+</body>
+</html>

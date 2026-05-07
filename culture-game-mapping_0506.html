@@ -1,0 +1,2063 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文化×游戏联动 Mapping 地图</title>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #f5f5f7;
+    --surface: #ffffff;
+    --text-primary: #1d1d1f;
+    --text-secondary: #6e6e73;
+    --text-tertiary: #a1a1a6;
+    --border: #e5e5ea;
+    --accent: #0071e3;
+    --accent-light: #e8f2ff;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,.06);
+    --shadow-md: 0 4px 16px rgba(0,0,0,.08);
+    --shadow-lg: 0 12px 40px rgba(0,0,0,.12);
+    --radius: 14px;
+    --radius-sm: 8px;
+    --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'PingFang SC',
+             'Helvetica Neue', 'Microsoft YaHei', sans-serif;
+    --color-S: #ff6b6b;
+    --color-A: #ffa94d;
+    --color-B: #51cf66;
+    --color-C: #339af0;
+    --color-D: #a9a9a9;
+    --culture-color: #7c3aed;
+    --game-color: #2563eb;
+  }
+
+  html { font-size: 16px; }
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text-primary);
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ========== Layout ========== */
+  .app {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    grid-template-rows: 52px 1fr 280px;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  /* ========== Header ========== */
+  .header {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    background: rgba(255,255,255,.82);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    z-index: 20;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .header-logo {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    background: linear-gradient(135deg, var(--culture-color), var(--game-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .header-divider {
+    width: 1px;
+    height: 20px;
+    background: var(--border);
+  }
+
+  .header-subtitle {
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  .header-stats {
+    display: flex;
+    gap: 20px;
+  }
+
+  .header-stat {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  .header-stat strong {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  /* ========== Sidebar ========== */
+  .sidebar {
+    grid-row: 2 / 4;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 10;
+  }
+
+  .sidebar-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 18px;
+  }
+
+  .sidebar-body::-webkit-scrollbar { width: 3px; }
+  .sidebar-body::-webkit-scrollbar-thumb { background: #d1d1d6; border-radius: 2px; }
+
+  .filter-section { margin-bottom: 20px; }
+
+  .filter-section h3 {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    color: var(--text-tertiary);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .filter-section h3 .icon { font-size: 13px; }
+
+  .filter-group { display: flex; flex-direction: column; gap: 3px; }
+
+  .filter-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background .12s;
+    user-select: none;
+  }
+
+  .filter-item:hover { background: var(--bg); }
+
+  .filter-item input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 4px;
+    cursor: pointer;
+    position: relative;
+    transition: all .12s;
+    flex-shrink: 0;
+  }
+
+  .filter-item input:checked {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .filter-item input:checked::after {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 1px;
+    width: 4.5px;
+    height: 8px;
+    border: solid #fff;
+    border-width: 0 1.5px 1.5px 0;
+    transform: rotate(45deg);
+  }
+
+  .filter-item label {
+    font-size: 13px;
+    cursor: pointer;
+    flex: 1;
+  }
+
+  .filter-item .count {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    min-width: 16px;
+    text-align: right;
+  }
+
+  /* Legend */
+  .legend-box {
+    margin-bottom: 20px;
+    padding: 12px;
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+  }
+
+  .legend-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    color: var(--text-tertiary);
+    margin-bottom: 8px;
+  }
+
+  .legend-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .legend-line {
+    width: 18px;
+    height: 3px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .legend-shape {
+    width: 10px;
+    height: 10px;
+    flex-shrink: 0;
+  }
+
+  .depth-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 8px;
+  }
+
+  .depth-row span { font-size: 10px; color: var(--text-tertiary); }
+
+  .depth-bar {
+    flex: 1;
+    height: 4px;
+    border-radius: 2px;
+    background: linear-gradient(to right, #e0e0e0, var(--accent));
+  }
+
+  /* Time slider */
+  .time-section { padding: 0 18px 18px; }
+
+  .time-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    color: var(--text-tertiary);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .time-display {
+    font-size: 13px;
+    color: var(--text-primary);
+    font-weight: 500;
+    text-align: center;
+    margin-bottom: 6px;
+  }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    border-radius: 2px;
+    background: linear-gradient(to right, var(--accent), var(--accent));
+    outline: none;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,.2);
+    cursor: pointer;
+  }
+
+  /* ========== Canvas area ========== */
+  .graph-area {
+    position: relative;
+    background: var(--bg);
+    overflow: hidden;
+  }
+
+  #graphCanvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+  }
+
+  #graphCanvas:active { cursor: grabbing; }
+
+  .graph-controls {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    display: flex;
+    gap: 6px;
+  }
+
+  .graph-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,.9);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--text-secondary);
+    transition: all .12s;
+  }
+
+  .graph-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* Tooltip */
+  .tooltip {
+    display: none;
+    position: fixed;
+    background: rgba(255,255,255,.96);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    box-shadow: var(--shadow-md);
+    max-width: 320px;
+    pointer-events: none;
+    z-index: 50;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .tooltip.show { display: block; }
+
+  .tooltip-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .tooltip-badge {
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 10px;
+    font-weight: 500;
+  }
+
+  .tooltip-desc {
+    color: var(--text-secondary);
+    font-size: 12px;
+  }
+
+  .tooltip-link-info {
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  /* ========== Bottom Panel ========== */
+  .bottom-panel {
+    grid-column: 2 / -1;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .panel-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+    gap: 0;
+    flex-shrink: 0;
+  }
+
+  .panel-tab {
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all .15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    font-family: var(--font);
+  }
+
+  .panel-tab:hover { color: var(--text-primary); }
+  .panel-tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  .panel-tab .tab-icon { font-size: 15px; }
+
+  .panel-content {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .tab-pane {
+    display: none;
+    position: absolute;
+    inset: 0;
+    padding: 16px 20px;
+    overflow-y: auto;
+  }
+
+  .tab-pane.active { display: block; }
+
+  .tab-pane::-webkit-scrollbar { width: 3px; }
+  .tab-pane::-webkit-scrollbar-thumb { background: #d1d1d6; border-radius: 2px; }
+
+  /* -- Tab1: 热度趋势 -- */
+  .trend-chart {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* -- Tab2: 效果对比 -- */
+  .radar-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+    height: 100%;
+    overflow-y: auto;
+    align-content: start;
+  }
+
+  .compare-card {
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .compare-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .compare-name {
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .compare-badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 500;
+    background: #dbeafe;
+    color: #2563eb;
+  }
+
+  .compare-score {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--accent);
+  }
+
+  .compare-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .bar-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .bar-label {
+    font-size: 11px;
+    color: var(--text-secondary);
+    width: 56px;
+    flex-shrink: 0;
+    text-align: right;
+  }
+
+  .bar-track {
+    flex: 1;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.4s ease;
+  }
+
+  .bar-value {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-primary);
+    width: 32px;
+    flex-shrink: 0;
+  }
+
+  /* -- Tab3: 案例详情（三层导航） -- */
+  .case-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 12px;
+  }
+
+  .case-nav-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--accent);
+    cursor: pointer;
+    margin-bottom: 12px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: var(--accent-light);
+    transition: background .12s;
+  }
+
+  .case-nav-back:hover { background: #d1e5ff; }
+
+  .culture-group-card {
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: all .15s;
+    border: 1px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .culture-group-card:hover {
+    border-color: var(--accent);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .culture-group-left {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .culture-group-name {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .culture-group-meta {
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  .culture-group-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .culture-group-count {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .culture-group-arrow {
+    color: var(--text-tertiary);
+    font-size: 16px;
+  }
+
+  .case-card {
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    cursor: pointer;
+    transition: all .15s;
+    border: 1px solid transparent;
+  }
+
+  .case-card:hover {
+    border-color: var(--accent);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .case-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .case-pair {
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .case-arrow {
+    color: var(--text-tertiary);
+    font-size: 12px;
+  }
+
+  .case-badges {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .case-rating {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: #fff;
+  }
+
+  .case-depth {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    letter-spacing: 1px;
+  }
+
+  .case-note {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  /* ========== Modal ========== */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.3);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-overlay.active { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    max-width: 580px;
+    width: 90%;
+    max-height: 85vh;
+    overflow-y: auto;
+    animation: modalIn .2s ease;
+  }
+
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(.96) translateY(8px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  .modal-head {
+    padding: 20px 24px 12px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    background: var(--surface);
+    z-index: 1;
+  }
+
+  .modal-head h2 {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  .modal-type-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 500;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+
+  .badge-culture { background: #f3e8ff; color: #7c3aed; }
+  .badge-game { background: #dbeafe; color: #2563eb; }
+
+  .modal-close-btn {
+    width: 26px; height: 26px;
+    border: none;
+    background: var(--bg);
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 15px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-left: 10px;
+  }
+
+  .modal-close-btn:hover { background: #e5e5ea; }
+
+  .modal-content {
+    padding: 0 24px 20px;
+  }
+
+  .modal-desc-text {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 14px;
+  }
+
+  .modal-relations { display: flex; flex-direction: column; gap: 6px; }
+
+  .modal-rel-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: var(--bg);
+    border-radius: 6px;
+  }
+
+  .rel-left { display: flex; flex-direction: column; gap: 2px; }
+
+  .rel-name { font-size: 13px; font-weight: 500; }
+
+  .rel-meta { font-size: 11px; color: var(--text-tertiary); }
+
+  .rel-rating {
+    font-size: 12px;
+    font-weight: 700;
+    width: 24px; height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    color: #fff;
+  }
+
+  /* ========== Case Detail Styles ========== */
+  .detail-section {
+    margin-bottom: 14px;
+  }
+
+  .detail-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 5px 0;
+  }
+
+  .detail-label {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    min-width: 64px;
+    flex-shrink: 0;
+    font-weight: 500;
+  }
+
+  .detail-value {
+    font-size: 13px;
+    color: var(--text-primary);
+    line-height: 1.5;
+  }
+
+  .detail-heading {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .detail-text {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    padding: 8px 12px;
+    background: var(--bg);
+    border-radius: 6px;
+  }
+
+  .detail-missing {
+    border-left: 3px solid #ffa94d;
+    color: #b45309;
+    background: #fffbeb;
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <span class="header-logo">文化×游戏 联动 Mapping 地图</span>
+      <div class="header-divider"></div>
+      <span class="header-subtitle">全球文化资产 · 游戏产品联动关系网络</span>
+    </div>
+    <div class="header-stats">
+      <div class="header-stat"><strong id="hCulture">24</strong> 文化主题</div>
+      <div class="header-stat"><strong id="hGame">31</strong> 游戏产品</div>
+      <div class="header-stat"><strong id="hLink">57</strong> 联动关系</div>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-body">
+      <!-- Legend -->
+      <div class="legend-box">
+        <div class="legend-title">图例</div>
+        <div class="legend-row">
+          <div class="legend-item"><div class="legend-dot" style="background:#e8dff7;border:1.5px solid #c4b0e8"></div>文化主题</div>
+          <div class="legend-item"><div class="legend-shape" style="background:#e4f0ff;border:1.5px solid #b0d0f0;border-radius:3px"></div>游戏产品</div>
+        </div>
+        <div class="legend-row" style="margin-top:8px">
+          <div class="legend-item"><div class="legend-line" style="background:var(--color-S)"></div>S</div>
+          <div class="legend-item"><div class="legend-line" style="background:var(--color-A)"></div>A</div>
+          <div class="legend-item"><div class="legend-line" style="background:var(--color-B)"></div>B</div>
+          <div class="legend-item"><div class="legend-line" style="background:var(--color-C)"></div>C</div>
+          <div class="legend-item"><div class="legend-line" style="background:var(--color-D)"></div>D</div>
+        </div>
+        <div class="depth-row">
+          <span>浅</span><div class="depth-bar"></div><span>深</span>
+        </div>
+      </div>
+
+      <!-- 文化类型 -->
+      <div class="filter-section">
+        <h3><span class="icon">📋</span> 文化主题筛选器</h3>
+        <div class="filter-group" id="cultureFilters"></div>
+      </div>
+
+      <!-- 游戏品类 -->
+      <div class="filter-section">
+        <h3><span class="icon">🎮</span> 游戏品类筛选器</h3>
+        <div class="filter-group" id="gameFilters"></div>
+      </div>
+    </div>
+
+    <!-- 时间范围 -->
+    <div class="time-section">
+      <div class="time-label"><span class="icon">🕐</span> 时间范围</div>
+      <div class="time-display" id="timeDisplay">2015 – 2026</div>
+      <input type="range" id="timeSlider" min="2015" max="2026" value="2026" step="1" oninput="handleTimeChange(this.value)">
+    </div>
+  </aside>
+
+  <!-- Central Graph -->
+  <div class="graph-area">
+    <canvas id="graphCanvas"></canvas>
+    <div class="graph-controls">
+      <button class="graph-btn" onclick="zoomGraph(1.2)" title="放大">+</button>
+      <button class="graph-btn" onclick="zoomGraph(0.8)" title="缩小">−</button>
+      <button class="graph-btn" onclick="resetGraph()" title="重置">↺</button>
+    </div>
+  </div>
+
+  <!-- Bottom Panel -->
+  <div class="bottom-panel">
+    <div class="panel-tabs">
+      <button class="panel-tab active" data-tab="trend"><span class="tab-icon">📈</span> 热度趋势</button>
+      <button class="panel-tab" data-tab="radar"><span class="tab-icon">📊</span> 效果对比</button>
+      <button class="panel-tab" data-tab="cases"><span class="tab-icon">📑</span> 案例详情</button>
+    </div>
+    <div class="panel-content">
+      <div class="tab-pane active" id="pane-trend">
+        <canvas id="trendCanvas" class="trend-chart"></canvas>
+      </div>
+      <div class="tab-pane" id="pane-radar">
+        <div class="radar-container" id="radarContainer"></div>
+      </div>
+      <div class="tab-pane" id="pane-cases">
+        <div class="case-grid" id="caseGrid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tooltip -->
+<div class="tooltip" id="tooltip"></div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <div><h2 id="modalTitle"></h2></div>
+      <button class="modal-close-btn" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-content">
+      <div class="modal-desc-text" id="modalDesc"></div>
+      <div class="modal-relations" id="modalRels"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===================================================================
+// DATA — 基于 create_culture_table_v4.py 67条真实联动案例
+// ===================================================================
+const cultureTypes = ['非遗传承', '敦煌文化', '戏曲国粹', '博物馆/文物', '文旅联动', '少数民族文化', '古典文学/IP', '世界历史文明', '北欧/维京文化', '西部/拓荒文化'];
+const gameGenres   = ['MOBA', '武侠MMO', '开放世界RPG', '音舞/换装', '卡牌RPG', 'SLG策略', '射击/战术竞技', '派对竞技', '模拟经营', '动作冒险3A'];
+
+const cultureNodes = [
+  { id:'c1',  name:'非遗·京剧/昆曲', type:'culture', category:'戏曲国粹', desc:'京剧/昆曲为国粹戏曲代表，王者荣耀霸王别姬/游园惊梦开创游戏×戏曲先河。', year:2016 },
+  { id:'c2',  name:'敦煌壁画·飞天', type:'culture', category:'敦煌文化', desc:'敦煌莫高窟壁画千年瑰宝，与敦煌研究院深度合作的标杆联动多次获央媒报道。', year:2018 },
+  { id:'c3',  name:'非遗·传统服饰/刺绣', type:'culture', category:'非遗传承', desc:'包括苏绣、蜀绣、湘绣、云锦、苗族刺绣等多项国家级非遗技艺，与换装/女性向游戏天然适配。', year:2017 },
+  { id:'c4',  name:'非遗·皮影/傩戏', type:'culture', category:'非遗传承', desc:'皮影戏、傩戏等传统表演艺术，北京皮影剧团、泰山皮影等国家级传承人多次与游戏合作。', year:2019 },
+  { id:'c5',  name:'非遗·传统工艺', type:'culture', category:'非遗传承', desc:'花丝镶嵌、雕版印刷、螺钿漆器、活字印刷、掐丝珐琅等古法工艺，多入选国家级非遗名录。', year:2019 },
+  { id:'c6',  name:'敦煌文化(综合)', type:'culture', category:'敦煌文化', desc:'敦煌博物馆/敦煌文旅集团联动，覆盖换装、射击、战术竞技等多品类游戏。', year:2023 },
+  { id:'c7',  name:'少数民族非遗', type:'culture', category:'少数民族文化', desc:'苗族银饰/刺绣、柯尔克孜族刺绣、孔雀舞、白族文化等，展现中华民族多样性。', year:2017 },
+  { id:'c8',  name:'博物馆·故宫/南越王', type:'culture', category:'博物馆/文物', desc:'故宫观唐、南越王博物院等，以文物数字化为核心，实现博物馆级文化资产进入游戏。', year:2020 },
+  { id:'c9',  name:'三国文物/历史', type:'culture', category:'博物馆/文物', desc:'中国文物交流中心与40余家博物馆联展，三国历史文物融入SLG策略游戏核心系统。', year:2020 },
+  { id:'c10', name:'三星堆/秦陵博物馆', type:'culture', category:'博物馆/文物', desc:'三星堆博物馆战略签约米哈游，秦始皇帝陵博物院与CF手游联动文物数字焕活。', year:2023 },
+  { id:'c11', name:'文旅·山西古建/城市', type:'culture', category:'文旅联动', desc:'黑神话悟空27处取景地来自山西古建，景区搜索热度暴涨156%，带动文旅热潮。', year:2024 },
+  { id:'c12', name:'文旅·汉中/故宫/土楼', type:'culture', category:'文旅联动', desc:'天涯明月刀实体建筑落户芙蓉镇、入选联合国教科文组织案例；率土之滨联动故宫观唐。', year:2020 },
+  { id:'c13', name:'非遗·舞龙醒狮', type:'culture', category:'非遗传承', desc:'铜梁龙舞/佛山醒狮传承人参与研发，和平精英春节版本让亿万玩家体验非遗。', year:2022 },
+  { id:'c14', name:'非遗·傩舞/秦腔/曲剧', type:'culture', category:'戏曲国粹', desc:'燕云十六声深度还原傩舞仪式，携手国家级传承人惠敏莉创作秦腔主题歌曲。', year:2025 },
+  { id:'c15', name:'西游文化/神话', type:'culture', category:'古典文学/IP', desc:'西游记IP覆盖黑神话悟空、王者荣耀、原神等；结合古建实景扫描，实现文化深度还原。', year:2020 },
+  { id:'c16', name:'古埃及历史', type:'culture', category:'世界历史文明', desc:'刺客信条：起源发现之旅教育模式，被全球学校作为教学工具，将历史考据融入游戏体验。', year:2018 },
+  { id:'c17', name:'北欧维京文化', type:'culture', category:'北欧/维京文化', desc:'战神系列/刺客信条英灵殿/Valheim以北欧神话为核心，全球验证维京题材的商业号召力。', year:2017 },
+  { id:'c18', name:'日本武士/妖怪文化', type:'culture', category:'世界历史文明', desc:'对马岛之魂制作人获永久旅游大使称号，仁王系列融合战国历史与妖怪民俗。', year:2017 },
+  { id:'c19', name:'波兰斯拉夫文化', type:'culture', category:'世界历史文明', desc:'巫师3深度扎根斯拉夫神话民间传说，全球5000万套，波兰政府曾作国礼赠送。', year:2015 },
+  { id:'c20', name:'美国西部拓荒', type:'culture', category:'西部/拓荒文化', desc:'荒野大镖客2还原1899年西部，田纳西大学用其开设历史课，全球6500万套。', year:2018 },
+  { id:'c21', name:'非遗·多项系统化(31项)', type:'culture', category:'非遗传承', desc:'逆水寒手游系统化联动31项非遗（簪花、昆曲、醒狮、灯彩等），几乎全部免费获取。', year:2023 },
+  { id:'c22', name:'苗族/故宫/国宝归乡', type:'culture', category:'少数民族文化', desc:'蛋仔派对联动苗族四项非遗+故宫观唐+博物馆赛季，连上3台春晚，国宝归乡季为品类首创。', year:2023 },
+  { id:'c23', name:'凯尔特/多元部落', type:'culture', category:'世界历史文明', desc:'Hellblade联合剑桥大学融合精神健康与凯尔特文化；地平线系列融合阿兹特克/因纽特/非洲文化。', year:2017 },
+  { id:'c24', name:'中世纪阿拉伯/伊斯兰', type:'culture', category:'世界历史文明', desc:'刺客信条：幻景发现之旅还原中世纪巴格达黄金时代，填补伊斯兰历史展现空白。', year:2024 },
+];
+
+const gameNodes = [
+  { id:'g1',  name:'王者荣耀',       type:'game', genre:'MOBA', desc:'腾讯天美MOBA手游，十年九系列文化联动，覆盖敦煌/京剧/皮影/醒狮/西游等。', year:2016 },
+  { id:'g2',  name:'逆水寒手游',     type:'game', genre:'武侠MMO', desc:'网易武侠MMO，系统化联动31项非遗，几乎全部免费获取，被称为文化基建路线。', year:2023 },
+  { id:'g3',  name:'天涯明月刀',     type:'game', genre:'武侠MMO', desc:'腾讯北极光武侠MMO，天衣别院实体建筑落户芙蓉镇，入选联合国教科文组织案例。', year:2020 },
+  { id:'g4',  name:'原神',           type:'game', genre:'开放世界RPG', desc:'米哈游开放世界RPG，《流光拾遗之旅》系列纪录片15+项非遗，15种语言全球传播。', year:2020 },
+  { id:'g5',  name:'黑神话：悟空',   type:'game', genre:'动作冒险3A', desc:'游戏科学3A动作RPG，27处取景地来自山西古建，景区搜索热度暴涨156%。', year:2024 },
+  { id:'g6',  name:'燕云十六声',     type:'game', genre:'开放世界RPG', desc:'网易开放世界武侠，深度还原傩舞/秦腔/曲剧，全球8000万玩家，CGTN纪录片报道。', year:2025 },
+  { id:'g7',  name:'和平精英',       type:'game', genre:'射击/战术竞技', desc:'腾讯光子战术竞技手游，系统化文旅+非遗布局，助力北京中轴线申遗成功。', year:2022 },
+  { id:'g8',  name:'CF手游',         type:'game', genre:'射击/战术竞技', desc:'腾讯光子射击手游，联动秦始皇帝陵博物院/新华网巡百城，十年IP通过文旅焕新。', year:2024 },
+  { id:'g9',  name:'阴阳师',         type:'game', genre:'卡牌RPG', desc:'网易卡牌RPG，联动东昌叶雕/云锦等非遗传承人共创，与博物馆深度合作。', year:2020 },
+  { id:'g10', name:'FGO',            type:'game', genre:'卡牌RPG', desc:'B站代理卡牌RPG，联动大英博物馆/国家宝藏/上海图书馆，8年文化传承集大成。', year:2020 },
+  { id:'g11', name:'三国志·战略版',  type:'game', genre:'SLG策略', desc:'灵犀互娱SLG，携手40余家博物馆推出三国志文化特展，首个入驻中国游戏博物馆。', year:2020 },
+  { id:'g12', name:'率土之滨',       type:'game', genre:'SLG策略', desc:'网易SLG，联动故宫观唐+汉中文旅，薪火相传将典藏文物融入游戏宝物系统。', year:2020 },
+  { id:'g13', name:'QQ炫舞',         type:'game', genre:'音舞/换装', desc:'腾讯音舞手游，杨丽萍团队371天深度参与孔雀舞联动，新华网专题报道。', year:2017 },
+  { id:'g14', name:'以闪亮之名',     type:'game', genre:'音舞/换装', desc:'祖龙时尚生活手游，蜀绣+柯尔克孜族刺绣联动，入选伽马数据社会责任报告。', year:2024 },
+  { id:'g15', name:'闪耀暖暖',       type:'game', genre:'音舞/换装', desc:'叠纸3D换装手游，闪耀非遗系列联动苏州评弹/蟳埔女习俗/87版红楼梦，获上海市级奖项。', year:2023 },
+  { id:'g16', name:'光与夜之恋',     type:'game', genre:'音舞/换装', desc:'腾讯北极光恋爱互动手游，苏绣婚书在博物馆展出，少数民族采风获新华网报道。', year:2022 },
+  { id:'g17', name:'蛋仔派对',       type:'game', genre:'派对竞技', desc:'网易派对手游，苗族非遗+故宫+博物馆赛季+春晚联动，国宝归乡季为品类首创。', year:2023 },
+  { id:'g18', name:'江南百景图',     type:'game', genre:'模拟经营', desc:'椰岛模拟经营手游，联动雕版印刷/螺钿漆器/谢馥春，经营玩法与工坊天然匹配。', year:2022 },
+  { id:'g19', name:'明日方舟',       type:'game', genre:'卡牌RPG', desc:'鹰角塔防策略手游，南越王博物院线下联动当天下午门票告罄，日均超2万人。', year:2024 },
+  { id:'g20', name:'超自然行动组',   type:'game', genre:'动作冒险3A', desc:'巨人网络恐怖冒险手游，傩面具雕刻传人共创，2025年流水超50亿。', year:2025 },
+  { id:'g21', name:'第五人格',       type:'game', genre:'卡牌RPG', desc:'网易非对称竞技，2022春节与北京皮影剧团合作，活动参与度极高。', year:2022 },
+  { id:'g22', name:'永劫无间',       type:'game', genre:'动作冒险3A', desc:'网易动作竞技跨平台，金乌纪企划系列化联动白族/金沙遗址/武术/西泠。', year:2022 },
+  { id:'g23', name:'梦幻西游',       type:'game', genre:'武侠MMO', desc:'网易回合制MMO，匠心传梦非遗守护计划联动花丝镶嵌/泰山皮影/琵琶等28项。', year:2019 },
+  { id:'g24', name:'碧蓝航线',       type:'game', genre:'卡牌RPG', desc:'B站舰船收集RPG，六周年敦煌博物馆联动+七周年苏州丝绸博物馆，龚琳娜担任交流官。', year:2023 },
+  { id:'g25', name:'刺客信条系列',   type:'game', genre:'动作冒险3A', desc:'育碧动作冒险3A，发现之旅教育模式覆盖古埃及/维京/巴格达，被全球学校作为教学工具。', year:2018 },
+  { id:'g26', name:'战神：诸神黄昏', type:'game', genre:'动作冒险3A', desc:'SIE Santa Monica 3A动作冒险，深度融合北欧神话九界体系，首周510万套。', year:2022 },
+  { id:'g27', name:'对马岛之魂',     type:'game', genre:'动作冒险3A', desc:'Sucker Punch开放世界，还原1274年对马岛，制作人获永久旅游大使称号。', year:2020 },
+  { id:'g28', name:'巫师3',          type:'game', genre:'开放世界RPG', desc:'CD Projekt Red开放世界RPG，深度扎根波兰斯拉夫文化，全球5000万套。', year:2015 },
+  { id:'g29', name:'荒野大镖客2',    type:'game', genre:'开放世界RPG', desc:'Rockstar开放世界，还原1899年西部拓荒，大学历史课教材，全球6500万套。', year:2018 },
+  { id:'g30', name:'Valheim',        type:'game', genre:'动作冒险3A', desc:'瑞典5人团队生存游戏，以北欧神话为核心世界观，一月售500万套。', year:2021 },
+  { id:'g31', name:'使命召唤手游',   type:'game', genre:'射击/战术竞技', desc:'腾讯天美射击手游，携手江苏非遗中心+传承人张方林推出南京剪纸联动。', year:2022 },
+];
+
+const links = [
+  // 王者荣耀 文化联动
+  { source:'c1',  target:'g1',  depth:5, rating:'S', note:'项羽+虞姬霸王别姬京剧主题皮肤，融入京剧脸谱、水袖、唱腔设计，开创游戏×戏曲先河', year:2016 },
+  { source:'c1',  target:'g1',  depth:4, rating:'S', note:'甄姬游园惊梦昆曲限定，灵感源自《牡丹亭》，至今最渴望返场绝版皮肤之一', year:2017 },
+  { source:'c2',  target:'g1',  depth:5, rating:'S', note:'杨玉环遇见飞天×敦煌研究院深度合作，设计组赴敦煌实地考察，央媒报道', year:2018 },
+  { source:'c15', target:'g1',  depth:3, rating:'A', note:'孙悟空为初始英雄，持续推出至尊宝等西游主题皮肤与活动', year:2020 },
+  // 逆水寒
+  { source:'c21', target:'g2',  depth:5, rating:'S', note:'系统化联动31项非遗（簪花、昆曲、醒狮、灯彩等），几乎全部免费获取，文化基建路线获赞', year:2023 },
+  { source:'c3',  target:'g2',  depth:4, rating:'A', note:'逆水寒联动苗族银饰非遗：推出限定银饰主题套装与打造系统', year:2023 },
+  // 天涯明月刀
+  { source:'c3',  target:'g3',  depth:5, rating:'S', note:'手游上线盛典融合多项非遗（云锦/苏绣/花丝镶嵌），天衣华服系列精致度获赞叹', year:2020 },
+  { source:'c12', target:'g3',  depth:5, rating:'S', note:'清华建筑学院天衣别院实体建筑落户芙蓉镇，央视报道；入选联合国教科文组织案例', year:2021 },
+  // 原神
+  { source:'c5',  target:'g4',  depth:5, rating:'S', note:'《流光拾遗之旅》系列纪录片15+项非遗，15种语言全球传播超2年，行业标杆', year:2023 },
+  { source:'c10', target:'g4',  depth:4, rating:'S', note:'三星堆博物馆战略签约，推出联动歌曲《青铜》（刘欢+方文山），全网热议', year:2023 },
+  { source:'c1',  target:'g4',  depth:4, rating:'A', note:'《神女劈观》戏歌B站数千万播放，年轻玩家首次接触戏曲；贵州线下非遗体验预约3分钟抢空', year:2022 },
+  // 黑神话：悟空
+  { source:'c15', target:'g5',  depth:5, rating:'S', note:'全面演绎西游记，实地扫描中国古建筑群呈现取经之路', year:2024 },
+  { source:'c11', target:'g5',  depth:5, rating:'S', note:'27处取景地来自山西古建，景区搜索热度暴涨156%，太原古建数字艺术展', year:2024 },
+  // 燕云十六声
+  { source:'c14', target:'g6',  depth:5, rating:'S', note:'深度还原傩舞仪式与面具，与惠敏莉合作创作秦腔《望西都》，CGTN纪录片', year:2025 },
+  { source:'c14', target:'g6',  depth:4, rating:'A', note:'河南曲剧/四川达州/开封/甘肃文旅联动，河西走廊版本反响热烈', year:2025 },
+  // 和平精英
+  { source:'c13', target:'g7',  depth:5, rating:'S', note:'邀请铜梁龙舞+佛山醒狮传承人参与版本研发，亿万玩家同场体验非遗', year:2022 },
+  { source:'c8',  target:'g7',  depth:4, rating:'A', note:'绿洲世界还原天坛古建筑群，助力北京中轴线2024申遗成功', year:2023 },
+  { source:'c6',  target:'g7',  depth:4, rating:'A', note:'联手甘肃文旅厅/敦煌文旅集团，丝路贺新春复刻玉门关实景', year:2026 },
+  // CF手游
+  { source:'c10', target:'g8',  depth:4, rating:'A', note:'秦始皇帝陵博物院联名：角色秦师+武器AK47-秦俑，抖音千万级曝光', year:2024 },
+  { source:'c12', target:'g8',  depth:4, rating:'A', note:'携手新华网巡百城+郑州非遗+《舌尖》IP，十年IP通过文旅焕新', year:2024 },
+  // 阴阳师
+  { source:'c5',  target:'g9',  depth:4, rating:'A', note:'联动东昌叶雕传承人吴金芝创作叶雕绘卷，界面新闻/京报网广泛报道', year:2022 },
+  { source:'c3',  target:'g9',  depth:4, rating:'A', note:'携手云锦传承人金文定制《飞龙在天》，中国日报报道', year:2024 },
+  // FGO
+  { source:'c8',  target:'g10', depth:4, rating:'S', note:'系列历史纪录片联动大英博物馆，英灵原型与文物对照，二次元与博物馆双向破圈', year:2022 },
+  { source:'c8',  target:'g10', depth:4, rating:'A', note:'与央视《国家宝藏》IP联动，澎湃报道变文化传播器', year:2020 },
+  { source:'c8',  target:'g10', depth:4, rating:'A', note:'与上海图书馆+华东师大举办特展，8年文化传承集大成', year:2024 },
+  // 三国志·战略版
+  { source:'c9',  target:'g11', depth:5, rating:'S', note:'携手40余家文博单位推出三国志文化主题特展，SLG品类最大规模文博联动', year:2020 },
+  { source:'c9',  target:'g11', depth:4, rating:'A', note:'非遗漆器仿汉龙虎冠军鼎入驻中国游戏博物馆，首个入驻的国产三国SLG', year:2025 },
+  // 率土之滨
+  { source:'c9',  target:'g12', depth:5, rating:'S', note:'携手中国文物交流中心，薪火相传将典藏文物融入游戏宝物系统，SLG最早系统化文博联动', year:2020 },
+  { source:'c12', target:'g12', depth:4, rating:'A', note:'十周年联动故宫观唐，传世文物+太和殿融入游戏，全网爆料即引爆关注', year:2025 },
+  // QQ炫舞
+  { source:'c7',  target:'g13', depth:5, rating:'S', note:'杨丽萍团队371天深度参与孔雀舞瞳·雀联动，新华网专题报道', year:2020 },
+  { source:'c3',  target:'g13', depth:4, rating:'A', note:'与湘绣大师李艳共创，虚拟代言人星瞳任长沙非遗推广大使（行业首创）', year:2021 },
+  // 以闪亮之名
+  { source:'c3',  target:'g14', depth:4, rating:'A', note:'首次蜀绣国家级传承人合作，"玩了就是传承人"成热梗，入选伽马数据报告', year:2024 },
+  { source:'c7',  target:'g14', depth:4, rating:'A', note:'联合柯尔克孜族刺绣传承人布如力·斯开克共创三形态套装，中国日报报道', year:2024 },
+  // 闪耀暖暖
+  { source:'c3',  target:'g15', depth:4, rating:'A', note:'闪耀非遗系列联动苏州评弹/蟳埔女习俗/87版红楼梦，获上海市级重磅奖项', year:2023 },
+  // 光与夜之恋
+  { source:'c7',  target:'g16', depth:4, rating:'A', note:'夏日民间采风沉浸式视频探访4个少数民族非遗，新华网/光明网/中国日报报道', year:2023 },
+  { source:'c3',  target:'g16', depth:4, rating:'A', note:'苏绣婚书在苏州丝绸博物馆展出，手游联动产出博物馆级展品', year:2022 },
+  // 蛋仔派对
+  { source:'c22', target:'g17', depth:5, rating:'S', note:'苗族四项非遗+醒狮+川剧+故宫+博物馆赛季，连上3台春晚，国宝归乡季品类首创', year:2023 },
+  // 江南百景图
+  { source:'c5',  target:'g18', depth:4, rating:'A', note:'联动雕版印刷（扬州广陵古籍刻印社）+螺钿漆器+谢馥春，模拟经营与工坊天然契合', year:2022 },
+  // 明日方舟
+  { source:'c8',  target:'g19', depth:5, rating:'S', note:'南越王博物院线下联动：干员林听讲解文物，当天下午门票告罄，日均超2万人', year:2024 },
+  // 超自然行动组
+  { source:'c4',  target:'g20', depth:5, rating:'S', note:'邀请傩面具雕刻第七代传人杨云霞共创，2025年流水超50亿，中式微恐+民俗新赛道', year:2025 },
+  { source:'c5',  target:'g20', depth:4, rating:'A', note:'掐丝珐琅融入武器设计（妇女节免费送）+华县皮影联动，免费策略口碑极佳', year:2026 },
+  // 第五人格
+  { source:'c4',  target:'g21', depth:4, rating:'A', note:'2022春节灯影遂愿×北京皮影剧团合作纪录片，活动参与度极高，玩家好评如潮', year:2022 },
+  // 永劫无间
+  { source:'c7',  target:'g22', depth:4, rating:'A', note:'金乌纪企划联动白族/金沙遗址/武术/西泠，长期系列化文化品牌运营行业范例', year:2022 },
+  // 梦幻西游
+  { source:'c5',  target:'g23', depth:5, rating:'S', note:'匠心传梦非遗守护计划28项，联动花丝镶嵌/泰山皮影/琵琶传承人，20+年情怀拉满', year:2019 },
+  // 碧蓝航线
+  { source:'c6',  target:'g24', depth:3, rating:'A', note:'六周年敦煌博物馆联动飞天换装（免费获取）+西湖龙井非遗双文化联动', year:2023 },
+  { source:'c3',  target:'g24', depth:3, rating:'A', note:'七周年联动苏州丝绸博物馆，龚琳娜担任交流官，三方联动模式新颖', year:2024 },
+  // 刺客信条系列
+  { source:'c16', target:'g25', depth:5, rating:'S', note:'发现之旅：古埃及教育模式，被全球学校作为教学工具，比去博物馆还有趣', year:2018 },
+  { source:'c17', target:'g25', depth:5, rating:'S', note:'发现之旅：维京时代角色扮演式教育，学术论文收录，可操控的历史纪录片', year:2021 },
+  { source:'c24', target:'g25', depth:4, rating:'A', note:'发现之旅：中世纪巴格达，填补伊斯兰历史展现空白', year:2024 },
+  // 战神
+  { source:'c17', target:'g26', depth:5, rating:'S', note:'深度融合北欧神话九界体系，首周510万套，累计超1500万，催生大量北欧神话科普', year:2022 },
+  // 对马岛之魂
+  { source:'c18', target:'g27', depth:5, rating:'S', note:'还原1274年蒙古入侵对马岛，制作人获永久旅游大使称号，最懂日本精神的美国游戏', year:2020 },
+  // 巫师3
+  { source:'c19', target:'g28', depth:5, rating:'S', note:'深度扎根斯拉夫神话民间传说，全球5000万套，催生巫师之路旅游，波兰政府作国礼', year:2015 },
+  // 荒野大镖客2
+  { source:'c20', target:'g29', depth:5, rating:'S', note:'还原1899年西部拓荒，田纳西大学开设历史课，全球6500万套，CNN报道', year:2018 },
+  // Valheim
+  { source:'c17', target:'g30', depth:4, rating:'A', note:'瑞典5人团队以北欧神话为核心世界观，一月售500万套，全球玩家搭建维京长屋刷屏', year:2021 },
+  // 使命召唤手游
+  { source:'c5',  target:'g31', depth:3, rating:'B', note:'携手江苏非遗中心+传承人张方林推出南京剪纸春节视觉+全球活动', year:2022 },
+];
+
+// 「非遗·传统服饰/刺绣」(c3) 8条联动的详细分析数据
+const caseDetails = {
+  'c3|g2': {
+    title: '逆水寒手游 × 苗族银饰非遗',
+    game: '逆水寒手游', culture: '非遗·传统服饰/刺绣（苗族银饰）',
+    time: '2023年', partner: '苗族银饰传承人',
+    form: '限定银饰主题时装套装 + 银饰打造系统 + 免费获取',
+    userFeedback: '玩家高度好评，"免费获取"策略赢得口碑；社区称赞"文化基建路线"，认为逆水寒是最尊重玩家的非遗联动游戏。TapTap评论区多条高赞评论表示"良心联动"。',
+    revenue: '数据缺失 待补充（逆水寒非遗联动均为免费外观，不直接产生付费收入，但通过提升品牌好感度拉动整体DAU和月度流水）',
+    socialBuzz: '21世纪经济报道/搜狐/腾讯新闻等央媒报道；微博相关话题阅读量超5000万；逆水寒"31项非遗联动"成为行业讨论标杆案例。',
+    conversionNote: '免费获取策略，不设付费门槛。通过文化口碑带动游戏整体DAU提升和付费意愿，属于品牌型投入。',
+    source: '21世纪经济报道/搜狐/腾讯新闻'
+  },
+  'c3|g3': {
+    title: '天涯明月刀 × 云锦/苏绣/花丝镶嵌',
+    game: '天涯明月刀', culture: '非遗·传统服饰/刺绣（云锦/苏绣/花丝镶嵌）',
+    time: '2020年10月起持续', partner: '张家界文旅/非遗机构/盖娅传说/宋锦传承人',
+    form: '天衣华服系列（付费高定时装）+ 战略文旅合作 + 实体华服共创 + 国风大秀走秀',
+    userFeedback: '玩家社区称赞"华服精致度行业顶尖"；TapTap多条评论表示"为衣服氪金值了"；外观设计多次冲上微博热搜。宋锦联动获盛泽丝绸产业认可。',
+    revenue: '天衣华服系列为天刀核心付费项目，单件高定时装定价约200-400元档位。天刀手游2020年首月流水预估超5亿元（综合数据），华服系统为核心付费驱动力之一。',
+    socialBuzz: '新浪游戏/腾讯新闻重点报道；与盛泽丝绸产业联动获B站数十万播放；微博#天刀华服#话题累计阅读超2亿。',
+    conversionNote: '华服属于高客单价付费内容，非遗赋予其"文化溢价"，玩家付费意愿高。文旅合作则更多为品牌提升和政府关系维护。',
+    source: '新浪游戏/腾讯新闻/TapTap'
+  },
+  'c3|g9': {
+    title: '阴阳师 × 云锦非遗传承人金文',
+    game: '阴阳师', culture: '非遗·传统服饰/刺绣（云锦）',
+    time: '2024年1月（龙年新春）', partner: '金文（云锦国家级代表性传承人）',
+    form: '传承人共创实物云锦作品《飞龙在天》+ 龙年生肖限定皮肤 + 纪录片式宣发',
+    userFeedback: '玩家反馈积极，"云锦质感无法用语言形容"成为热门评论；美术品质获高度认可。游侠手游/4A广告网称赞跨界创新。NGA社区讨论热度中等偏上。',
+    revenue: '数据缺失 待补充（龙年生肖皮肤为限时付费内容，阴阳师2024年Q1整体收入有所回暖，但无法单独归因于此联动）',
+    socialBuzz: '中国日报/扬子晚报/人民金融/4A广告网等报道；B站相关视频累计播放超200万。',
+    conversionNote: '生肖限定皮肤为标准付费模式（抽卡/直购），云锦联动提供了"文化价值感"的付费理由，有助于提升皮肤转化率。',
+    source: '中国日报/扬子晚报/人民金融/4A广告网'
+  },
+  'c3|g13': {
+    title: 'QQ炫舞 × 湘绣大师李艳',
+    game: 'QQ炫舞', culture: '非遗·传统服饰/刺绣（湘绣）',
+    time: '2021年5月', partner: '李艳（湘绣大师）/长沙市文旅广电局',
+    form: '联名非遗服饰（游戏内时装）+ 虚拟偶像星瞳任长沙非遗推广大使（行业首创）',
+    userFeedback: '年轻女性玩家对湘绣服饰设计反响积极；"虚拟偶像担任文旅推广大使"引发行业讨论；三湘都市报报道获地方认可。',
+    revenue: '数据缺失 待补充（QQ炫舞未单独公布联动活动流水，但时装为其核心变现模式，非遗服饰属于限时高价值外观）',
+    socialBuzz: '三湘都市报/搜狐报道；微博#星瞳非遗推广大使#话题阅读量超3000万；行业内"虚拟偶像+非遗"模式被多次引用作为案例。',
+    conversionNote: 'QQ炫舞时装为核心付费内容，非遗联动时装通常定价高于常规时装，但具体转化率数据未公开。',
+    source: '三湘都市报/搜狐'
+  },
+  'c3|g14': {
+    title: '以闪亮之名 × 蜀绣国家级传承人孟德芝',
+    game: '以闪亮之名', culture: '非遗·传统服饰/刺绣（蜀绣）',
+    time: '2024年1月10日', partner: '孟德芝（蜀绣国家级非遗技艺传承人、中国首届刺绣艺术大师）',
+    form: '非遗联动版本"锦绣人间" + 六星蜀绣联动套装【绣阙锦天】+ 五星套装【风忆佳期】+ 追光活动·山河绣景 + 线下文化行',
+    userFeedback: '"玩了就是传承人"成为玩家热梗广泛传播；套装设计细节获专业认可（融入孟德芝两幅代表作品）；TapTap评分期间小幅上升。抖音相关话题热度高。',
+    revenue: '入选伽马数据2024年社会责任报告，证明商业与文化双重价值。六星套装为高稀有度付费内容（追光抽取模式），预估单次活动流水千万级。',
+    socialBuzz: '搜狐/今日头条/GameRes报道；抖音#以闪亮之名蜀绣非遗联动 话题播放超500万；伽马数据收录为行业正面案例。',
+    conversionNote: '六星套装通过追光活动抽取（保底机制），属于中高客单价付费。"首次重磅非遗合作"的稀缺性提升了抽取意愿。',
+    source: '搜狐/今日头条/GameRes/伽马数据'
+  },
+  'c3|g15': {
+    title: '闪耀暖暖 × 闪耀非遗系列',
+    game: '闪耀暖暖', culture: '非遗·传统服饰/刺绣（苏州评弹/蟳埔女习俗等）',
+    time: '2023年1月起持续至今', partner: '各非遗传承人/87版《红楼梦》IP/西影',
+    form: '闪耀非遗长期系列品牌 + 非遗联动套装与剧情 + 三作联动非遗纪录片 + 影游合作',
+    userFeedback: '玩家高度认可"闪耀非遗"成为品牌系列；蟳埔女联动免费服饰策略获好评；87版红楼梦联动引发情怀讨论。社区长期保持正面评价。',
+    revenue: '获上海市级重磅奖项（社会价值认可）。闪耀暖暖为叠纸核心产品，非遗系列套装为限时付费内容。具体流水数据未公开，但长期系列化运营表明ROI为正。',
+    socialBuzz: '搜狐/百度百科收录；中国日报/新民晚报报道三作联动非遗纪录片；获上海市级奖项为行业罕见的政府认可。',
+    conversionNote: '采用"免费+付费"组合策略：部分联动服饰免费获取（如蟳埔女），高品质联动套装为限时付费。长期系列化降低了单次联动的营销成本。',
+    source: '搜狐/百度百科/中国日报/新民晚报'
+  },
+  'c3|g16': {
+    title: '光与夜之恋 × 苏绣婚书+故宫以东',
+    game: '光与夜之恋', culture: '非遗·传统服饰/刺绣（苏绣）',
+    time: '2022-2025年持续', partner: '苏州丝绸博物馆/姚建萍（苏绣大师）/故宫以东',
+    form: '非遗实物苏绣婚书共创 + 博物馆正式展出 + 城市漫游联动 + 角色剧情融合',
+    userFeedback: '玩家群体（以女性为主）极度热情，"谁在博物馆备婚"成为抖音/小红书热梗；苏绣婚书实物在苏州丝绸博物馆特别展出引发大量打卡。GameRes/163新闻报道"手游联动产出博物馆级展品"。',
+    revenue: '数据缺失 待补充（光与夜之恋为恋爱互动手游，联动内容融合角色付费剧情和限定外观，但具体活动流水未公开）',
+    socialBuzz: '抖音相关话题播放超1000万；苏州丝绸博物馆正式展出吸引线下打卡流量；GameRes/163新闻/澎湃新闻报道；行业内被视为"游戏联动产出实体文化资产"的标杆。',
+    conversionNote: '联动与角色剧情深度绑定（恋爱向玩法核心），通过情感+文化双重驱动提升付费意愿。博物馆展出反哺品牌溢价。',
+    source: 'GameRes/163新闻/抖音/苏州丝绸博物馆'
+  },
+  'c3|g24': {
+    title: '碧蓝航线 × 苏州丝绸博物馆',
+    game: '碧蓝航线', culture: '非遗·传统服饰/刺绣（苏州丝绸）',
+    time: '2024年5-6月（七周年）', partner: '苏州丝绸博物馆/龚琳娜（非遗文化交流官）',
+    form: '博物馆+名人交流官+纪录片 + 限定联动换装"翠园佳绣"（免费获取）+ 线下快闪',
+    userFeedback: '玩家对免费获取策略反响积极（NGA论坛多条好评）；龚琳娜跨界引发话题讨论（部分玩家好奇，部分认为"意外的匹配"）；线下苏州快闪活动参与热情高。',
+    revenue: '联动换装为免费获取（7日登录任务），不直接产生付费收入。但七周年整体氪金活动期间流水有所提升（免费联动作为福利拉动DAU）。具体数据未公开。',
+    socialBuzz: 'B站官方动态获高互动；TapTap公告评论积极；腾讯新闻/品玩报道；NGA相关讨论帖多条。"三方联动模式新颖"获行业关注。',
+    conversionNote: '免费获取策略+周年庆付费活动组合拳。联动本身不付费，但作为周年庆生态的一部分，提升整体活跃度和付费氛围。',
+    source: '腾讯新闻/B站/TapTap/NGA'
+  }
+};
+
+const ratingColors = { S:'#ff6b6b', A:'#ffa94d', B:'#51cf66', C:'#339af0', D:'#a9a9a9' };
+const allNodes = [...cultureNodes, ...gameNodes];
+const nodeMap = {};
+allNodes.forEach(n => nodeMap[n.id] = n);
+
+// ===================================================================
+// STATE
+// ===================================================================
+let activeCultureTypes = new Set(cultureTypes);
+let activeGameGenres = new Set(gameGenres);
+let currentMaxYear = 2026;
+let allFiltersOn = true;
+
+// ===================================================================
+// FILTERS
+// ===================================================================
+function initFilters() {
+  const cEl = document.getElementById('cultureFilters');
+  const cCount = {};
+  cultureNodes.forEach(n => { cCount[n.category] = (cCount[n.category]||0)+1; });
+  cultureTypes.forEach(ct => {
+    cEl.innerHTML += `<div class="filter-item">
+      <input type="checkbox" checked id="cf_${ct}" data-type="culture" data-value="${ct}" onchange="handleFilter(this)">
+      <label for="cf_${ct}">${ct}</label>
+      <span class="count">${cCount[ct]||0}</span></div>`;
+  });
+
+  const gEl = document.getElementById('gameFilters');
+  const gCount = {};
+  gameNodes.forEach(n => { gCount[n.genre] = (gCount[n.genre]||0)+1; });
+  gameGenres.forEach(gg => {
+    gEl.innerHTML += `<div class="filter-item">
+      <input type="checkbox" checked id="gf_${gg}" data-type="game" data-value="${gg}" onchange="handleFilter(this)">
+      <label for="gf_${gg}">${gg}</label>
+      <span class="count">${gCount[gg]||0}</span></div>`;
+  });
+}
+
+function handleFilter(el) {
+  const t = el.dataset.type, v = el.dataset.value;
+  if (t === 'culture') el.checked ? activeCultureTypes.add(v) : activeCultureTypes.delete(v);
+  else el.checked ? activeGameGenres.add(v) : activeGameGenres.delete(v);
+  updateAll();
+}
+
+function handleTimeChange(val) {
+  currentMaxYear = parseInt(val);
+  document.getElementById('timeDisplay').textContent = `2015 – ${currentMaxYear}`;
+  updateAll();
+}
+
+function getFiltered() {
+  const vis = cultureNodes.filter(n => activeCultureTypes.has(n.category) && n.year <= currentMaxYear);
+  const vg  = gameNodes.filter(n => activeGameGenres.has(n.genre) && n.year <= currentMaxYear);
+  const ids = new Set([...vis,...vg].map(n=>n.id));
+  const vl  = links.filter(l => ids.has(l.source) && ids.has(l.target) && l.year <= currentMaxYear);
+  const linked = new Set();
+  vl.forEach(l => { linked.add(l.source); linked.add(l.target); });
+  // 合并同源链接用于力导向图（取最高rating和最大depth）
+  const mergedMap = {};
+  const ratingOrder = {S:5,A:4,B:3,C:2,D:1};
+  vl.forEach(l => {
+    const key = l.source + '|' + l.target;
+    if (!mergedMap[key] || ratingOrder[l.rating] > ratingOrder[mergedMap[key].rating]) {
+      mergedMap[key] = {...l};
+    }
+    if (mergedMap[key].depth < l.depth) mergedMap[key].depth = l.depth;
+  });
+  const mergedLinks = Object.values(mergedMap);
+  return { nodes: [...vis,...vg].filter(n=>linked.has(n.id)), links: vl, mergedLinks };
+}
+
+function updateAll() {
+  const d = getFiltered();
+  document.getElementById('hCulture').textContent = d.nodes.filter(n=>n.type==='culture').length;
+  document.getElementById('hGame').textContent = d.nodes.filter(n=>n.type==='game').length;
+  document.getElementById('hLink').textContent = d.links.length;
+  initForceGraph(d);
+  renderTrend(d);
+  renderRadar(d);
+  renderCases(d);
+}
+
+// ===================================================================
+// FORCE-DIRECTED GRAPH (pure canvas)
+// ===================================================================
+let graphNodes = [], graphEdges = [];
+let canvas, ctx, W, H;
+let scale = 1, offsetX = 0, offsetY = 0;
+let dragging = null, panning = false, panStart = {x:0,y:0}, panOffset = {x:0,y:0};
+let hoveredNode = null, hoveredEdge = null;
+let simTimer = null;
+
+function initForceGraph(data) {
+  canvas = document.getElementById('graphCanvas');
+  ctx = canvas.getContext('2d');
+  const rect = canvas.parentElement.getBoundingClientRect();
+  W = rect.width; H = rect.height;
+  canvas.width = W * devicePixelRatio;
+  canvas.height = H * devicePixelRatio;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+
+  // Create nodes
+  const existing = {};
+  graphNodes.forEach(n => existing[n.id] = { x: n.x, y: n.y });
+
+  const edgeData = data.mergedLinks || data.links;
+
+  graphNodes = data.nodes.map(n => {
+    const lc = edgeData.filter(l => l.source === n.id || l.target === n.id).length;
+    const r = n.type === 'culture' ? 18 + lc * 2.5 : 16 + lc * 2;
+    const prev = existing[n.id];
+    return {
+      id: n.id, name: n.name, type: n.type,
+      category: n.category, genre: n.genre, desc: n.desc,
+      r,
+      x: prev ? prev.x : W/2 + (Math.random()-0.5) * W * 0.6,
+      y: prev ? prev.y : H/2 + (Math.random()-0.5) * H * 0.6,
+      vx: 0, vy: 0,
+    };
+  });
+
+  const nodeIdx = {};
+  graphNodes.forEach((n,i) => nodeIdx[n.id] = i);
+
+  graphEdges = edgeData.map(l => ({
+    source: nodeIdx[l.source],
+    target: nodeIdx[l.target],
+    depth: l.depth,
+    rating: l.rating,
+    note: l.note,
+    sourceId: l.source,
+    targetId: l.target,
+  })).filter(e => e.source !== undefined && e.target !== undefined);
+
+  // Run simulation
+  if (simTimer) cancelAnimationFrame(simTimer);
+  let tickCount = 0;
+  const maxTicks = 400;
+  const alpha0 = 1;
+
+  function tick() {
+    tickCount++;
+    const alpha = alpha0 * Math.max(0, 1 - tickCount / maxTicks);
+    if (alpha < 0.005) { drawGraph(); return; }
+
+    // Forces
+    const N = graphNodes.length;
+    // repulsion (scaled for larger graph)
+    for (let i = 0; i < N; i++) {
+      for (let j = i+1; j < N; j++) {
+        let dx = graphNodes[j].x - graphNodes[i].x;
+        let dy = graphNodes[j].y - graphNodes[i].y;
+        let d2 = dx*dx + dy*dy;
+        if (d2 < 1) d2 = 1;
+        const f = 12000 / d2;
+        const fx = dx / Math.sqrt(d2) * f * alpha;
+        const fy = dy / Math.sqrt(d2) * f * alpha;
+        graphNodes[i].vx -= fx;
+        graphNodes[i].vy -= fy;
+        graphNodes[j].vx += fx;
+        graphNodes[j].vy += fy;
+      }
+    }
+
+    // attraction
+    graphEdges.forEach(e => {
+      const a = graphNodes[e.source], b = graphNodes[e.target];
+      let dx = b.x - a.x, dy = b.y - a.y;
+      const d = Math.sqrt(dx*dx + dy*dy) || 1;
+      const ideal = 100 + (5 - e.depth) * 15;
+      const f = (d - ideal) * 0.004 * alpha;
+      const fx = dx/d * f, fy = dy/d * f;
+      a.vx += fx; a.vy += fy;
+      b.vx -= fx; b.vy -= fy;
+    });
+
+    // gravity (stronger to keep large graph centered)
+    graphNodes.forEach(n => {
+      n.vx += (W/2 - n.x) * 0.001 * alpha;
+      n.vy += (H/2 - n.y) * 0.001 * alpha;
+    });
+
+    // integrate
+    graphNodes.forEach(n => {
+      if (n === dragging) return;
+      n.vx *= 0.6;
+      n.vy *= 0.6;
+      n.x += n.vx;
+      n.y += n.vy;
+      n.x = Math.max(n.r, Math.min(W - n.r, n.x));
+      n.y = Math.max(n.r, Math.min(H - n.r, n.y));
+    });
+
+    drawGraph();
+    simTimer = requestAnimationFrame(tick);
+  }
+
+  tick();
+}
+
+function drawGraph() {
+  ctx.clearRect(0, 0, W, H);
+  ctx.save();
+  ctx.translate(offsetX, offsetY);
+  ctx.scale(scale, scale);
+
+  // draw edges — soft, muted colors
+  graphEdges.forEach(e => {
+    const a = graphNodes[e.source], b = graphNodes[e.target];
+    const isHover = hoveredNode && (graphNodes[e.source] === hoveredNode || graphNodes[e.target] === hoveredNode);
+    const isFaded = hoveredNode && !isHover;
+    const isEdgeHover = hoveredEdge === e;
+
+    ctx.beginPath();
+    const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+    const dx = b.x - a.x, dy = b.y - a.y;
+    const cx = mx + dy * 0.1, cy = my - dx * 0.1;
+    ctx.moveTo(a.x, a.y);
+    ctx.quadraticCurveTo(cx, cy, b.x, b.y);
+    // muted edge colors based on rating
+    const edgeColors = { S:'#e8a0a0', A:'#e8c89a', B:'#a0d4a8', C:'#a0c4e8', D:'#c8c8c8' };
+    ctx.strokeStyle = isHover || isEdgeHover ? ratingColors[e.rating] : edgeColors[e.rating];
+    ctx.lineWidth = (isEdgeHover ? e.depth * 1.5 : e.depth * 0.8) + 0.5;
+    ctx.globalAlpha = isFaded ? 0.06 : (isHover || isEdgeHover ? 0.8 : 0.3);
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  });
+
+  // draw nodes — minimal, soft style
+  graphNodes.forEach(n => {
+    const isHover = n === hoveredNode;
+    const isAdjacent = hoveredNode && graphEdges.some(e =>
+      (graphNodes[e.source] === hoveredNode && graphNodes[e.target] === n) ||
+      (graphNodes[e.target] === hoveredNode && graphNodes[e.source] === n));
+    const isFaded = hoveredNode && !isHover && !isAdjacent;
+
+    ctx.globalAlpha = isFaded ? 0.2 : 1;
+
+    // subtle shadow
+    ctx.shadowColor = 'rgba(0,0,0,.06)';
+    ctx.shadowBlur = isHover ? 12 : 4;
+    ctx.shadowOffsetY = 1;
+
+    const r = isHover ? n.r * 1.08 : n.r;
+    if (n.type === 'culture') {
+      // soft circle — unified purple tone
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
+      ctx.fillStyle = isHover ? '#c4b0e8' : '#d4c5f0';
+      ctx.fill();
+      ctx.lineWidth = isHover ? 2 : 1.5;
+      ctx.strokeStyle = isHover ? '#9b7dd4' : '#d4c5f0';
+      ctx.stroke();
+    } else {
+      // soft rounded rect — unified blue tone
+      const s = r * 1.5;
+      const rr = 6;
+      const x0 = n.x - s/2, y0 = n.y - s/2;
+      ctx.beginPath();
+      ctx.moveTo(x0+rr, y0);
+      ctx.lineTo(x0+s-rr, y0);
+      ctx.arcTo(x0+s, y0, x0+s, y0+rr, rr);
+      ctx.lineTo(x0+s, y0+s-rr);
+      ctx.arcTo(x0+s, y0+s, x0+s-rr, y0+s, rr);
+      ctx.lineTo(x0+rr, y0+s);
+      ctx.arcTo(x0, y0+s, x0, y0+s-rr, rr);
+      ctx.lineTo(x0, y0+rr);
+      ctx.arcTo(x0, y0, x0+rr, y0, rr);
+      ctx.closePath();
+      ctx.fillStyle = isHover ? '#b0ccf0' : '#c5daf0';
+      ctx.fill();
+      ctx.lineWidth = isHover ? 2 : 1.5;
+      ctx.strokeStyle = isHover ? '#7aabe8' : '#c5daf0';
+      ctx.stroke();
+    }
+
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
+
+    // label
+    ctx.font = `500 ${isHover ? 12 : 10.5}px -apple-system, "PingFang SC", sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillStyle = isFaded ? 'rgba(29,29,31,.1)' : (isHover ? '#1d1d1f' : '#6e6e73');
+    ctx.fillText(n.name, n.x, n.y + r + 14);
+    ctx.globalAlpha = 1;
+  });
+
+  ctx.restore();
+}
+
+// ===================================================================
+// GRAPH INTERACTION
+// ===================================================================
+function screenToGraph(sx, sy) {
+  return { x: (sx - offsetX) / scale, y: (sy - offsetY) / scale };
+}
+
+function hitTestNode(gx, gy) {
+  for (let i = graphNodes.length - 1; i >= 0; i--) {
+    const n = graphNodes[i];
+    const dx = gx - n.x, dy = gy - n.y;
+    if (dx*dx + dy*dy < (n.r+4)*(n.r+4)) return n;
+  }
+  return null;
+}
+
+function hitTestEdge(gx, gy) {
+  let best = null, bestDist = 8;
+  graphEdges.forEach(e => {
+    const a = graphNodes[e.source], b = graphNodes[e.target];
+    // point-to-segment
+    const dx = b.x-a.x, dy = b.y-a.y;
+    const len2 = dx*dx+dy*dy;
+    if (len2 === 0) return;
+    let t = ((gx-a.x)*dx+(gy-a.y)*dy)/len2;
+    t = Math.max(0, Math.min(1, t));
+    const px = a.x+t*dx, py = a.y+t*dy;
+    const d = Math.sqrt((gx-px)*(gx-px)+(gy-py)*(gy-py));
+    if (d < bestDist) { bestDist = d; best = e; }
+  });
+  return best;
+}
+
+function initGraphEvents() {
+  const c = document.getElementById('graphCanvas');
+  const tip = document.getElementById('tooltip');
+
+  c.addEventListener('mousedown', e => {
+    const rect = c.getBoundingClientRect();
+    const p = screenToGraph(e.clientX - rect.left, e.clientY - rect.top);
+    const node = hitTestNode(p.x, p.y);
+    if (node) {
+      dragging = node;
+      c.style.cursor = 'grabbing';
+    } else {
+      panning = true;
+      panStart = { x: e.clientX, y: e.clientY };
+      panOffset = { x: offsetX, y: offsetY };
+      c.style.cursor = 'grabbing';
+    }
+  });
+
+  c.addEventListener('mousemove', e => {
+    const rect = c.getBoundingClientRect();
+    if (dragging) {
+      const p = screenToGraph(e.clientX - rect.left, e.clientY - rect.top);
+      dragging.x = p.x;
+      dragging.y = p.y;
+      drawGraph();
+      return;
+    }
+    if (panning) {
+      offsetX = panOffset.x + (e.clientX - panStart.x);
+      offsetY = panOffset.y + (e.clientY - panStart.y);
+      drawGraph();
+      return;
+    }
+
+    const p = screenToGraph(e.clientX - rect.left, e.clientY - rect.top);
+    const node = hitTestNode(p.x, p.y);
+    const oldHover = hoveredNode;
+    hoveredNode = node;
+
+    if (!node) {
+      const edge = hitTestEdge(p.x, p.y);
+      hoveredEdge = edge;
+      if (edge) {
+        const sn = nodeMap[edge.sourceId], tn = nodeMap[edge.targetId];
+        tip.innerHTML = `<div class="tooltip-title">${sn.name} ↔ ${tn.name}</div>
+          <div class="tooltip-link-info">
+            评级 <span style="color:${ratingColors[edge.rating]};font-weight:700">${edge.rating}</span> · 深度 ${'●'.repeat(edge.depth)}${'○'.repeat(5-edge.depth)}<br/>
+            ${edge.note}
+          </div>`;
+        tip.classList.add('show');
+        tip.style.left = (e.clientX + 14) + 'px';
+        tip.style.top = (e.clientY - 10) + 'px';
+        c.style.cursor = 'pointer';
+      } else {
+        tip.classList.remove('show');
+        c.style.cursor = 'grab';
+      }
+    } else {
+      hoveredEdge = null;
+      const icon = node.type === 'culture' ? '🏛' : '🎮';
+      const badge = node.type === 'culture'
+        ? `<span class="tooltip-badge" style="background:#f3e8ff;color:#7c3aed">${node.category}</span>`
+        : `<span class="tooltip-badge" style="background:#dbeafe;color:#2563eb">${node.genre}</span>`;
+      tip.innerHTML = `<div class="tooltip-title">${icon} ${node.name} ${badge}</div>
+        <div class="tooltip-desc">${node.desc}</div>`;
+      tip.classList.add('show');
+      tip.style.left = (e.clientX + 14) + 'px';
+      tip.style.top = (e.clientY - 10) + 'px';
+      c.style.cursor = 'pointer';
+    }
+
+    if (hoveredNode !== oldHover || hoveredEdge) drawGraph();
+  });
+
+  c.addEventListener('mouseup', () => {
+    dragging = null;
+    panning = false;
+    c.style.cursor = 'grab';
+  });
+
+  c.addEventListener('mouseleave', () => {
+    dragging = null;
+    panning = false;
+    hoveredNode = null;
+    hoveredEdge = null;
+    tip.classList.remove('show');
+    drawGraph();
+  });
+
+  c.addEventListener('click', e => {
+    const rect = c.getBoundingClientRect();
+    const p = screenToGraph(e.clientX - rect.left, e.clientY - rect.top);
+    const node = hitTestNode(p.x, p.y);
+    if (node) showModal(node);
+  });
+
+  c.addEventListener('wheel', e => {
+    e.preventDefault();
+    const factor = e.deltaY < 0 ? 1.08 : 0.92;
+    scale *= factor;
+    scale = Math.max(0.3, Math.min(3, scale));
+    drawGraph();
+  }, { passive: false });
+}
+
+function zoomGraph(factor) {
+  scale *= factor;
+  scale = Math.max(0.3, Math.min(3, scale));
+  drawGraph();
+}
+
+function resetGraph() {
+  scale = 1; offsetX = 0; offsetY = 0;
+  updateAll();
+}
+
+// ===================================================================
+// MODAL
+// ===================================================================
+function showModal(node) {
+  document.getElementById('modalTitle').innerHTML = `${node.type==='culture'?'🏛':'🎮'} ${node.name}
+    <span class="modal-type-badge ${node.type==='culture'?'badge-culture':'badge-game'}">
+    ${node.type==='culture'?node.category:node.genre}</span>`;
+  document.getElementById('modalDesc').textContent = node.desc;
+
+  const rels = links.filter(l => l.source === node.id || l.target === node.id);
+  const relsEl = document.getElementById('modalRels');
+  relsEl.innerHTML = '';
+  rels.forEach(l => {
+    const oid = l.source === node.id ? l.target : l.source;
+    const o = nodeMap[oid];
+    if (!o) return;
+    relsEl.innerHTML += `<div class="modal-rel-item">
+      <div class="rel-left">
+        <span class="rel-name">${o.type==='culture'?'🏛':'🎮'} ${o.name}</span>
+        <span class="rel-meta">深度 ${'●'.repeat(l.depth)}${'○'.repeat(5-l.depth)} · ${l.note.slice(0,50)}…</span>
+      </div>
+      <div class="rel-rating" style="background:${ratingColors[l.rating]}">${l.rating}</div>
+    </div>`;
+  });
+  document.getElementById('modalOverlay').classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('active');
+}
+document.addEventListener('keydown', e => { if (e.key==='Escape') closeModal(); });
+
+// ===================================================================
+// BOTTOM PANEL: Tabs
+// ===================================================================
+document.querySelectorAll('.panel-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('pane-' + tab.dataset.tab).classList.add('active');
+    // redraw canvas-based tabs
+    if (tab.dataset.tab === 'trend') { const d = getFiltered(); renderTrend(d); }
+    if (tab.dataset.tab === 'radar') { const d = getFiltered(); renderRadar(d); }
+  });
+});
+
+// ===================================================================
+// TAB 1: 热度趋势 (canvas line chart)
+// ===================================================================
+function renderTrend(data) {
+  const tc = document.getElementById('trendCanvas');
+  const pane = tc.parentElement;
+  const rect = pane.getBoundingClientRect();
+  const w = rect.width, h = rect.height;
+  tc.width = w * devicePixelRatio;
+  tc.height = h * devicePixelRatio;
+  tc.style.width = w + 'px';
+  tc.style.height = h + 'px';
+  const c = tc.getContext('2d');
+  c.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+
+  const years = [2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026];
+  const pad = { top:30, right:30, bottom:36, left:50 };
+  const cw = w - pad.left - pad.right;
+  const ch = h - pad.top - pad.bottom;
+
+  // Count links per year
+  const counts = {};
+  const ratingCounts = { S:{}, A:{}, B:{} };
+  years.forEach(y => {
+    counts[y] = links.filter(l => l.year <= y).length;
+    ['S','A','B'].forEach(r => {
+      ratingCounts[r][y] = links.filter(l => l.year <= y && l.rating === r).length;
+    });
+  });
+
+  const maxVal = Math.max(...Object.values(counts), 1);
+
+  // grid
+  c.strokeStyle = '#eee';
+  c.lineWidth = 1;
+  for (let i = 0; i <= 5; i++) {
+    const y = pad.top + ch * i / 5;
+    c.beginPath(); c.moveTo(pad.left, y); c.lineTo(pad.left+cw, y); c.stroke();
+    c.fillStyle = '#a1a1a6';
+    c.font = '11px -apple-system, sans-serif';
+    c.textAlign = 'right';
+    c.fillText(Math.round(maxVal * (5-i)/5), pad.left-8, y+4);
+  }
+
+  // x labels
+  c.textAlign = 'center';
+  c.fillStyle = '#a1a1a6';
+  years.forEach((yr,i) => {
+    const x = pad.left + cw * i / (years.length-1);
+    c.fillText(yr, x, h - pad.bottom + 20);
+  });
+
+  // draw lines
+  function drawLine(dataObj, color, label) {
+    c.beginPath();
+    c.strokeStyle = color;
+    c.lineWidth = 2.5;
+    c.lineJoin = 'round';
+    years.forEach((yr,i) => {
+      const x = pad.left + cw * i / (years.length-1);
+      const y = pad.top + ch * (1 - (dataObj[yr]||0)/maxVal);
+      i === 0 ? c.moveTo(x, y) : c.lineTo(x, y);
+    });
+    c.stroke();
+
+    // dots
+    years.forEach((yr,i) => {
+      const x = pad.left + cw * i / (years.length-1);
+      const y = pad.top + ch * (1 - (dataObj[yr]||0)/maxVal);
+      c.beginPath();
+      c.arc(x, y, 3.5, 0, Math.PI*2);
+      c.fillStyle = '#fff';
+      c.fill();
+      c.strokeStyle = color;
+      c.lineWidth = 2;
+      c.stroke();
+    });
+  }
+
+  drawLine(counts, '#0071e3', '总联动');
+  drawLine(ratingCounts.S, '#ff6b6b', 'S级');
+  drawLine(ratingCounts.A, '#ffa94d', 'A级');
+
+  // legend
+  const legends = [['总联动','#0071e3'],['S级','#ff6b6b'],['A级','#ffa94d']];
+  let lx = pad.left + 10;
+  legends.forEach(([lb,cl]) => {
+    c.fillStyle = cl;
+    c.fillRect(lx, 8, 16, 3);
+    c.fillStyle = '#6e6e73';
+    c.font = '11px -apple-system, sans-serif';
+    c.textAlign = 'left';
+    c.fillText(lb, lx+20, 13);
+    lx += 70;
+  });
+}
+
+// ===================================================================
+// TAB 2: 效果对比 (横向条形图卡片)
+// ===================================================================
+function renderRadar(data) {
+  const container = document.getElementById('radarContainer');
+  
+  // 按联动数量排序取top游戏
+  const gameLinkCount = {};
+  gameNodes.forEach(g => {
+    gameLinkCount[g.id] = data.links.filter(l => l.source === g.id || l.target === g.id).length;
+  });
+  const topGames = [...gameNodes]
+    .filter(g => gameLinkCount[g.id] > 0)
+    .sort((a,b) => (gameLinkCount[b.id]||0) - (gameLinkCount[a.id]||0))
+    .slice(0, 8);
+
+  const barColors = {
+    '联动数量': '#0071e3',
+    '平均深度': '#34c759',
+    'S级占比': '#ff6b6b',
+    '文化覆盖': '#af52de',
+    '近期活跃': '#ff9500',
+  };
+
+  container.innerHTML = topGames.map(g => {
+    const gLinks = data.links.filter(l => l.source === g.id || l.target === g.id);
+    const count = gLinks.length;
+    const avgDepth = count ? (gLinks.reduce((s,l) => s+l.depth, 0)/count) : 0;
+    const sRatio = count ? (gLinks.filter(l => l.rating==='S').length/count) : 0;
+    const cultureCount = new Set(gLinks.map(l => l.source.startsWith('c') ? l.source : l.target)).size;
+    const recentCount = gLinks.filter(l => l.year >= 2023).length;
+
+    // 综合评分 (0-100)
+    const score = Math.round(
+      (Math.min(count/6, 1) * 25) +
+      (avgDepth/5 * 25) +
+      (sRatio * 25) +
+      (Math.min(cultureCount/5, 1) * 15) +
+      (Math.min(recentCount/4, 1) * 10)
+    );
+
+    const bars = [
+      { label: '联动数量', value: Math.min(count/6, 1) * 100, display: count + '条' },
+      { label: '平均深度', value: avgDepth/5 * 100, display: avgDepth.toFixed(1) + '/5' },
+      { label: 'S级占比', value: sRatio * 100, display: Math.round(sRatio*100) + '%' },
+      { label: '文化覆盖', value: Math.min(cultureCount/5, 1) * 100, display: cultureCount + '类' },
+      { label: '近期活跃', value: Math.min(recentCount/4, 1) * 100, display: recentCount + '条' },
+    ];
+
+    return `<div class="compare-card">
+      <div class="compare-header">
+        <div class="compare-name">
+          🎮 ${g.name}
+          <span class="compare-badge">${g.genre}</span>
+        </div>
+        <div class="compare-score">${score}</div>
+      </div>
+      <div class="compare-bars">
+        ${bars.map(b => `<div class="bar-row">
+          <span class="bar-label">${b.label}</span>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:${b.value}%;background:${barColors[b.label]}"></div>
+          </div>
+          <span class="bar-value">${b.display}</span>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ===================================================================
+// TAB 3: 案例详情（三层导航）
+// ===================================================================
+let caseViewState = { level: 1, cultureId: null }; // level: 1=文化列表, 2=联动合集
+
+function renderCases(data) {
+  if (caseViewState.level === 2 && caseViewState.cultureId) {
+    renderCaseLevel2(data, caseViewState.cultureId);
+  } else {
+    renderCaseLevel1(data);
+  }
+}
+
+// 第1层：按文化主题分组展示
+function renderCaseLevel1(data) {
+  const el = document.getElementById('caseGrid');
+  caseViewState = { level: 1, cultureId: null };
+
+  // 按文化节点分组
+  const groups = {};
+  data.links.forEach(l => {
+    const cn = nodeMap[l.source];
+    if (!cn || cn.type !== 'culture') return;
+    if (!groups[l.source]) groups[l.source] = { node: cn, links: [] };
+    groups[l.source].links.push(l);
+  });
+
+  const sorted = Object.values(groups).sort((a, b) => b.links.length - a.links.length);
+
+  el.innerHTML = sorted.map(g => {
+    const bestRating = ['S','A','B','C','D'].find(r => g.links.some(l => l.rating === r)) || 'D';
+    const gameNames = [...new Set(g.links.map(l => nodeMap[l.target]?.name).filter(Boolean))].slice(0, 3);
+    const hasDetails = g.links.some(l => caseDetails[l.source + '|' + l.target]);
+    return `<div class="culture-group-card" onclick="openCultureGroup('${g.node.id}')">
+      <div class="culture-group-left">
+        <div class="culture-group-name">🏛 ${g.node.name}${hasDetails ? ' <span style="font-size:10px;color:var(--accent);font-weight:400">有详情</span>' : ''}</div>
+        <div class="culture-group-meta">${gameNames.join('、')}${g.links.length > 3 ? ' 等' : ''} · 最高${bestRating}级</div>
+      </div>
+      <div class="culture-group-right">
+        <div class="culture-group-count">${g.links.length}</div>
+        <div class="culture-group-arrow">›</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openCultureGroup(cultureId) {
+  caseViewState = { level: 2, cultureId };
+  const data = getFiltered();
+  renderCaseLevel2(data, cultureId);
+}
+
+// 第2层：某文化主题下的联动案例列表
+function renderCaseLevel2(data, cultureId) {
+  const el = document.getElementById('caseGrid');
+  const cn = nodeMap[cultureId];
+  const groupLinks = data.links.filter(l => l.source === cultureId);
+  const sorted = groupLinks.sort((a,b) => {
+    const ro = {S:0,A:1,B:2,C:3,D:4};
+    return (ro[a.rating]||4) - (ro[b.rating]||4) || b.depth - a.depth;
+  });
+
+  let html = `<div style="grid-column:1/-1">
+    <div class="case-nav-back" onclick="backToCaseList()">← 返回文化主题列表</div>
+    <div style="font-size:15px;font-weight:700;margin-bottom:4px">🏛 ${cn.name}</div>
+    <div style="font-size:12px;color:var(--text-secondary);margin-bottom:14px">${cn.desc} · 共 ${sorted.length} 条联动案例</div>
+  </div>`;
+
+  html += sorted.map(l => {
+    const tn = nodeMap[l.target];
+    const detailKey = l.source + '|' + l.target;
+    const hasDetail = !!caseDetails[detailKey];
+    return `<div class="case-card" onclick='handleCaseClick("${l.source}","${l.target}")'>
+      <div class="case-header">
+        <div class="case-pair">
+          <span>🎮 ${tn.name}</span>
+        </div>
+        <div class="case-badges">
+          ${hasDetail ? '<span style="font-size:10px;color:var(--accent);margin-right:4px">详情 →</span>' : ''}
+          <span class="case-depth">${'●'.repeat(l.depth)}${'○'.repeat(5-l.depth)}</span>
+          <span class="case-rating" style="background:${ratingColors[l.rating]}">${l.rating}</span>
+        </div>
+      </div>
+      <div class="case-note">${l.note}</div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = html;
+}
+
+function backToCaseList() {
+  caseViewState = { level: 1, cultureId: null };
+  const data = getFiltered();
+  renderCaseLevel1(data);
+}
+
+function handleCaseClick(sourceId, targetId) {
+  const detailKey = sourceId + '|' + targetId;
+  const detail = caseDetails[detailKey];
+  if (detail) {
+    showCaseDetail(detail, sourceId, targetId);
+  } else {
+    // 无详情时显示节点Modal
+    const node = nodeMap[targetId];
+    if (node) showModal(node);
+  }
+}
+
+function showCaseDetail(d, sourceId, targetId) {
+  const link = links.find(l => l.source === sourceId && l.target === targetId);
+  const rating = link ? link.rating : '-';
+  const depth = link ? link.depth : 0;
+
+  document.getElementById('modalTitle').innerHTML = `
+    <span style="font-size:15px">${d.title}</span>
+    <span class="modal-type-badge badge-culture">${rating}级 · 深度${'●'.repeat(depth)}${'○'.repeat(5-depth)}</span>`;
+  document.getElementById('modalDesc').textContent = '';
+
+  const relsEl = document.getElementById('modalRels');
+  relsEl.innerHTML = `
+    <div class="detail-section">
+      <div class="detail-row"><span class="detail-label">游戏产品</span><span class="detail-value">${d.game}</span></div>
+      <div class="detail-row"><span class="detail-label">文化方向</span><span class="detail-value">${d.culture}</span></div>
+      <div class="detail-row"><span class="detail-label">联动时间</span><span class="detail-value">${d.time}</span></div>
+      <div class="detail-row"><span class="detail-label">合作方</span><span class="detail-value">${d.partner}</span></div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-heading">📋 联动内容形式</div>
+      <div class="detail-text">${d.form}</div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-heading">💬 用户反馈与社区讨论</div>
+      <div class="detail-text">${d.userFeedback}</div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-heading">💰 流水表现</div>
+      <div class="detail-text ${d.revenue.includes('数据缺失') ? 'detail-missing' : ''}">${d.revenue}</div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-heading">🔥 社区讨论热度</div>
+      <div class="detail-text">${d.socialBuzz}</div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-heading">📈 付费转化</div>
+      <div class="detail-text">${d.conversionNote}</div>
+    </div>
+    <div class="detail-section" style="border-top:1px solid var(--border);padding-top:10px;margin-top:6px">
+      <div class="detail-row"><span class="detail-label">参考来源</span><span class="detail-value" style="color:var(--text-tertiary)">${d.source}</span></div>
+    </div>
+  `;
+  document.getElementById('modalOverlay').classList.add('active');
+}
+
+// ===================================================================
+// INIT
+// ===================================================================
+function init() {
+  initFilters();
+  initGraphEvents();
+  updateAll();
+
+  window.addEventListener('resize', () => {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    W = rect.width; H = rect.height;
+    canvas.width = W * devicePixelRatio;
+    canvas.height = H * devicePixelRatio;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+    drawGraph();
+    const d = getFiltered();
+    renderTrend(d);
+    renderRadar(d);
+  });
+}
+
+init();
+</script>
+</body>
+</html>
