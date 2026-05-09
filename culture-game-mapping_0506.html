@@ -875,9 +875,9 @@
       <span class="header-subtitle">全球文化资产 · 游戏产品联动关系网络</span>
     </div>
     <div class="header-stats">
-      <div class="header-stat"><strong id="hCulture">24</strong> 文化主题</div>
-      <div class="header-stat"><strong id="hGame">31</strong> 游戏产品</div>
-      <div class="header-stat"><strong id="hLink">57</strong> 联动关系</div>
+      <div class="header-stat"><strong id="hCulture">26</strong> 文化主题</div>
+      <div class="header-stat"><strong id="hGame">40</strong> 游戏产品</div>
+      <div class="header-stat"><strong id="hLink">65</strong> 联动关系</div>
     </div>
   </div>
 
@@ -974,159 +974,186 @@
 
 <script>
 // ===================================================================
-// DATA — 基于 create_culture_table_v4.py 67条真实联动案例
+// DATA — 基于 create_culture_table_v4.py 86条联动案例（去腾讯版+MD补充）
 // ===================================================================
-const cultureTypes = ['非遗传承', '敦煌文化', '戏曲国粹', '博物馆/文物', '文旅联动', '少数民族文化', '古典文学/IP', '世界历史文明', '北欧/维京文化', '西部/拓荒文化'];
-const gameGenres   = ['MOBA', '武侠MMO', '开放世界RPG', '音舞/换装', '卡牌RPG', 'SLG策略', '射击/战术竞技', '派对竞技', '模拟经营', '动作冒险3A'];
+const cultureTypes = ['非遗传承', '敦煌文化', '戏曲国粹', '博物馆/文物', '文旅联动', '少数民族文化', '古典文学/IP', '世界历史文明', '北欧/维京文化', '西部/拓荒文化', '东方美学/国风'];
+const gameGenres   = ['武侠MMO', '开放世界RPG', '音舞/换装', '卡牌RPG', 'SLG策略', '派对竞技', '模拟经营', '动作冒险3A', 'MOBA', '恐怖冒险', '回合制MMO', '动作竞技'];
 
 const cultureNodes = [
-  { id:'c1',  name:'非遗·京剧/昆曲', type:'culture', category:'戏曲国粹', desc:'京剧/昆曲为国粹戏曲代表，王者荣耀霸王别姬/游园惊梦开创游戏×戏曲先河。', year:2016 },
-  { id:'c2',  name:'敦煌壁画·飞天', type:'culture', category:'敦煌文化', desc:'敦煌莫高窟壁画千年瑰宝，与敦煌研究院深度合作的标杆联动多次获央媒报道。', year:2018 },
-  { id:'c3',  name:'非遗·传统服饰/刺绣', type:'culture', category:'非遗传承', desc:'包括苏绣、蜀绣、湘绣、云锦、苗族刺绣等多项国家级非遗技艺，与换装/女性向游戏天然适配。', year:2017 },
-  { id:'c4',  name:'非遗·皮影/傩戏', type:'culture', category:'非遗传承', desc:'皮影戏、傩戏等传统表演艺术，北京皮影剧团、泰山皮影等国家级传承人多次与游戏合作。', year:2019 },
-  { id:'c5',  name:'非遗·传统工艺', type:'culture', category:'非遗传承', desc:'花丝镶嵌、雕版印刷、螺钿漆器、活字印刷、掐丝珐琅等古法工艺，多入选国家级非遗名录。', year:2019 },
-  { id:'c6',  name:'敦煌文化(综合)', type:'culture', category:'敦煌文化', desc:'敦煌博物馆/敦煌文旅集团联动，覆盖换装、射击、战术竞技等多品类游戏。', year:2023 },
-  { id:'c7',  name:'少数民族非遗', type:'culture', category:'少数民族文化', desc:'苗族银饰/刺绣、柯尔克孜族刺绣、孔雀舞、白族文化等，展现中华民族多样性。', year:2017 },
-  { id:'c8',  name:'博物馆·故宫/南越王', type:'culture', category:'博物馆/文物', desc:'故宫观唐、南越王博物院等，以文物数字化为核心，实现博物馆级文化资产进入游戏。', year:2020 },
-  { id:'c9',  name:'三国文物/历史', type:'culture', category:'博物馆/文物', desc:'中国文物交流中心与40余家博物馆联展，三国历史文物融入SLG策略游戏核心系统。', year:2020 },
-  { id:'c10', name:'三星堆/秦陵博物馆', type:'culture', category:'博物馆/文物', desc:'三星堆博物馆战略签约米哈游，秦始皇帝陵博物院与CF手游联动文物数字焕活。', year:2023 },
-  { id:'c11', name:'文旅·山西古建/城市', type:'culture', category:'文旅联动', desc:'黑神话悟空27处取景地来自山西古建，景区搜索热度暴涨156%，带动文旅热潮。', year:2024 },
-  { id:'c12', name:'文旅·汉中/故宫/土楼', type:'culture', category:'文旅联动', desc:'天涯明月刀实体建筑落户芙蓉镇、入选联合国教科文组织案例；率土之滨联动故宫观唐。', year:2020 },
-  { id:'c13', name:'非遗·舞龙醒狮', type:'culture', category:'非遗传承', desc:'铜梁龙舞/佛山醒狮传承人参与研发，和平精英春节版本让亿万玩家体验非遗。', year:2022 },
-  { id:'c14', name:'非遗·傩舞/秦腔/曲剧', type:'culture', category:'戏曲国粹', desc:'燕云十六声深度还原傩舞仪式，携手国家级传承人惠敏莉创作秦腔主题歌曲。', year:2025 },
-  { id:'c15', name:'西游文化/神话', type:'culture', category:'古典文学/IP', desc:'西游记IP覆盖黑神话悟空、王者荣耀、原神等；结合古建实景扫描，实现文化深度还原。', year:2020 },
-  { id:'c16', name:'古埃及历史', type:'culture', category:'世界历史文明', desc:'刺客信条：起源发现之旅教育模式，被全球学校作为教学工具，将历史考据融入游戏体验。', year:2018 },
-  { id:'c17', name:'北欧维京文化', type:'culture', category:'北欧/维京文化', desc:'战神系列/刺客信条英灵殿/Valheim以北欧神话为核心，全球验证维京题材的商业号召力。', year:2017 },
-  { id:'c18', name:'日本武士/妖怪文化', type:'culture', category:'世界历史文明', desc:'对马岛之魂制作人获永久旅游大使称号，仁王系列融合战国历史与妖怪民俗。', year:2017 },
-  { id:'c19', name:'波兰斯拉夫文化', type:'culture', category:'世界历史文明', desc:'巫师3深度扎根斯拉夫神话民间传说，全球5000万套，波兰政府曾作国礼赠送。', year:2015 },
-  { id:'c20', name:'美国西部拓荒', type:'culture', category:'西部/拓荒文化', desc:'荒野大镖客2还原1899年西部，田纳西大学用其开设历史课，全球6500万套。', year:2018 },
-  { id:'c21', name:'非遗·多项系统化(31项)', type:'culture', category:'非遗传承', desc:'逆水寒手游系统化联动31项非遗（簪花、昆曲、醒狮、灯彩等），几乎全部免费获取。', year:2023 },
-  { id:'c22', name:'苗族/故宫/国宝归乡', type:'culture', category:'少数民族文化', desc:'蛋仔派对联动苗族四项非遗+故宫观唐+博物馆赛季，连上3台春晚，国宝归乡季为品类首创。', year:2023 },
-  { id:'c23', name:'凯尔特/多元部落', type:'culture', category:'世界历史文明', desc:'Hellblade联合剑桥大学融合精神健康与凯尔特文化；地平线系列融合阿兹特克/因纽特/非洲文化。', year:2017 },
-  { id:'c24', name:'中世纪阿拉伯/伊斯兰', type:'culture', category:'世界历史文明', desc:'刺客信条：幻景发现之旅还原中世纪巴格达黄金时代，填补伊斯兰历史展现空白。', year:2024 },
+  { id:'c1',  name:'非遗·传统服饰/刺绣', type:'culture', category:'非遗传承', desc:'苏绣、蜀绣、湘绣、云锦、京绣、杭缎、缂丝等多项国家级非遗技艺，与换装/女性向游戏天然适配。', year:2017 },
+  { id:'c2',  name:'非遗·皮影/傩戏/傩舞', type:'culture', category:'戏曲国粹', desc:'皮影戏、傩戏、傩舞、火虎等传统表演艺术，多位国家级传承人与游戏合作共创。', year:2019 },
+  { id:'c3',  name:'非遗·传统工艺', type:'culture', category:'非遗传承', desc:'花丝镶嵌、雕版印刷、螺钿漆器、掐丝珐琅、景泰蓝、漆器等古法工艺。', year:2019 },
+  { id:'c4',  name:'敦煌文化', type:'culture', category:'敦煌文化', desc:'敦煌博物馆/石窟保护/飞天/壁画，丝路美学与公益石窟保护结合。', year:2018 },
+  { id:'c5',  name:'非遗·戏曲(秦腔/曲剧/京剧)', type:'culture', category:'戏曲国粹', desc:'秦腔、曲剧、京剧等戏曲与游戏融合，惠敏莉等国家级传承人参与创作。', year:2022 },
+  { id:'c6',  name:'博物馆·三星堆/南越王', type:'culture', category:'博物馆/文物', desc:'三星堆博物馆战略签约、南越王博物院线下联动，国宝文物数字化呈现。', year:2020 },
+  { id:'c7',  name:'博物馆·故宫/上博/国博', type:'culture', category:'博物馆/文物', desc:'故宫观唐、上海博物馆、中国国家博物馆等顶级文博机构与游戏联动。', year:2020 },
+  { id:'c8',  name:'三国文物/历史', type:'culture', category:'博物馆/文物', desc:'中国文物交流中心40余家博物馆联展，三国历史文物融入SLG策略游戏。', year:2020 },
+  { id:'c9',  name:'文旅·山西古建/河西走廊', type:'culture', category:'文旅联动', desc:'黑神话悟空27处山西取景地、燕云十六声河西6景区打卡，带动文旅热潮。', year:2024 },
+  { id:'c10', name:'文旅·开封/乌镇/汉中', type:'culture', category:'文旅联动', desc:'开封清明上河园、乌镇风景区、汉中北伐等线下文旅联动。', year:2023 },
+  { id:'c11', name:'少数民族/苗族非遗', type:'culture', category:'少数民族文化', desc:'苗族银饰/刺绣、柯尔克孜族刺绣、普宁英歌、白族文化等多民族非遗。', year:2017 },
+  { id:'c12', name:'非遗·综合系统化(100+项)', type:'culture', category:'非遗传承', desc:'逆水寒100+项非遗系统化联动，覆盖簪花、昆曲、醒狮、马踏飞燕等。', year:2023 },
+  { id:'c13', name:'西游/神话文化', type:'culture', category:'古典文学/IP', desc:'西游记IP覆盖黑神话悟空；《红楼梦》87版联动等古典文学经典。', year:2020 },
+  { id:'c14', name:'北欧维京/凯尔特', type:'culture', category:'北欧/维京文化', desc:'战神/Valheim/Hellblade以北欧神话与凯尔特文化为核心世界观。', year:2017 },
+  { id:'c15', name:'日本武士/妖怪文化', type:'culture', category:'世界历史文明', desc:'对马岛之魂/仁王系列深度还原日本武士与妖怪文化，获官方旅游大使。', year:2017 },
+  { id:'c16', name:'波兰斯拉夫文化', type:'culture', category:'世界历史文明', desc:'巫师3深度扎根斯拉夫神话，全球5000万套，波兰政府曾作国礼。', year:2015 },
+  { id:'c17', name:'美国西部拓荒', type:'culture', category:'西部/拓荒文化', desc:'荒野大镖客2还原1899年西部，田纳西大学开设历史课，全球6500万套。', year:2018 },
+  { id:'c18', name:'古埃及/阿拉伯历史', type:'culture', category:'世界历史文明', desc:'刺客信条发现之旅教育模式覆盖古埃及/维京/巴格达，全球学校教学工具。', year:2018 },
+  { id:'c19', name:'博物馆·大英/上图/学术', type:'culture', category:'博物馆/文物', desc:'FGO联动大英博物馆/国家宝藏/上海图书馆，8年文化传承集大成。', year:2020 },
+  { id:'c20', name:'非遗·簪花围/孔雀舞', type:'culture', category:'非遗传承', desc:'叠纸恋与深空簪花围联动7000万全球玩家触达，入选人民日报年度报道。', year:2025 },
+  { id:'c21', name:'闽南/海丝文化', type:'culture', category:'文旅联动', desc:'泉州刺桐港/提线木偶/南音/海交馆，世界级非遗与海丝文化还原。', year:2025 },
+  { id:'c22', name:'国宝·甘肃省博(马踏飞燕)', type:'culture', category:'博物馆/文物', desc:'甘肃省博物馆马踏飞燕联动，抖音3500万+点赞。', year:2025 },
+  { id:'c23', name:'大禹治水/怀远文旅', type:'culture', category:'文旅联动', desc:'征途系列联动怀远文旅推出大禹精神主题活动。', year:2025 },
+  { id:'c24', name:'东方美学/水墨', type:'culture', category:'东方美学/国风', desc:'崩坏星穹铁道/鸣潮融入水墨画/东方哲学/国风场景，全球认同。', year:2023 },
+  { id:'c25', name:'多元部落/考古文化', type:'culture', category:'世界历史文明', desc:'地平线/古墓丽影融合阿兹特克/因纽特/全球考古遗址文化。', year:2017 },
+  { id:'c26', name:'非遗·剪纸/叶雕', type:'culture', category:'非遗传承', desc:'中国剪纸博物馆、东昌叶雕等平面非遗艺术与游戏创新结合。', year:2022 },
 ];
 
 const gameNodes = [
-  { id:'g1',  name:'王者荣耀',       type:'game', genre:'MOBA', desc:'腾讯天美MOBA手游，十年九系列文化联动，覆盖敦煌/京剧/皮影/醒狮/西游等。', year:2016 },
-  { id:'g2',  name:'逆水寒手游',     type:'game', genre:'武侠MMO', desc:'网易武侠MMO，系统化联动31项非遗，几乎全部免费获取，被称为文化基建路线。', year:2023 },
-  { id:'g3',  name:'天涯明月刀',     type:'game', genre:'武侠MMO', desc:'腾讯北极光武侠MMO，天衣别院实体建筑落户芙蓉镇，入选联合国教科文组织案例。', year:2020 },
-  { id:'g4',  name:'原神',           type:'game', genre:'开放世界RPG', desc:'米哈游开放世界RPG，《流光拾遗之旅》系列纪录片15+项非遗，15种语言全球传播。', year:2020 },
-  { id:'g5',  name:'黑神话：悟空',   type:'game', genre:'动作冒险3A', desc:'游戏科学3A动作RPG，27处取景地来自山西古建，景区搜索热度暴涨156%。', year:2024 },
-  { id:'g6',  name:'燕云十六声',     type:'game', genre:'开放世界RPG', desc:'网易开放世界武侠，深度还原傩舞/秦腔/曲剧，全球8000万玩家，CGTN纪录片报道。', year:2025 },
-  { id:'g7',  name:'和平精英',       type:'game', genre:'射击/战术竞技', desc:'腾讯光子战术竞技手游，系统化文旅+非遗布局，助力北京中轴线申遗成功。', year:2022 },
-  { id:'g8',  name:'CF手游',         type:'game', genre:'射击/战术竞技', desc:'腾讯光子射击手游，联动秦始皇帝陵博物院/新华网巡百城，十年IP通过文旅焕新。', year:2024 },
-  { id:'g9',  name:'阴阳师',         type:'game', genre:'卡牌RPG', desc:'网易卡牌RPG，联动东昌叶雕/云锦等非遗传承人共创，与博物馆深度合作。', year:2020 },
-  { id:'g10', name:'FGO',            type:'game', genre:'卡牌RPG', desc:'B站代理卡牌RPG，联动大英博物馆/国家宝藏/上海图书馆，8年文化传承集大成。', year:2020 },
-  { id:'g11', name:'三国志·战略版',  type:'game', genre:'SLG策略', desc:'灵犀互娱SLG，携手40余家博物馆推出三国志文化特展，首个入驻中国游戏博物馆。', year:2020 },
-  { id:'g12', name:'率土之滨',       type:'game', genre:'SLG策略', desc:'网易SLG，联动故宫观唐+汉中文旅，薪火相传将典藏文物融入游戏宝物系统。', year:2020 },
-  { id:'g13', name:'QQ炫舞',         type:'game', genre:'音舞/换装', desc:'腾讯音舞手游，杨丽萍团队371天深度参与孔雀舞联动，新华网专题报道。', year:2017 },
-  { id:'g14', name:'以闪亮之名',     type:'game', genre:'音舞/换装', desc:'祖龙时尚生活手游，蜀绣+柯尔克孜族刺绣联动，入选伽马数据社会责任报告。', year:2024 },
-  { id:'g15', name:'闪耀暖暖',       type:'game', genre:'音舞/换装', desc:'叠纸3D换装手游，闪耀非遗系列联动苏州评弹/蟳埔女习俗/87版红楼梦，获上海市级奖项。', year:2023 },
-  { id:'g16', name:'光与夜之恋',     type:'game', genre:'音舞/换装', desc:'腾讯北极光恋爱互动手游，苏绣婚书在博物馆展出，少数民族采风获新华网报道。', year:2022 },
-  { id:'g17', name:'蛋仔派对',       type:'game', genre:'派对竞技', desc:'网易派对手游，苗族非遗+故宫+博物馆赛季+春晚联动，国宝归乡季为品类首创。', year:2023 },
-  { id:'g18', name:'江南百景图',     type:'game', genre:'模拟经营', desc:'椰岛模拟经营手游，联动雕版印刷/螺钿漆器/谢馥春，经营玩法与工坊天然匹配。', year:2022 },
-  { id:'g19', name:'明日方舟',       type:'game', genre:'卡牌RPG', desc:'鹰角塔防策略手游，南越王博物院线下联动当天下午门票告罄，日均超2万人。', year:2024 },
-  { id:'g20', name:'超自然行动组',   type:'game', genre:'动作冒险3A', desc:'巨人网络恐怖冒险手游，傩面具雕刻传人共创，2025年流水超50亿。', year:2025 },
-  { id:'g21', name:'第五人格',       type:'game', genre:'卡牌RPG', desc:'网易非对称竞技，2022春节与北京皮影剧团合作，活动参与度极高。', year:2022 },
-  { id:'g22', name:'永劫无间',       type:'game', genre:'动作冒险3A', desc:'网易动作竞技跨平台，金乌纪企划系列化联动白族/金沙遗址/武术/西泠。', year:2022 },
-  { id:'g23', name:'梦幻西游',       type:'game', genre:'武侠MMO', desc:'网易回合制MMO，匠心传梦非遗守护计划联动花丝镶嵌/泰山皮影/琵琶等28项。', year:2019 },
-  { id:'g24', name:'碧蓝航线',       type:'game', genre:'卡牌RPG', desc:'B站舰船收集RPG，六周年敦煌博物馆联动+七周年苏州丝绸博物馆，龚琳娜担任交流官。', year:2023 },
-  { id:'g25', name:'刺客信条系列',   type:'game', genre:'动作冒险3A', desc:'育碧动作冒险3A，发现之旅教育模式覆盖古埃及/维京/巴格达，被全球学校作为教学工具。', year:2018 },
-  { id:'g26', name:'战神：诸神黄昏', type:'game', genre:'动作冒险3A', desc:'SIE Santa Monica 3A动作冒险，深度融合北欧神话九界体系，首周510万套。', year:2022 },
-  { id:'g27', name:'对马岛之魂',     type:'game', genre:'动作冒险3A', desc:'Sucker Punch开放世界，还原1274年对马岛，制作人获永久旅游大使称号。', year:2020 },
-  { id:'g28', name:'巫师3',          type:'game', genre:'开放世界RPG', desc:'CD Projekt Red开放世界RPG，深度扎根波兰斯拉夫文化，全球5000万套。', year:2015 },
-  { id:'g29', name:'荒野大镖客2',    type:'game', genre:'开放世界RPG', desc:'Rockstar开放世界，还原1899年西部拓荒，大学历史课教材，全球6500万套。', year:2018 },
-  { id:'g30', name:'Valheim',        type:'game', genre:'动作冒险3A', desc:'瑞典5人团队生存游戏，以北欧神话为核心世界观，一月售500万套。', year:2021 },
-  { id:'g31', name:'使命召唤手游',   type:'game', genre:'射击/战术竞技', desc:'腾讯天美射击手游，携手江苏非遗中心+传承人张方林推出南京剪纸联动。', year:2022 },
+  { id:'g1',  name:'剑网3',         type:'game', genre:'武侠MMO', desc:'西山居武侠MMO，最早系统性融合传统文化的国产MMO，持续联动文旅。', year:2018 },
+  { id:'g2',  name:'梦幻西游',       type:'game', genre:'回合制MMO', desc:'网易回合制MMO，匠心传梦非遗守护计划联动28+项非遗，20+年情怀。', year:2019 },
+  { id:'g3',  name:'江南百景图',     type:'game', genre:'模拟经营', desc:'椰岛模拟经营手游，联动雕版印刷/螺钿漆器/谢馥春。', year:2022 },
+  { id:'g4',  name:'阴阳师',         type:'game', genre:'卡牌RPG', desc:'网易卡牌RPG，联动叶雕/云锦/缂丝等非遗传承人共创。', year:2020 },
+  { id:'g5',  name:'碧蓝航线',       type:'game', genre:'卡牌RPG', desc:'B站舰船收集RPG，敦煌博物馆+苏州丝绸博物馆联动。', year:2023 },
+  { id:'g6',  name:'明日方舟',       type:'game', genre:'卡牌RPG', desc:'鹰角塔防策略，南越王博物院/国博联动，门票秒罄。', year:2024 },
+  { id:'g7',  name:'以闪亮之名',     type:'game', genre:'音舞/换装', desc:'祖龙时尚生活手游，蜀绣+柯尔克孜族刺绣联动，伽马数据收录。', year:2024 },
+  { id:'g8',  name:'闪耀暖暖',       type:'game', genre:'音舞/换装', desc:'叠纸3D换装，闪耀非遗长期系列+三作纪录片，获上海市级奖项。', year:2023 },
+  { id:'g9',  name:'燕云十六声',     type:'game', genre:'开放世界RPG', desc:'网易开放世界武侠，傩舞/秦腔/曲剧/河西/开封多维文化联动。', year:2025 },
+  { id:'g10', name:'第五人格',       type:'game', genre:'卡牌RPG', desc:'网易非对称竞技，北京皮影剧团联动纪录片。', year:2022 },
+  { id:'g11', name:'超自然行动组',   type:'game', genre:'恐怖冒险', desc:'巨人网络恐怖冒险，傩面具/皮影/珐琅传承人共创，流水超50亿。', year:2025 },
+  { id:'g12', name:'原神',           type:'game', genre:'开放世界RPG', desc:'米哈游开放世界RPG，流光拾遗之旅15+项非遗纪录片，全球传播标杆。', year:2020 },
+  { id:'g13', name:'黑神话：悟空',   type:'game', genre:'动作冒险3A', desc:'游戏科学3A，27处山西古建取景，景区搜索暴涨156%。', year:2024 },
+  { id:'g14', name:'逆水寒手游',     type:'game', genre:'武侠MMO', desc:'网易武侠MMO，100+项非遗系统化联动，文化基建路线标杆。', year:2023 },
+  { id:'g15', name:'永劫无间',       type:'game', genre:'动作竞技', desc:'网易动作竞技，金乌纪+上博+西泠+海丝，系列化文化品牌。', year:2022 },
+  { id:'g16', name:'FGO',            type:'game', genre:'卡牌RPG', desc:'B站代理卡牌RPG，大英博物馆/国家宝藏/上图联动，8年传承。', year:2020 },
+  { id:'g17', name:'三国志·战略版',  type:'game', genre:'SLG策略', desc:'灵犀互娱SLG，40余家博物馆联展+漆器+南越王+许昌文旅。', year:2020 },
+  { id:'g18', name:'率土之滨',       type:'game', genre:'SLG策略', desc:'网易SLG，故宫观唐+汉中文旅+薪火相传文物系统。', year:2020 },
+  { id:'g19', name:'蛋仔派对',       type:'game', genre:'派对竞技', desc:'网易派对手游，苗族/故宫/敦煌/英歌多季联动，连上3台春晚。', year:2023 },
+  { id:'g20', name:'刺客信条系列',   type:'game', genre:'动作冒险3A', desc:'育碧发现之旅教育模式，覆盖古埃及/维京/巴格达。', year:2018 },
+  { id:'g21', name:'战神：诸神黄昏', type:'game', genre:'动作冒险3A', desc:'SIE 3A动作冒险，北欧神话九界体系，首周510万套。', year:2022 },
+  { id:'g22', name:'巫师3',          type:'game', genre:'开放世界RPG', desc:'CDPR开放世界RPG，斯拉夫文化，全球5000万套。', year:2015 },
+  { id:'g23', name:'对马岛之魂',     type:'game', genre:'动作冒险3A', desc:'Sucker Punch开放世界，制作人获永久旅游大使。', year:2020 },
+  { id:'g24', name:'荒野大镖客2',    type:'game', genre:'开放世界RPG', desc:'Rockstar开放世界，大学历史课教材，全球6500万套。', year:2018 },
+  { id:'g25', name:'Valheim',        type:'game', genre:'动作冒险3A', desc:'瑞典5人团队，北欧神话核心，一月500万套。', year:2021 },
+  { id:'g26', name:'决胜巅峰',       type:'game', genre:'MOBA', desc:'网易MOBA手游，S2赛季×贵州傩文化博物馆联动。', year:2025 },
+  { id:'g27', name:'如鸢',           type:'game', genre:'卡牌RPG', desc:'灵犀互娱剧情卡牌，雕版作品纳入扬州非遗珍宝馆永久陈列。', year:2025 },
+  { id:'g28', name:'指间山海',       type:'game', genre:'卡牌RPG', desc:'国风志怪手游，携手中国剪纸博物馆线下展。', year:2025 },
+  { id:'g29', name:'大话西游',       type:'game', genre:'回合制MMO', desc:'网易回合制系列，洛阳木雕/乌镇/洛阳牡丹节文旅联动。', year:2023 },
+  { id:'g30', name:'崩坏：星穹铁道', type:'game', genre:'开放世界RPG', desc:'米哈游回合RPG，仙舟罗浮水墨东方哲学+苏博联动。', year:2023 },
+  { id:'g31', name:'恋与深空',       type:'game', genre:'音舞/换装', desc:'叠纸恋爱动作手游，簪花围非遗联动7000万全球玩家。', year:2025 },
+  { id:'g32', name:'诸神之战',       type:'game', genre:'武侠MMO', desc:'完美世界MMORPG，景泰蓝"珐琅张"1:1复刻。', year:2025 },
+  { id:'g33', name:'诛仙2',          type:'game', genre:'武侠MMO', desc:'完美世界MMORPG，京绣/杭缎/火虎非遗联动。', year:2025 },
+  { id:'g34', name:'征途系列',       type:'game', genre:'武侠MMO', desc:'巨人网络MMORPG，大禹治水×怀远文旅20周年焕新。', year:2025 },
+  { id:'g35', name:'鸣潮',           type:'game', genre:'开放世界RPG', desc:'库洛游戏开放世界动作RPG，东方美学国风场景设计。', year:2025 },
+  { id:'g36', name:'战双帕弥什',     type:'game', genre:'动作竞技', desc:'库洛游戏动作RPG，库洛FES线下非遗手工艺体验。', year:2025 },
+  { id:'g37', name:'万国觉醒',       type:'game', genre:'SLG策略', desc:'莉莉丝SLG，全球多元文明深度展示。', year:2025 },
+  { id:'g38', name:'地平线/古墓丽影', type:'game', genre:'动作冒险3A', desc:'多元部落+全球考古遗址，系列累计超1.2亿套。', year:2017 },
+  { id:'g39', name:'仁王系列',       type:'game', genre:'动作冒险3A', desc:'光荣特库摩动作RPG，日本战国+妖怪文化，系列700万套。', year:2017 },
+  { id:'g40', name:'Hellblade',      type:'game', genre:'动作冒险3A', desc:'Ninja Theory动作冒险，剑桥大学合作凯尔特文化+精神健康。', year:2017 },
 ];
 
 const links = [
-  // 王者荣耀 文化联动
-  { source:'c1',  target:'g1',  depth:5, rating:'S', note:'项羽+虞姬霸王别姬京剧主题皮肤，融入京剧脸谱、水袖、唱腔设计，开创游戏×戏曲先河', year:2016 },
-  { source:'c1',  target:'g1',  depth:4, rating:'S', note:'甄姬游园惊梦昆曲限定，灵感源自《牡丹亭》，至今最渴望返场绝版皮肤之一', year:2017 },
-  { source:'c2',  target:'g1',  depth:5, rating:'S', note:'杨玉环遇见飞天×敦煌研究院深度合作，设计组赴敦煌实地考察，央媒报道', year:2018 },
-  { source:'c15', target:'g1',  depth:3, rating:'A', note:'孙悟空为初始英雄，持续推出至尊宝等西游主题皮肤与活动', year:2020 },
-  // 逆水寒
-  { source:'c21', target:'g2',  depth:5, rating:'S', note:'系统化联动31项非遗（簪花、昆曲、醒狮、灯彩等），几乎全部免费获取，文化基建路线获赞', year:2023 },
-  { source:'c3',  target:'g2',  depth:4, rating:'A', note:'逆水寒联动苗族银饰非遗：推出限定银饰主题套装与打造系统', year:2023 },
-  // 天涯明月刀
-  { source:'c3',  target:'g3',  depth:5, rating:'S', note:'手游上线盛典融合多项非遗（云锦/苏绣/花丝镶嵌），天衣华服系列精致度获赞叹', year:2020 },
-  { source:'c12', target:'g3',  depth:5, rating:'S', note:'清华建筑学院天衣别院实体建筑落户芙蓉镇，央视报道；入选联合国教科文组织案例', year:2021 },
-  // 原神
-  { source:'c5',  target:'g4',  depth:5, rating:'S', note:'《流光拾遗之旅》系列纪录片15+项非遗，15种语言全球传播超2年，行业标杆', year:2023 },
-  { source:'c10', target:'g4',  depth:4, rating:'S', note:'三星堆博物馆战略签约，推出联动歌曲《青铜》（刘欢+方文山），全网热议', year:2023 },
-  { source:'c1',  target:'g4',  depth:4, rating:'A', note:'《神女劈观》戏歌B站数千万播放，年轻玩家首次接触戏曲；贵州线下非遗体验预约3分钟抢空', year:2022 },
-  // 黑神话：悟空
-  { source:'c15', target:'g5',  depth:5, rating:'S', note:'全面演绎西游记，实地扫描中国古建筑群呈现取经之路', year:2024 },
-  { source:'c11', target:'g5',  depth:5, rating:'S', note:'27处取景地来自山西古建，景区搜索热度暴涨156%，太原古建数字艺术展', year:2024 },
-  // 燕云十六声
-  { source:'c14', target:'g6',  depth:5, rating:'S', note:'深度还原傩舞仪式与面具，与惠敏莉合作创作秦腔《望西都》，CGTN纪录片', year:2025 },
-  { source:'c14', target:'g6',  depth:4, rating:'A', note:'河南曲剧/四川达州/开封/甘肃文旅联动，河西走廊版本反响热烈', year:2025 },
-  // 和平精英
-  { source:'c13', target:'g7',  depth:5, rating:'S', note:'邀请铜梁龙舞+佛山醒狮传承人参与版本研发，亿万玩家同场体验非遗', year:2022 },
-  { source:'c8',  target:'g7',  depth:4, rating:'A', note:'绿洲世界还原天坛古建筑群，助力北京中轴线2024申遗成功', year:2023 },
-  { source:'c6',  target:'g7',  depth:4, rating:'A', note:'联手甘肃文旅厅/敦煌文旅集团，丝路贺新春复刻玉门关实景', year:2026 },
-  // CF手游
-  { source:'c10', target:'g8',  depth:4, rating:'A', note:'秦始皇帝陵博物院联名：角色秦师+武器AK47-秦俑，抖音千万级曝光', year:2024 },
-  { source:'c12', target:'g8',  depth:4, rating:'A', note:'携手新华网巡百城+郑州非遗+《舌尖》IP，十年IP通过文旅焕新', year:2024 },
-  // 阴阳师
-  { source:'c5',  target:'g9',  depth:4, rating:'A', note:'联动东昌叶雕传承人吴金芝创作叶雕绘卷，界面新闻/京报网广泛报道', year:2022 },
-  { source:'c3',  target:'g9',  depth:4, rating:'A', note:'携手云锦传承人金文定制《飞龙在天》，中国日报报道', year:2024 },
-  // FGO
-  { source:'c8',  target:'g10', depth:4, rating:'S', note:'系列历史纪录片联动大英博物馆，英灵原型与文物对照，二次元与博物馆双向破圈', year:2022 },
-  { source:'c8',  target:'g10', depth:4, rating:'A', note:'与央视《国家宝藏》IP联动，澎湃报道变文化传播器', year:2020 },
-  { source:'c8',  target:'g10', depth:4, rating:'A', note:'与上海图书馆+华东师大举办特展，8年文化传承集大成', year:2024 },
-  // 三国志·战略版
-  { source:'c9',  target:'g11', depth:5, rating:'S', note:'携手40余家文博单位推出三国志文化主题特展，SLG品类最大规模文博联动', year:2020 },
-  { source:'c9',  target:'g11', depth:4, rating:'A', note:'非遗漆器仿汉龙虎冠军鼎入驻中国游戏博物馆，首个入驻的国产三国SLG', year:2025 },
-  // 率土之滨
-  { source:'c9',  target:'g12', depth:5, rating:'S', note:'携手中国文物交流中心，薪火相传将典藏文物融入游戏宝物系统，SLG最早系统化文博联动', year:2020 },
-  { source:'c12', target:'g12', depth:4, rating:'A', note:'十周年联动故宫观唐，传世文物+太和殿融入游戏，全网爆料即引爆关注', year:2025 },
-  // QQ炫舞
-  { source:'c7',  target:'g13', depth:5, rating:'S', note:'杨丽萍团队371天深度参与孔雀舞瞳·雀联动，新华网专题报道', year:2020 },
-  { source:'c3',  target:'g13', depth:4, rating:'A', note:'与湘绣大师李艳共创，虚拟代言人星瞳任长沙非遗推广大使（行业首创）', year:2021 },
-  // 以闪亮之名
-  { source:'c3',  target:'g14', depth:4, rating:'A', note:'首次蜀绣国家级传承人合作，"玩了就是传承人"成热梗，入选伽马数据报告', year:2024 },
-  { source:'c7',  target:'g14', depth:4, rating:'A', note:'联合柯尔克孜族刺绣传承人布如力·斯开克共创三形态套装，中国日报报道', year:2024 },
-  // 闪耀暖暖
-  { source:'c3',  target:'g15', depth:4, rating:'A', note:'闪耀非遗系列联动苏州评弹/蟳埔女习俗/87版红楼梦，获上海市级重磅奖项', year:2023 },
-  // 光与夜之恋
-  { source:'c7',  target:'g16', depth:4, rating:'A', note:'夏日民间采风沉浸式视频探访4个少数民族非遗，新华网/光明网/中国日报报道', year:2023 },
-  { source:'c3',  target:'g16', depth:4, rating:'A', note:'苏绣婚书在苏州丝绸博物馆展出，手游联动产出博物馆级展品', year:2022 },
-  // 蛋仔派对
-  { source:'c22', target:'g17', depth:5, rating:'S', note:'苗族四项非遗+醒狮+川剧+故宫+博物馆赛季，连上3台春晚，国宝归乡季品类首创', year:2023 },
-  // 江南百景图
-  { source:'c5',  target:'g18', depth:4, rating:'A', note:'联动雕版印刷（扬州广陵古籍刻印社）+螺钿漆器+谢馥春，模拟经营与工坊天然契合', year:2022 },
-  // 明日方舟
-  { source:'c8',  target:'g19', depth:5, rating:'S', note:'南越王博物院线下联动：干员林听讲解文物，当天下午门票告罄，日均超2万人', year:2024 },
-  // 超自然行动组
-  { source:'c4',  target:'g20', depth:5, rating:'S', note:'邀请傩面具雕刻第七代传人杨云霞共创，2025年流水超50亿，中式微恐+民俗新赛道', year:2025 },
-  { source:'c5',  target:'g20', depth:4, rating:'A', note:'掐丝珐琅融入武器设计（妇女节免费送）+华县皮影联动，免费策略口碑极佳', year:2026 },
-  // 第五人格
-  { source:'c4',  target:'g21', depth:4, rating:'A', note:'2022春节灯影遂愿×北京皮影剧团合作纪录片，活动参与度极高，玩家好评如潮', year:2022 },
-  // 永劫无间
-  { source:'c7',  target:'g22', depth:4, rating:'A', note:'金乌纪企划联动白族/金沙遗址/武术/西泠，长期系列化文化品牌运营行业范例', year:2022 },
+  // 剑网3
+  { source:'c1', target:'g1', depth:4, rating:'A', note:'九周年联合盖娅传说国风华服共创+粤剧非遗深度结合', year:2018 },
+  { source:'c4', target:'g1', depth:5, rating:'S', note:'2024联动敦煌博物馆+石窟保护研究基金会，入选2024游戏公益典型案例', year:2024 },
+  { source:'c9', target:'g1', depth:4, rating:'A', note:'持续联动张家界/丽江/敦煌等知名文旅景区，十年文旅路线', year:2023 },
   // 梦幻西游
-  { source:'c5',  target:'g23', depth:5, rating:'S', note:'匠心传梦非遗守护计划28项，联动花丝镶嵌/泰山皮影/琵琶传承人，20+年情怀拉满', year:2019 },
+  { source:'c3', target:'g2', depth:5, rating:'S', note:'匠心传梦非遗守护计划28+项：花丝镶嵌/泰山皮影/琵琶等传承人共创+实物复刻', year:2019 },
+  // 江南百景图
+  { source:'c3', target:'g3', depth:4, rating:'A', note:'联动雕版印刷（扬州广陵古籍刻印社）+螺钿漆器+谢馥春，澎湃/新华网报道', year:2022 },
+  // 阴阳师
+  { source:'c26',target:'g4', depth:4, rating:'A', note:'联动东昌叶雕传承人吴金芝创作叶雕绘卷，界面新闻/京报网报道', year:2022 },
+  { source:'c1', target:'g4', depth:4, rating:'A', note:'云锦传承人金文定制《飞龙在天》+缂丝主题皮肤，中国日报报道', year:2024 },
   // 碧蓝航线
-  { source:'c6',  target:'g24', depth:3, rating:'A', note:'六周年敦煌博物馆联动飞天换装（免费获取）+西湖龙井非遗双文化联动', year:2023 },
-  { source:'c3',  target:'g24', depth:3, rating:'A', note:'七周年联动苏州丝绸博物馆，龚琳娜担任交流官，三方联动模式新颖', year:2024 },
-  // 刺客信条系列
-  { source:'c16', target:'g25', depth:5, rating:'S', note:'发现之旅：古埃及教育模式，被全球学校作为教学工具，比去博物馆还有趣', year:2018 },
-  { source:'c17', target:'g25', depth:5, rating:'S', note:'发现之旅：维京时代角色扮演式教育，学术论文收录，可操控的历史纪录片', year:2021 },
-  { source:'c24', target:'g25', depth:4, rating:'A', note:'发现之旅：中世纪巴格达，填补伊斯兰历史展现空白', year:2024 },
+  { source:'c4', target:'g5', depth:3, rating:'A', note:'六周年敦煌博物馆联动飞天换装+西湖龙井非遗', year:2023 },
+  { source:'c1', target:'g5', depth:3, rating:'A', note:'七周年联动苏州丝绸博物馆，龚琳娜担任交流官', year:2024 },
+  // 明日方舟
+  { source:'c6', target:'g6', depth:5, rating:'S', note:'南越王博物院线下联动：当天下午门票告罄，日均超2万人', year:2024 },
+  { source:'c7', target:'g6', depth:4, rating:'A', note:'萨卡兹主题曲邀请民乐团演奏，融合中国民族音乐', year:2024 },
+  // 以闪亮之名
+  { source:'c1', target:'g7', depth:4, rating:'A', note:'蜀绣传承人孟德芝合作"锦绣人间"+柯尔克孜族刺绣三形态套装', year:2024 },
+  { source:'c11',target:'g7', depth:4, rating:'A', note:'联合柯尔克孜族刺绣传承人共创，中国日报/界面新闻报道', year:2024 },
+  // 闪耀暖暖
+  { source:'c1', target:'g8', depth:4, rating:'A', note:'闪耀非遗系列联动苏州评弹/蟳埔女/红楼梦，获上海市级奖项', year:2023 },
+  // 燕云十六声
+  { source:'c2', target:'g9', depth:5, rating:'S', note:'深度还原傩舞仪式与面具，全球8000万玩家，CGTN纪录片报道', year:2025 },
+  { source:'c5', target:'g9', depth:4, rating:'A', note:'惠敏莉合作秦腔《望西都》+河南曲剧联动', year:2025 },
+  { source:'c9', target:'g9', depth:5, rating:'S', note:'甘肃河西走廊6景区打卡，小红书超1万篇+CGTN纪录片', year:2025 },
+  { source:'c10',target:'g9', depth:4, rating:'A', note:'线上还原开封府/清明上河园，线下巡游+AR体验', year:2025 },
+  // 第五人格
+  { source:'c2', target:'g10',depth:4, rating:'A', note:'2022春节灯影遂愿×北京皮影剧团合作纪录片', year:2022 },
+  // 超自然行动组
+  { source:'c2', target:'g11',depth:5, rating:'S', note:'傩面具第七代传人杨云霞共创，2025年流水超50亿，营收增长72.69%', year:2025 },
+  { source:'c3', target:'g11',depth:4, rating:'A', note:'掐丝珐琅武器+华县皮影联动，妇女节免费策略口碑极佳', year:2026 },
+  // 原神
+  { source:'c3', target:'g12',depth:5, rating:'S', note:'《流光拾遗之旅》15+项非遗纪录片15种语言全球传播+景德镇陶瓷', year:2023 },
+  { source:'c6', target:'g12',depth:5, rating:'S', note:'三星堆博物馆战略签约+联动歌曲《青铜》（刘欢+方文山），全网热议', year:2023 },
+  { source:'c5', target:'g12',depth:4, rating:'S', note:'《神女劈观》戏歌B站数千万播放+贵州傩戏「傩女幻剧」文旅', year:2022 },
+  { source:'c7', target:'g12',depth:4, rating:'A', note:'联动浙江省博物馆/苏州博物馆，线下文物展示', year:2025 },
+  // 黑神话：悟空
+  { source:'c13',target:'g13',depth:5, rating:'S', note:'全面演绎西游记，实地扫描中国古建筑群呈现取经之路', year:2024 },
+  { source:'c9', target:'g13',depth:5, rating:'S', note:'27处山西古建取景+太原古县城遗址艺术展，景区暴涨156%', year:2024 },
+  // 逆水寒手游
+  { source:'c12',target:'g14',depth:5, rating:'S', note:'100+项国家级非遗系统化联动，行业之最，几乎全部免费获取', year:2023 },
+  { source:'c22',target:'g14',depth:4, rating:'S', note:'联动甘肃省博物馆马踏飞燕，抖音3500万+点赞', year:2025 },
+  { source:'c21',target:'g14',depth:4, rating:'A', note:'泉州刺桐港地图+提线木偶/南音还原，千万玩家云游泉州', year:2025 },
+  // 永劫无间
+  { source:'c11',target:'g15',depth:4, rating:'A', note:'金乌纪企划联动白族/金沙遗址/武术/西泠，系列化文化品牌', year:2022 },
+  { source:'c7', target:'g15',depth:4, rating:'A', note:'九州遗珍联动上海博物馆+西泠印社篆刻融入武器纹饰', year:2025 },
+  { source:'c21',target:'g15',depth:3, rating:'B', note:'柯桐湾海丝新地图，海丝文化融入竞技场景', year:2025 },
+  // FGO
+  { source:'c19',target:'g16',depth:5, rating:'S', note:'大英博物馆纪录片+国家宝藏IP联动+上图特展，8年传承集大成', year:2022 },
+  // 三国志·战略版
+  { source:'c8', target:'g17',depth:5, rating:'S', note:'40余家博物馆联展+漆器入驻中国游戏博物馆+南越王+许昌文旅', year:2020 },
+  // 率土之滨
+  { source:'c8', target:'g18',depth:5, rating:'S', note:'薪火相传典藏文物融入+汉中北伐文旅赛季', year:2020 },
+  { source:'c7', target:'g18',depth:4, rating:'A', note:'十周年联动故宫观唐，传世文物+太和殿融入游戏', year:2025 },
+  // 蛋仔派对
+  { source:'c11',target:'g19',depth:5, rating:'S', note:'苗族四项非遗+醒狮+川剧+故宫+博物馆赛季，连上3台春晚', year:2023 },
+  { source:'c7', target:'g19',depth:4, rating:'A', note:'国宝归乡季联动多家博物馆+敦煌春节联动+普宁英歌', year:2024 },
+  // 刺客信条
+  { source:'c18',target:'g20',depth:5, rating:'S', note:'发现之旅教育模式覆盖古埃及/维京/巴格达，被全球学校教学工具', year:2018 },
   // 战神
-  { source:'c17', target:'g26', depth:5, rating:'S', note:'深度融合北欧神话九界体系，首周510万套，累计超1500万，催生大量北欧神话科普', year:2022 },
-  // 对马岛之魂
-  { source:'c18', target:'g27', depth:5, rating:'S', note:'还原1274年蒙古入侵对马岛，制作人获永久旅游大使称号，最懂日本精神的美国游戏', year:2020 },
+  { source:'c14',target:'g21',depth:5, rating:'S', note:'深度融合北欧神话九界体系，首周510万套，催生大量科普', year:2022 },
   // 巫师3
-  { source:'c19', target:'g28', depth:5, rating:'S', note:'深度扎根斯拉夫神话民间传说，全球5000万套，催生巫师之路旅游，波兰政府作国礼', year:2015 },
+  { source:'c16',target:'g22',depth:5, rating:'S', note:'深度扎根斯拉夫神话，全球5000万套，波兰政府作国礼', year:2015 },
+  // 对马岛之魂
+  { source:'c15',target:'g23',depth:5, rating:'S', note:'还原1274年对马岛，制作人获永久旅游大使称号', year:2020 },
   // 荒野大镖客2
-  { source:'c20', target:'g29', depth:5, rating:'S', note:'还原1899年西部拓荒，田纳西大学开设历史课，全球6500万套，CNN报道', year:2018 },
+  { source:'c17',target:'g24',depth:5, rating:'S', note:'还原1899年西部拓荒，大学历史课教材，全球6500万套', year:2018 },
   // Valheim
-  { source:'c17', target:'g30', depth:4, rating:'A', note:'瑞典5人团队以北欧神话为核心世界观，一月售500万套，全球玩家搭建维京长屋刷屏', year:2021 },
-  // 使命召唤手游
-  { source:'c5',  target:'g31', depth:3, rating:'B', note:'携手江苏非遗中心+传承人张方林推出南京剪纸春节视觉+全球活动', year:2022 },
+  { source:'c14',target:'g25',depth:4, rating:'A', note:'瑞典5人团队北欧神话世界观，一月500万套', year:2021 },
+  // 决胜巅峰
+  { source:'c2', target:'g26',depth:4, rating:'A', note:'S2赛季×贵州傩文化博物馆联动，傩神主题赛季', year:2025 },
+  // 如鸢
+  { source:'c3', target:'g27',depth:4, rating:'S', note:'雕版作品正式纳入扬州非遗珍宝馆永久陈列，博物馆级认定', year:2025 },
+  // 指间山海
+  { source:'c26',target:'g28',depth:3, rating:'B', note:'携手中国剪纸博物馆，扬州非遗珍宝馆线下展', year:2025 },
+  // 大话西游
+  { source:'c3', target:'g29',depth:4, rating:'A', note:'洛阳木雕传承人安少明合作+非遗守护计划持续', year:2024 },
+  { source:'c10',target:'g29',depth:3, rating:'B', note:'乌镇风景区联动+洛阳牡丹文化节联动', year:2024 },
+  // 崩坏星穹铁道
+  { source:'c24',target:'g30',depth:4, rating:'A', note:'仙舟罗浮水墨画+道家哲学世界观，全球最受欢迎地图', year:2023 },
+  { source:'c7', target:'g30',depth:3, rating:'B', note:'造物大赛+苏州博物馆"听阮寻梅"联动', year:2025 },
+  // 恋与深空
+  { source:'c20',target:'g31',depth:5, rating:'S', note:'簪花围非遗三款头饰免费领，7000万全球玩家触达，人民日报报道', year:2025 },
+  // 诸神之战
+  { source:'c3', target:'g32',depth:4, rating:'A', note:'景泰蓝大师张旭合作1:1复刻"诸神金尊"，历时18个月', year:2025 },
+  // 诛仙2
+  { source:'c1', target:'g33',depth:4, rating:'A', note:'中国文物交流中心京绣/杭缎限定服饰+非遗娃衣+火虎联动', year:2025 },
+  // 征途系列
+  { source:'c23',target:'g34',depth:3, rating:'B', note:'联动怀远文旅"大禹精神"+线下文化节+纪录片', year:2025 },
+  // 鸣潮
+  { source:'c24',target:'g35',depth:3, rating:'B', note:'开放世界融入中国传统建筑与东方美学场景设计', year:2025 },
+  // 战双帕弥什
+  { source:'c3', target:'g36',depth:3, rating:'B', note:'库洛FES线下非遗手工艺体验活动', year:2025 },
+  // 万国觉醒
+  { source:'c25',target:'g37',depth:3, rating:'B', note:'游戏内深度展现全球多文明历史与建筑', year:2025 },
+  // 地平线/古墓丽影
+  { source:'c25',target:'g38',depth:4, rating:'A', note:'融合阿兹特克/因纽特/非洲文化+27年全球考古遗址，累计超1.2亿套', year:2017 },
+  // 仁王
+  { source:'c15',target:'g39',depth:4, rating:'A', note:'以三浦按针为主角还原战国末期+妖怪民俗，系列700万套', year:2017 },
+  // Hellblade
+  { source:'c14',target:'g40',depth:4, rating:'A', note:'联合剑桥大学融合精神健康与凯尔特文化，BAFTA最佳英国游戏', year:2017 },
 ];
 
 // 「非遗·传统服饰/刺绣」(c3) 8条联动的详细分析数据
