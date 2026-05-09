@@ -1851,8 +1851,7 @@ function renderRadar(data) {
   });
   const topGames = [...gameNodes]
     .filter(g => gameLinkCount[g.id] > 0)
-    .sort((a,b) => (gameLinkCount[b.id]||0) - (gameLinkCount[a.id]||0))
-    .slice(0, 8);
+    .sort((a,b) => (gameLinkCount[b.id]||0) - (gameLinkCount[a.id]||0));
 
   const barColors = {
     '联动数量': '#0071e3',
