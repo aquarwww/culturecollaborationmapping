@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>网易 · 文化联动深度分析 | 江湖案牍</title>
+<style>
+  /* ============ 新派武侠 设计系统 ============ */
+  :root{
+    /* 夜色 + 墨玉 + 朱砂 + 暗金 */
+    --bg-1:#13110f;            /* 极深墨夜 */
+    --bg-2:#1a1814;
+    --bg-3:#221e18;
+    --bg-card:#1c1a16;
+    --paper:#e8e2d4;            /* 留白宣纸 */
+    --line:rgba(232,226,212,.10);
+    --line-strong:rgba(232,226,212,.22);
+
+    /* 主色 */
+    --crimson:#c83128;          /* 朱砂血红 */
+    --crimson-dim:#8a1f18;
+    --gold:#c89a3a;             /* 暗金 */
+    --gold-bright:#e8c160;
+    --jade:#5a9686;              /* 墨玉青 */
+    --azure:#4d7896;             /* 远山青 */
+    --bone:#d8cfb8;              /* 骨白 */
+    --ash:#8a8275;               /* 灰烬 */
+
+    --shadow:0 8px 28px rgba(0,0,0,.45);
+    --shadow-lg:0 20px 60px rgba(0,0,0,.6);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:"PingFang SC","Source Han Sans SC","HarmonyOS Sans SC","Microsoft YaHei",sans-serif;
+    color:var(--paper);
+    background:var(--bg-1);
+    line-height:1.85;
+    font-size:15px;
+    overflow-x:hidden;
+    position:relative;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* 远山雾气 + 微光 */
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:
+      radial-gradient(ellipse 1100px 700px at 80% -10%, rgba(200,49,40,.10), transparent 55%),
+      radial-gradient(ellipse 900px 600px at 10% 30%, rgba(77,120,150,.10), transparent 55%),
+      radial-gradient(ellipse 1000px 700px at 50% 110%, rgba(200,154,58,.08), transparent 55%);
+  }
+  /* 极细噪点（像电影颗粒） */
+  body::after{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.5;mix-blend-mode:overlay;
+    background-image:
+      radial-gradient(circle at 30% 40%, rgba(255,255,255,.04) 1px, transparent 1px),
+      radial-gradient(circle at 70% 80%, rgba(255,255,255,.03) 1px, transparent 1px);
+    background-size:3px 3px,5px 5px;
+  }
+  .wrap{max-width:1200px;margin:0 auto;padding:60px 36px;position:relative;z-index:1}
+
+  /* ============ Hero · 利落分屏 ============ */
+  .hero{
+    position:relative;margin-bottom:80px;padding:0;
+    border:1px solid var(--line-strong);
+    background:linear-gradient(135deg, #1a1814 0%, #221e18 100%);
+    overflow:hidden;
+    box-shadow:var(--shadow-lg);
+  }
+  /* 顶部血线 */
+  .hero::before{
+    content:"";position:absolute;top:0;left:0;right:0;height:3px;
+    background:linear-gradient(90deg, transparent 0%, var(--crimson) 25%, var(--gold) 50%, var(--crimson) 75%, transparent 100%);
+  }
+  /* 角落几何装饰 */
+  .corner{position:absolute;width:80px;height:80px;pointer-events:none}
+  .corner.tl{top:18px;left:18px;border-top:2px solid var(--gold);border-left:2px solid var(--gold)}
+  .corner.tr{top:18px;right:18px;border-top:2px solid var(--gold);border-right:2px solid var(--gold)}
+  .corner.bl{bottom:18px;left:18px;border-bottom:2px solid var(--gold);border-left:2px solid var(--gold)}
+  .corner.br{bottom:18px;right:18px;border-bottom:2px solid var(--gold);border-right:2px solid var(--gold)}
+
+  .hero-grid{display:grid;grid-template-columns:1fr 280px;gap:0;min-height:380px}
+  .hero-main{padding:60px 56px;position:relative;z-index:2}
+  .hero-side{
+    background:
+      linear-gradient(135deg, rgba(200,49,40,.08), rgba(200,154,58,.04));
+    border-left:1px solid var(--line-strong);
+    padding:60px 36px;display:flex;flex-direction:column;justify-content:center;gap:18px;
+    position:relative;z-index:2;
+  }
+  .top-line{
+    display:flex;align-items:center;gap:16px;margin-bottom:28px;
+    font-size:11px;letter-spacing:6px;color:var(--ash);font-weight:600;
+  }
+  .top-line .dot{width:6px;height:6px;background:var(--crimson);border-radius:50%}
+  .top-line .bar{flex:0 0 40px;height:1px;background:var(--gold)}
+
+  h1.title{
+    font-family:"STSong","SimSun","Source Han Serif SC",serif;
+    font-size:62px;font-weight:900;letter-spacing:6px;
+    color:var(--paper);line-height:1.1;
+    margin:0 0 12px;
+  }
+  h1.title .accent{color:var(--crimson)}
+  .title-sub{
+    font-size:16px;letter-spacing:8px;color:var(--gold);font-weight:600;
+    margin:18px 0 6px;
+    display:flex;align-items:center;gap:14px;
+  }
+  .title-sub::before,.title-sub::after{
+    content:"";flex:0 0 36px;height:1px;background:var(--gold);opacity:.5;
+  }
+  .title-en{
+    font-family:"Cormorant Garamond","Times New Roman",serif;
+    font-style:italic;color:var(--ash);font-size:14px;letter-spacing:3px;
+    margin-bottom:30px;
+  }
+  .lede-hero{
+    font-size:15.5px;line-height:2;color:var(--bone);max-width:680px;
+    border-left:2px solid var(--crimson);padding:8px 0 8px 22px;
+  }
+  .lede-hero b{color:var(--gold-bright);font-weight:600}
+
+  /* Side - 数据塔 */
+  .stat{padding:14px 0;border-bottom:1px dashed var(--line-strong)}
+  .stat:last-child{border-bottom:none}
+  .stat .v{
+    font-family:"STSong",serif;font-size:36px;font-weight:900;color:var(--gold-bright);line-height:1;
+    display:flex;align-items:baseline;gap:8px;
+  }
+  .stat .v small{font-size:14px;color:var(--ash);font-weight:400;letter-spacing:2px}
+  .stat .l{font-size:11px;color:var(--ash);letter-spacing:4px;margin-top:6px}
+
+  /* ============ Section ============ */
+  section{margin:60px 0;position:relative;z-index:1}
+  .sec-head{
+    display:flex;align-items:center;gap:18px;margin-bottom:6px;padding-bottom:16px;
+    border-bottom:1px solid var(--line-strong);position:relative;
+  }
+  .sec-head::after{
+    content:"";position:absolute;left:0;bottom:-1px;width:80px;height:2px;background:var(--crimson);
+  }
+  .sec-num{
+    flex-shrink:0;width:48px;height:48px;
+    background:transparent;color:var(--gold);
+    border:1.5px solid var(--gold);
+    display:flex;align-items:center;justify-content:center;
+    font-family:"STSong",serif;font-size:20px;font-weight:900;
+    position:relative;
+  }
+  .sec-num::before{
+    content:"";position:absolute;inset:-5px;border:1px solid var(--gold);opacity:.3;
+  }
+  h2.sec-title{
+    font-family:"STSong",serif;font-size:30px;letter-spacing:4px;color:var(--paper);font-weight:900;
+  }
+  h2.sec-title .red{color:var(--crimson)}
+  .sec-en{
+    margin-left:auto;font-style:italic;font-family:"Cormorant Garamond",serif;
+    color:var(--ash);font-size:13px;letter-spacing:3px;
+  }
+  h3{
+    font-family:"STSong",serif;font-size:22px;letter-spacing:3px;color:var(--gold-bright);font-weight:700;
+    margin:36px 0 16px;display:flex;align-items:center;gap:14px;
+  }
+  h3::before{
+    content:"";width:14px;height:2px;background:var(--crimson);
+  }
+  h4{font-size:16px;color:var(--paper);margin:18px 0 10px;font-weight:700;letter-spacing:2px}
+  p{margin:10px 0;color:var(--bone)}
+
+  .lede{
+    background:linear-gradient(135deg, rgba(200,49,40,.06), transparent 60%);
+    border-left:2px solid var(--crimson);
+    padding:20px 26px;margin:18px 0 28px;
+    font-size:15.5px;color:var(--bone);line-height:2;
+  }
+  .lede b{color:var(--gold-bright);font-weight:600}
+
+  /* ============ Studio cards · 三派 ============ */
+  .studios{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:24px 0}
+  .studio{
+    background:var(--bg-card);
+    border:1px solid var(--line-strong);
+    padding:28px 24px;position:relative;
+    transition:all .3s;
+    overflow:hidden;
+  }
+  .studio:hover{transform:translateY(-3px);border-color:var(--gold);box-shadow:var(--shadow)}
+  /* 派别色条（左边竖线） */
+  .studio::before{
+    content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--crimson);
+  }
+  .s2::before{background:var(--azure)}
+  .s3::before{background:var(--jade)}
+  /* 派别角标 */
+  .studio::after{
+    content:"";position:absolute;top:0;right:0;width:50px;height:50px;
+    background:linear-gradient(225deg, var(--crimson) 50%, transparent 50%);
+    opacity:.5;
+  }
+  .s2::after{background:linear-gradient(225deg, var(--azure) 50%, transparent 50%)}
+  .s3::after{background:linear-gradient(225deg, var(--jade) 50%, transparent 50%)}
+  .studio .label-en{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:11px;
+    color:var(--ash);letter-spacing:3px;text-transform:uppercase}
+  .studio h4{margin:6px 0 16px;font-size:22px;color:var(--paper);
+    font-family:"STSong",serif;letter-spacing:4px;font-weight:900;
+    border-bottom:1px solid var(--line);padding-bottom:12px}
+  .studio .games{font-size:13.5px;color:var(--bone);line-height:2}
+  .studio .games b{color:var(--gold-bright);font-weight:600}
+  .studio .stat-line{
+    margin-top:16px;padding-top:12px;border-top:1px solid var(--line);
+    display:flex;justify-content:space-between;align-items:baseline;font-size:12px;color:var(--ash);
+    letter-spacing:1px;
+  }
+  .studio .stat-line b{color:var(--gold-bright);font-family:"STSong",serif;font-size:20px;font-weight:900}
+
+  /* ============ Methods · 招式 ============ */
+  .methods{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:28px 0}
+  .method{
+    background:var(--bg-card);
+    border:1px solid var(--line-strong);
+    padding:28px 28px 24px;position:relative;
+    transition:all .3s;
+    overflow:hidden;
+  }
+  .method:hover{transform:translateY(-2px);border-color:var(--gold)}
+  .method::before{
+    content:"";position:absolute;top:0;left:0;width:60px;height:2px;background:var(--crimson);
+  }
+  .m2::before{background:var(--azure)}
+  .m3::before{background:var(--jade)}
+  .m4::before{background:var(--gold)}
+  .m5::before{background:#b06030}
+  .m6::before{background:var(--bone)}
+
+  .method-head{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+  .method-head .seal{
+    width:42px;height:42px;flex-shrink:0;
+    background:transparent;color:var(--crimson);
+    border:1.5px solid var(--crimson);
+    display:flex;align-items:center;justify-content:center;
+    font-family:"STSong",serif;font-size:18px;font-weight:900;
+  }
+  .m2 .seal{color:var(--azure);border-color:var(--azure)}
+  .m3 .seal{color:var(--jade);border-color:var(--jade)}
+  .m4 .seal{color:var(--gold);border-color:var(--gold)}
+  .m5 .seal{color:#c97a4a;border-color:#c97a4a}
+  .m6 .seal{color:var(--bone);border-color:var(--bone)}
+  .method-head .label{
+    font-family:"Cormorant Garamond",serif;font-style:italic;font-size:11px;
+    color:var(--ash);letter-spacing:3px;
+  }
+  .method h3{
+    margin:0 0 12px;font-size:20px;color:var(--paper);font-weight:900;
+    font-family:"STSong",serif;letter-spacing:3px;border:none;padding:0;
+  }
+  .method h3::before{display:none}
+  .method .desc{font-size:14px;color:var(--bone);line-height:2}
+  .method .desc b{color:var(--crimson);font-weight:600}
+  .m2 .desc b{color:var(--azure)}
+  .m3 .desc b{color:var(--jade)}
+  .m4 .desc b{color:var(--gold-bright)}
+  .m5 .desc b{color:#c97a4a}
+  .m6 .desc b{color:var(--bone)}
+  .method .case{
+    margin-top:14px;padding:14px 16px;
+    background:rgba(232,226,212,.04);
+    border-left:2px solid var(--gold);
+    font-size:13px;color:var(--bone);line-height:1.95;
+  }
+  .method .case b{color:var(--paper);font-weight:600}
+
+  /* ============ Case Card · 江湖卷宗 ============ */
+  .case-card{
+    background:linear-gradient(135deg, var(--bg-card) 0%, var(--bg-3) 100%);
+    border:1px solid var(--line-strong);
+    padding:38px 40px;margin:28px 0;
+    position:relative;overflow:hidden;
+    box-shadow:var(--shadow);
+  }
+  .case-card::before{
+    /* 顶部血线装饰 */
+    content:"";position:absolute;top:0;left:0;width:140px;height:2px;background:var(--crimson);
+  }
+  .case-card::after{
+    /* 右下水墨晕染 */
+    content:"";position:absolute;bottom:-50px;right:-50px;width:200px;height:200px;
+    background:radial-gradient(circle, rgba(200,49,40,.10), transparent 70%);
+  }
+  .case-card .head{
+    display:flex;justify-content:space-between;align-items:flex-start;
+    margin-bottom:20px;padding-bottom:18px;
+    border-bottom:1px solid var(--line);position:relative;z-index:1;
+  }
+  .case-card .head h3{
+    margin:0;color:var(--paper);font-size:24px;font-family:"STSong",serif;
+    letter-spacing:3px;border:none;padding:0;flex:1;font-weight:900;
+  }
+  .case-card .head h3::before{display:none}
+  .case-card .stamp{
+    background:transparent;color:var(--crimson);
+    padding:7px 14px;font-size:11px;font-weight:700;letter-spacing:3px;
+    border:1.5px solid var(--crimson);
+    margin-left:14px;flex-shrink:0;
+    text-transform:uppercase;
+  }
+  .case-card .desc-p{font-size:15px;color:var(--bone);line-height:2;position:relative;z-index:1}
+  .case-card .desc-p b{color:var(--gold-bright);font-weight:600}
+  .case-card .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:22px;position:relative;z-index:1}
+  .case-card .col{
+    background:rgba(232,226,212,.03);
+    border:1px solid var(--line);
+    padding:22px;
+  }
+  .case-card .col h5{
+    font-family:"STSong",serif;font-size:14px;letter-spacing:4px;
+    color:var(--gold-bright);font-weight:700;margin-bottom:14px;
+    padding-bottom:10px;border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:10px;
+  }
+  .case-card .col h5::before{
+    content:"";width:6px;height:6px;background:var(--crimson);border-radius:50%;
+  }
+  .case-card .col ul{list-style:none;font-size:13.5px;color:var(--bone)}
+  .case-card .col li{padding:7px 0 7px 18px;position:relative;line-height:1.85}
+  .case-card .col li::before{
+    content:"";position:absolute;left:0;top:14px;width:8px;height:1px;background:var(--gold);
+  }
+  .case-card .col li b{color:var(--paper);font-weight:600}
+  .case-card .quote{
+    margin-top:22px;padding:20px 26px;
+    background:linear-gradient(135deg, rgba(200,154,58,.06), transparent);
+    border-left:3px solid var(--gold);
+    color:var(--bone);font-size:15px;line-height:2;
+    position:relative;z-index:1;
+    font-family:"STSong",serif;letter-spacing:1px;
+  }
+  .case-card .quote::before{
+    content:"";display:inline-block;width:30px;height:1px;background:var(--gold);
+    margin-right:12px;vertical-align:middle;
+  }
+  .case-card .quote b{color:var(--crimson);font-weight:700}
+
+  /* ============ Timeline · 江湖纪年 ============ */
+  .timeline{position:relative;padding-left:50px;margin:32px 0}
+  .timeline::before{
+    content:"";position:absolute;left:14px;top:0;bottom:0;width:1px;
+    background:linear-gradient(180deg, var(--crimson), var(--gold), var(--azure));
+  }
+  .tl-item{
+    position:relative;margin-bottom:22px;padding:20px 26px;
+    background:var(--bg-card);
+    border:1px solid var(--line);
+    transition:all .3s;
+  }
+  .tl-item:hover{transform:translateX(6px);border-color:var(--gold)}
+  .tl-item::before{
+    content:"";position:absolute;left:-40px;top:26px;width:9px;height:9px;
+    background:var(--bg-1);border:2px solid var(--gold);border-radius:50%;
+  }
+  .tl-item .date{
+    color:var(--gold);font-weight:600;font-size:12px;letter-spacing:4px;
+    font-family:"Cormorant Garamond",serif;text-transform:uppercase;
+  }
+  .tl-item .ttl{
+    font-family:"STSong",serif;font-size:18px;font-weight:900;letter-spacing:2px;
+    margin:6px 0 8px;color:var(--paper);
+  }
+  .tl-item .desc{color:var(--bone);font-size:13.5px;line-height:1.9}
+  .tl-item.milestone{
+    background:linear-gradient(135deg, var(--bg-card), rgba(200,49,40,.10));
+    border:1px solid var(--crimson);
+  }
+  .tl-item.milestone::before{
+    background:var(--crimson);border-color:var(--gold);
+    width:13px;height:13px;left:-42px;
+    box-shadow:0 0 0 4px rgba(200,49,40,.18);
+  }
+  .tl-item.milestone .date{color:var(--crimson)}
+  .tl-item.milestone .ttl::after{content:"  ✦";color:var(--gold-bright);margin-left:6px}
+
+  /* ============ Bars ============ */
+  .bars{
+    background:var(--bg-card);
+    border:1px solid var(--line);
+    padding:24px 28px;margin:20px 0;
+  }
+  .bar-row{display:grid;grid-template-columns:180px 1fr 110px;gap:16px;align-items:center;margin:14px 0;font-size:14px}
+  .bar-row .name{color:var(--paper);font-weight:600;letter-spacing:1px}
+  .bar-row .bar{background:rgba(232,226,212,.06);height:18px;position:relative}
+  .bar-row .bar .fill{
+    height:100%;
+    background:linear-gradient(90deg, var(--crimson), var(--gold));
+  }
+  .bar-row.b2 .fill{background:linear-gradient(90deg, var(--azure), var(--jade))}
+  .bar-row .val{
+    text-align:right;color:var(--gold-bright);
+    font-family:"STSong",serif;font-size:15px;font-weight:700;
+  }
+
+  /* ============ Tags ============ */
+  .tag{
+    display:inline-block;padding:3px 10px;font-size:11px;
+    margin-right:4px;font-weight:600;letter-spacing:1px;
+    border:1px solid;background:transparent;
+  }
+  .tag-A{color:var(--gold);border-color:var(--gold)}
+  .tag-B{color:var(--jade);border-color:var(--jade)}
+  .tag-C{color:var(--crimson);border-color:var(--crimson)}
+  .tag-D{color:var(--azure);border-color:var(--azure)}
+  .tag-E{color:#c97a4a;border-color:#c97a4a}
+  .tag-F{color:var(--bone);border-color:var(--bone)}
+
+  /* ============ Table ============ */
+  .table-wrap{
+    background:var(--bg-card);
+    border:1px solid var(--line-strong);
+    box-shadow:var(--shadow);overflow-x:auto;margin:22px 0;
+  }
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  thead{background:var(--bg-3);border-bottom:2px solid var(--gold)}
+  thead th{
+    color:var(--gold-bright);padding:16px 16px;text-align:left;
+    letter-spacing:3px;font-weight:700;font-size:12px;
+    font-family:"STSong",serif;text-transform:uppercase;
+  }
+  tbody td{
+    padding:14px 16px;text-align:left;vertical-align:top;
+    border-bottom:1px solid var(--line);color:var(--bone);
+  }
+  tbody tr:hover{background:rgba(200,154,58,.06)}
+  tbody tr:last-child td{border-bottom:none}
+
+  /* ============ Insight ============ */
+  .insight{
+    background:linear-gradient(135deg, rgba(200,49,40,.06), transparent);
+    border:1px solid var(--crimson);
+    padding:24px 30px;margin:22px 0;
+    position:relative;
+  }
+  .insight::before{
+    content:"";position:absolute;top:0;left:0;width:6px;height:100%;background:var(--crimson);
+  }
+  .insight h4{
+    color:var(--crimson);font-size:18px;font-family:"STSong",serif;
+    letter-spacing:3px;margin-bottom:14px;
+  }
+  .insight p{font-size:14.5px;color:var(--bone);line-height:2}
+  .insight p b{color:var(--paper);font-weight:600}
+
+  /* ============ Formula ============ */
+  .formula{
+    background:linear-gradient(135deg, rgba(200,49,40,.10), rgba(200,154,58,.08));
+    border:1px solid var(--gold);
+    padding:32px;margin:20px 0;text-align:center;
+    position:relative;
+  }
+  .formula::before,.formula::after{
+    content:"";position:absolute;width:24px;height:24px;border:2px solid var(--crimson);
+  }
+  .formula::before{top:-1px;left:-1px;border-right:none;border-bottom:none}
+  .formula::after{bottom:-1px;right:-1px;border-left:none;border-top:none}
+  .formula .label{
+    font-size:11px;color:var(--ash);letter-spacing:6px;margin-bottom:14px;
+    text-transform:uppercase;
+  }
+  .formula .f-text{
+    font-family:"STSong",serif;font-size:21px;font-weight:900;
+    letter-spacing:3px;color:var(--paper);line-height:2;
+  }
+  .formula .f-text b{color:var(--crimson)}
+
+  /* ============ Compare two ============ */
+  .compare2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:24px 0}
+  .compare2 .col{
+    background:var(--bg-card);
+    border:1px solid var(--line-strong);
+    padding:28px 24px;position:relative;
+  }
+  .compare2 .col::before{
+    content:"";position:absolute;top:0;left:0;width:100%;height:2px;background:var(--azure);
+  }
+  .compare2 .col:nth-child(2)::before{background:var(--crimson)}
+  .compare2 .col h4{
+    font-family:"STSong",serif;font-size:22px;letter-spacing:4px;color:var(--azure);
+    border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:16px;font-weight:900;
+  }
+  .compare2 .col:nth-child(2) h4{color:var(--crimson)}
+  .compare2 .col p{font-size:13.5px;color:var(--bone);line-height:2;margin:8px 0}
+  .compare2 .col p b{color:var(--paper);font-weight:600}
+  .compare2 .col .label{font-style:italic;font-size:12px;color:var(--ash);margin-top:10px;letter-spacing:1px}
+
+  /* ============ Triple ============ */
+  .triple{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:22px 0}
+  .triple .card{
+    background:var(--bg-card);
+    border:1px solid var(--line-strong);
+    border-top:3px solid var(--crimson);
+    padding:26px 22px;
+  }
+  .triple .card:nth-child(2){border-top-color:var(--gold)}
+  .triple .card:nth-child(3){border-top-color:var(--jade)}
+  .triple .card .num{
+    display:inline-block;font-family:"STSong",serif;font-size:36px;color:var(--crimson);font-weight:900;
+    line-height:1;margin-bottom:10px;
+  }
+  .triple .card:nth-child(2) .num{color:var(--gold-bright)}
+  .triple .card:nth-child(3) .num{color:var(--jade)}
+  .triple .card h4{
+    color:var(--paper);font-size:16px;font-family:"STSong",serif;letter-spacing:3px;
+    margin-bottom:12px;border-bottom:1px solid var(--line);padding-bottom:10px;
+  }
+  .triple .card p{font-size:13.5px;color:var(--bone);line-height:1.95}
+  .triple .card p b{color:var(--gold-bright);font-weight:600}
+
+  /* ============ Footer ============ */
+  footer{
+    margin-top:80px;padding:28px 32px;text-align:center;
+    background:var(--bg-card);
+    border:1px solid var(--line);
+    color:var(--ash);font-size:13px;letter-spacing:2px;
+    position:relative;
+  }
+  footer::before{
+    content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);
+    width:80px;height:2px;background:var(--crimson);
+  }
+  footer p{margin:8px 0}
+  footer .next{color:var(--gold-bright);font-weight:600;font-family:"STSong",serif;font-size:15px;letter-spacing:3px}
+
+  @media (max-width:880px){
+    .wrap{padding:32px 18px}
+    h1.title{font-size:38px;letter-spacing:3px}
+    .hero-grid{grid-template-columns:1fr}
+    .hero-side{border-left:none;border-top:1px solid var(--line-strong);padding:32px}
+    .studios,.methods,.triple,.compare2,.case-card .grid2{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- Hero -->
+<header class="hero">
+  <span class="corner tl"></span>
+  <span class="corner tr"></span>
+  <span class="corner bl"></span>
+  <span class="corner br"></span>
+  <div class="hero-grid">
+    <div class="hero-main">
+      <div class="top-line">
+        <span class="dot"></span>
+        <span>厂 商 深 度 分 析 · 卷 贰</span>
+        <span class="bar"></span>
+        <span>NETEASE GAMES</span>
+      </div>
+      <h1 class="title">网易 · <span class="accent">江湖案牍</span></h1>
+      <div class="title-sub">十 载 谋 篇 · 百 项 入 局</div>
+      <div class="title-en">NetEase Cultural Crossover Methodology · The Jianghu Playbook</div>
+      <div class="lede-hero">
+        十款产品，五十三道关卡。网易将文化联动从一次性合作升级为<b>系统化的"江湖经营"</b>——
+        以省域文旅为根基、百项级非遗为脉络、国家级博物馆为重镇、雷火 UX 为内功心法，
+        在中国本土文化中纵深扎根。本卷盘点其打法、招式与代表战役。
+      </div>
+    </div>
+    <div class="hero-side">
+      <div class="stat"><div class="v">10</div><div class="l">产　品</div></div>
+      <div class="stat"><div class="v">53</div><div class="l">联 动 事 件</div></div>
+      <div class="stat"><div class="v">3</div><div class="l">旗 舰 战 略 IP</div></div>
+      <div class="stat"><div class="v">96<small>%</small></div><div class="l">本 土 文 化</div></div>
+      <div class="stat"><div class="v">2020<small>—</small>2026</div><div class="l">时 间 跨 度</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- 一 战略定位 -->
+<section>
+  <div class="sec-head">
+    <div class="sec-num">壹</div>
+    <h2 class="sec-title">立 派 · <span class="red">战略定位</span></h2>
+    <span class="sec-en">Strategic Positioning</span>
+  </div>
+
+  <p class="lede">
+    若说米哈游是<b>面向全球的文化转译者</b>，网易便是<b>扎根中国本土的文化深耕者</b>。
+    53 条联动里 96% 聚焦中国文化，与省级文旅厅、国家级博物馆、非遗大师建立稳固关系网络，
+    构成行业最完整的"<b>官方文化体系合作通道</b>"。
+  </p>
+
+  <h3>三派分立 · 工作室梯队</h3>
+  <div class="studios">
+    <div class="studio s1">
+      <div class="label-en">SQUAD · 01 · 雷火</div>
+      <h4>武 林 主 派</h4>
+      <div class="games"><b>逆水寒手游</b> · <b>燕云十六声</b> · <b>永劫无间</b><br><b>天谕手游</b> · 雷火 UX 内容矩阵</div>
+      <div class="stat-line"><span>武侠 / 开放世界</span><b>4 款 · 25 条</b></div>
+    </div>
+    <div class="studio s2">
+      <div class="label-en">SQUAD · 02 · 互娱长青</div>
+      <h4>名 门 正 派</h4>
+      <div class="games"><b>梦幻西游</b> · <b>阴阳师</b> · <b>第五人格</b><br><b>率土之滨</b> · <b>我的世界国服</b></div>
+      <div class="stat-line"><span>长青 / 国民经典</span><b>5 款 · 24 条</b></div>
+    </div>
+    <div class="studio s3">
+      <div class="label-en">SQUAD · 03 · 派对</div>
+      <h4>新 锐 一 脉</h4>
+      <div class="games"><b>蛋仔派对</b>（派对工作室）<br>承担"年轻化 + 地方文旅轻量"路径</div>
+      <div class="stat-line"><span>派对 / UGC</span><b>1 款 · 2 条</b></div>
+    </div>
+  </div>
+
+  <h3>三大文化战略 IP · 镇派之宝</h3>
+  <div class="bars">
+    <div class="bar-row"><div class="name">永劫无间「金乌纪」</div><div class="bar"><div class="fill" style="width:90%"></div></div><div class="val">7 条 · 2022 起</div></div>
+    <div class="bar-row b2"><div class="name">逆水寒「100+ 项国家级非遗」</div><div class="bar"><div class="fill" style="width:90%"></div></div><div class="val">9 条 · 2025 起</div></div>
+    <div class="bar-row"><div class="name">梦幻西游「筑梦山西」</div><div class="bar"><div class="fill" style="width:75%"></div></div><div class="val">6 条 · 2021 起</div></div>
+  </div>
+</section>
+
+<!-- 二 招式 -->
+<section>
+  <div class="sec-head">
+    <div class="sec-num">贰</div>
+    <h2 class="sec-title">六 式 · <span class="red">核心方法论</span></h2>
+    <span class="sec-en">Six Core Principles</span>
+  </div>
+
+  <p class="lede">五十三招拆解为<b>六式心法</b>。每一式都呈现强烈的"网易底色"——重度合作、长期主义、深度共创。</p>
+
+  <div class="methods">
+
+    <div class="method m1">
+      <div class="method-head">
+        <div class="seal">壹</div>
+        <div class="label">METHOD · 01</div>
+      </div>
+      <h3>省 域 文 旅 · 庙 堂 之 盟</h3>
+      <p class="desc">网易最具识别度的招式：直接绑定<b>省级文化和旅游厅</b>，把游戏内容与<b>整个省的文化叙事</b>深度耦合。这是行业内极少数能做成"省级品牌"级别的合作模式。</p>
+      <div class="case">
+        <b>梦幻西游 × 山西省文旅厅：</b>2021 起战略合作"100 件文物读中华文明史"；2024"筑梦山西"覆盖永乐宫/山西博物院/晋祠/云冈石窟等 7 大文博单位<br>
+        <b>燕云十六声 × 甘肃省文旅厅：</b>2025.7 公测后首个版本"河西地图"；新华网/澎湃新闻报道<br>
+        <b>燕云十六声 × 开封文旅局：</b>2025.3 起线上数字还原 + 线下实景巡游
+      </div>
+    </div>
+
+    <div class="method m2">
+      <div class="method-head">
+        <div class="seal">贰</div>
+        <div class="label">METHOD · 02</div>
+      </div>
+      <h3>百 项 矩 阵 · 非 遗 大 阵</h3>
+      <p class="desc">网易把非遗合作从"<b>单点项目</b>"做成"<b>规模化矩阵</b>"——逆水寒"100+ 项国家级非遗"是行业首创的百项级合作框架，从根本上改变了"游戏 × 非遗"的产业谈判规模。</p>
+      <div class="case">
+        <b>逆水寒手游：</b>2025.6 公开宣布与超 100 项国家级非遗深度合作；闽南皮影 + 闽南傩面 + 戏曲文化（2025.4 国风民俗季）<br>
+        <b>永劫无间：</b>大理白族（瓦猫/甲马/扎染/刺绣）+ 龙门石窟 + 西泠印社 + 上海博物馆构成"金乌纪"完整网络<br>
+        <b>梦幻西游：</b>晋剧 + 泰顺非遗（浙江）+ 山西七大文博
+      </div>
+    </div>
+
+    <div class="method m3">
+      <div class="method-head">
+        <div class="seal">叁</div>
+        <div class="label">METHOD · 03</div>
+      </div>
+      <h3>博 物 馆 重 镇 · 群 雄 联 手</h3>
+      <p class="desc">2025 年起网易博物馆联动密度爆发——<b>故宫观唐</b>同时对接第五人格、率土之滨；上海博物馆、甘肃省博物馆、龙门石窟、汉魏洛阳故城遗址博物馆、南越王博物院等密集合作。质量与数量并重。</p>
+      <div class="case">
+        <b>永劫无间 × 上海博物馆（2025.8）：</b>"金乌纪文物典藏【九州遗珍】"；首个"游戏博物馆"+无间镖客模式；抖音 5288 万赞<br>
+        <b>第五人格 × 故宫观唐（2025.9）：</b>金瓯永固杯/珐琅彩合欢瓶等故宫文物模型；玩家在游戏内"开博物馆"<br>
+        <b>率土之滨：</b>武汉博 + 绵竹 + 曹操高陵 + 故宫观唐 + 汉魏洛阳——5 馆联动
+      </div>
+    </div>
+
+    <div class="method m4">
+      <div class="method-head">
+        <div class="seal">肆</div>
+        <div class="label">METHOD · 04</div>
+      </div>
+      <h3>大 师 亲 授 · 江 湖 拜 师</h3>
+      <p class="desc">网易开创了"<b>玩家成为非遗合伙人</b>"的独特模式——玩家可"零门槛转职国家非遗铸剑师"，<b>由龙泉市政府颁发实体证书</b>。这是把游戏激励系统接入<b>真实社会身份认证</b>的尝试。</p>
+      <div class="case">
+        <b>天谕手游 × 龙泉宝剑（2024.4）：</b>"谕剑争锋"非遗活动；国家非遗大师亲授；玩家可获龙泉市政府颁发的实体证书<br>
+        <b>率土之滨 × 龙泉宝剑（2024.11）：</b>"锻宝练习生"从 100+ 玩家中筛选 7 位赴龙泉古法铸剑<br>
+        <b>共性：</b>把"玩家身份"扩展到"非遗共建者"
+      </div>
+    </div>
+
+    <div class="method m5">
+      <div class="method-head">
+        <div class="seal">伍</div>
+        <div class="label">METHOD · 05</div>
+      </div>
+      <h3>戏 曲 入 戏 · 梨 园 一 脉</h3>
+      <p class="desc">在所有头部厂商中，网易是<b>戏曲合作最系统</b>的——晋剧、河南曲剧、闽南皮影、北京皮影都进入版本主线。雷火 UX 把"戏曲"做成了内容矩阵的固定品类。</p>
+      <div class="case">
+        <b>梦幻西游 × 晋剧（2024.10）：</b>晋剧非遗传承人孙红丽 + 舞者霍德玉，融入"筑梦山西"<br>
+        <b>燕云十六声 × 河南曲剧（2026.4）：</b>非遗曲剧创新演绎《千里送京娘》选段<br>
+        <b>逆水寒 × 闽南皮影（2025.4）：</b>玩家化身皮影戏英雄，闽南语念白主线剧情
+      </div>
+    </div>
+
+    <div class="method m6">
+      <div class="method-head">
+        <div class="seal">陆</div>
+        <div class="label">METHOD · 06</div>
+      </div>
+      <h3>UX 内 功 · 雷 火 心 法</h3>
+      <p class="desc">网易雷火 UX（用户体验中心）作为<b>独立内容生产单元</b>，已发布"游戏中的文物古迹/非遗" <b>27+ 期</b>专题。这是行业最完整、最系统的"游戏文化普及"内容 IP——超越营销作用，进入文化研究领域。</p>
+      <div class="case">
+        <b>"游戏中的文物古迹 05"：</b>逆水寒 × 甘肃省博物馆铜奔马 3D 还原<br>
+        <b>"游戏中的非遗 21"：</b>永劫无间 × 大理白族（雷火 UX 实地考察 + 公益纪录片）<br>
+        <b>"游戏中的非遗 22"：</b>天谕 × 龙泉宝剑锻制技艺<br>
+        <b>"游戏中的非遗 27"：</b>逆水寒 × 闽南傩面
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- 三 战役 -->
+<section>
+  <div class="sec-head">
+    <div class="sec-num">叁</div>
+    <h2 class="sec-title">三 役 · <span class="red">标杆案例深挖</span></h2>
+    <span class="sec-en">Flagship Case Deep Dive</span>
+  </div>
+
+  <div class="case-card">
+    <div class="head"><h3>战 役 一 · 永劫无间「金乌纪」品牌化旗舰</h3><span class="stamp">★ IP 化标杆</span></div>
+    <p class="desc-p">
+      自 2022 年起，永劫无间将所有传统文化合作收束于「<b>金乌纪</b>」品牌之下，形成行业首个以"<b>游戏内传统文化开发企划</b>"命名的旗舰 IP。
+      4 年间覆盖龙门石窟（2022.5）、李小龙武术（2023）、大理白族（2024）、上海博物馆（2025.8）、西泠印社（2026.2），把"文化合作"运营成"<b>世界观品牌</b>"。
+    </p>
+    <div class="grid2">
+      <div class="col"><h5>战 略 价 值</h5><ul>
+        <li><b>命名权前置：</b>"金乌纪"是品牌名而非项目名，从一开始就锚定 IP 化运营</li>
+        <li><b>合作类型多元：</b>石窟（A）+ 武术（C/D）+ 博物馆（A）+ 民族文化（C）+ 篆刻金石（C）</li>
+        <li><b>跨度长：</b>2022-2026 持续 5 年，无中断</li>
+        <li><b>跨媒介：</b>纪录片 + 时装 + 玩法（无间镖客）+ 出版物</li>
+      </ul></div>
+      <div class="col"><h5>代 表 战 役</h5><ul>
+        <li><b>2025.8 上海博物馆「九州遗珍」：</b>粉彩蝠桃纹瓶/胡人骑骆驼俑；首个游戏博物馆；抖音 5288 万赞</li>
+        <li><b>2026.2 西泠印社「满江红」：</b>"天下第一名社"理事唐存才亲刀篆专属金石印章；新华网/中青网/潮新闻报道</li>
+        <li><b>2024 大理白族：</b>雷火 UX 实地考察 + 公益纪录片；中国日报报道"武术文化出海"</li>
+      </ul></div>
+    </div>
+    <div class="quote">"金乌纪"的真正价值不在于某一次合作，而在于把每一次合作沉淀为<b>同一个品牌资产</b>——所有合作方都不是被孤立服务，而是共同进入网易自己经营的文化叙事体系。</div>
+  </div>
+
+  <div class="case-card">
+    <div class="head"><h3>战 役 二 · 梦幻西游「筑梦山西」省域范本</h3><span class="stamp">★ 省级标杆</span></div>
+    <p class="desc-p">
+      自 2021 年起，梦幻西游与<b>山西省文化和旅游厅</b>建立长期战略合作，成为行业内首个"<b>游戏 × 整省</b>"级别的合作范本。
+      2024 年"筑梦山西"主题集中发力，覆盖<b>永乐宫 / 山西博物院 / 晋祠 / 云冈石窟 / 广胜寺 / 玉皇庙 / 铁佛寺</b>七大文博单位 + 晋剧非遗 + 13 家景区，
+      实现"一款游戏 = 山西文化全景代言"。
+    </p>
+    <div class="grid2">
+      <div class="col"><h5>战 略 结 构</h5><ul>
+        <li><b>顶层框架：</b>省文旅厅"100 件文物读中华文明史"项目接入</li>
+        <li><b>横向覆盖：</b>7 大文博 + 13 景区 + 晋剧非遗</li>
+        <li><b>时间跨度：</b>2021-2025 持续 4 年深耕</li>
+        <li><b>媒体矩阵：</b>中国日报、人民日报、新华网多次专题</li>
+      </ul></div>
+      <div class="col"><h5>独 特 创 新</h5><ul>
+        <li><b>艺术家联袂：</b>光绘艺术家王思博主题作品</li>
+        <li><b>非遗 + 跨界：</b>晋剧传承人孙红丽 + 舞者霍德玉</li>
+        <li><b>电脑版承载：</b>不抢手游版本节奏，专属电脑版深度运营</li>
+        <li><b>"梦幻联动"系列：</b>2024.3 山西文物专题成为可复用 IP</li>
+      </ul></div>
+    </div>
+    <div class="quote">省文旅厅级别合作的关键不在<b>资源对接</b>，而在<b>长期信任</b>——梦幻西游的 4 年持续耕耘，让"山西"成为该 IP 的文化代名词，反向赋能游戏品牌。</div>
+  </div>
+
+  <div class="case-card">
+    <div class="head"><h3>战 役 三 · 逆水寒「百项国家级非遗」矩阵革命</h3><span class="stamp">★ 规模化革命</span></div>
+    <p class="desc-p">
+      2025 年 6 月，逆水寒手游公开宣布与<b>超 100 项国家级非遗深度合作</b>——这是行业首个"<b>百项级</b>"非遗合作框架，从根本上改变了"游戏 × 非遗"的产业谈判规模。
+      配合 2025.4 国风民俗季、2025.5 甘肃省博铜奔马 3D 还原、2026.3 春节"数字非遗馆"、2026 年末预告"敦煌新地图"，
+      逆水寒构建了"<b>系统化、规模化、玩家可参与</b>"的非遗矩阵。
+    </p>
+    <div class="grid2">
+      <div class="col"><h5>规 模 化 突 破</h5><ul>
+        <li><b>百项级框架：</b>从单一合作转向矩阵采购</li>
+        <li><b>数字非遗博物馆：</b>玩家在游戏内自建非遗博物馆（2025.3）</li>
+        <li><b>春节数字非遗馆：</b>免费戏服 + 打年糕 + 剪窗花（2026.3）</li>
+        <li><b>跨年敦煌：</b>"最美的相逢 2026"演唱会预告</li>
+      </ul></div>
+      <div class="col"><h5>玩 法 创 新</h5><ul>
+        <li><b>方言主线：</b>闽南语念白主线剧情</li>
+        <li><b>3D 扫描入游戏：</b>铜奔马高还原度复刻</li>
+        <li><b>玩家共创博物馆：</b>UGC 文化传承新路径</li>
+        <li><b>零门槛参与：</b>2026.3 春节免费体验</li>
+      </ul></div>
+    </div>
+    <div class="quote">百项级合作不是<b>数量游戏</b>，而是<b>谈判规模革命</b>——当一款游戏能与 100+ 非遗机构同时合作，它在文化体系中的位置就不再是"内容方"，而是"基础设施方"。</div>
+  </div>
+</section>
+
+<!-- 四 江湖纪年 -->
+<section>
+  <div class="sec-head">
+    <div class="sec-num">肆</div>
+    <h2 class="sec-title">江 湖 纪 年 · <span class="red">战略时间轴</span></h2>
+    <span class="sec-en">Strategic Timeline · 2020—2026</span>
+  </div>
+
+  <p class="lede">网易文化联动呈"<b>三段加速</b>"演化：2020-2022 早期试水；2023-2024 旗舰 IP 化；2025-2026 矩阵爆发。</p>
+
+  <div class="timeline">
+    <div class="tl-item"><div class="date">2020</div><div class="ttl">我的世界国服 × 三星堆 MOD</div><div class="desc">沙盒平台开启"国风建筑共创"。MOD《三星堆游记》《古蜀国历险》；展馆+文物方块化复原。</div></div>
+    <div class="tl-item milestone"><div class="date">2021 · 09 · MILESTONE</div><div class="ttl">梦幻西游 × 山西省文旅厅 战略合作</div><div class="desc">"100 件文物读中华文明史"项目；网易首个省域级文旅深度合作落地。</div></div>
+    <div class="tl-item"><div class="date">2022</div><div class="ttl">永劫无间「金乌纪」启动</div><div class="desc">行业首个游戏内"传统文化开发企划"品牌化运营；龙门石窟联动开篇。</div></div>
+    <div class="tl-item"><div class="date">2024 · 01</div><div class="ttl">阴阳师 × 南京云锦「飞龙在天」</div><div class="desc">国家级代表性传承人金文老师共创；龙年非遗皮肤；阴阳师中国本土文化首次发力。</div></div>
+    <div class="tl-item"><div class="date">2024 · 04</div><div class="ttl">阴阳师 × 中国版画博物馆「绮世绘影」</div><div class="desc">阴阳师本土文化系列正式品牌化；后续 2024.10、2025.7 持续延展。</div></div>
+    <div class="tl-item milestone"><div class="date">2024 · 10 · MILESTONE</div><div class="ttl">梦幻西游「筑梦山西」全面引爆</div><div class="desc">永乐宫/山西博物院/晋祠/云冈石窟/广胜寺/玉皇庙/铁佛寺 7 大文博单位 + 晋剧。</div></div>
+    <div class="tl-item"><div class="date">2024 · 11</div><div class="ttl">率土之滨 × 武汉博物馆 + 绵竹 + 曹操高陵</div><div class="desc">3 馆联动 + 玩家"锻宝练习生"赴龙泉古法铸剑；多地博物馆首次同步联动。</div></div>
+    <div class="tl-item"><div class="date">2025 · 04</div><div class="ttl">逆水寒「国风民俗季」闽南文化</div><div class="desc">闽南皮影 + 闽南傩面 + 戏曲文化；玩家化身皮影戏英雄，闽南语念白主线。</div></div>
+    <div class="tl-item milestone"><div class="date">2025 · 06 · MILESTONE</div><div class="ttl">逆水寒「100+ 项国家级非遗」</div><div class="desc">行业首个百项级非遗合作框架；从此"游戏 × 非遗"进入规模化时代。</div></div>
+    <div class="tl-item"><div class="date">2025 · 07</div><div class="ttl">燕云十六声 × 甘肃省文旅厅 河西版本</div><div class="desc">公测后首个大型版本；河西走廊深度植入；澎湃新闻"数字赋能文旅范例"。</div></div>
+    <div class="tl-item milestone"><div class="date">2025 · 08 · MILESTONE</div><div class="ttl">永劫无间 × 上海博物馆「九州遗珍」</div><div class="desc">"金乌纪"集大成之作；首个游戏博物馆 + 无间镖客模式；抖音 5288 万赞。</div></div>
+    <div class="tl-item"><div class="date">2025 · 09-10</div><div class="ttl">第五人格 + 率土之滨 × 故宫观唐</div><div class="desc">"故宫观唐"作为通道密集对接两款产品；故宫文物 IP 通过观唐入游戏。</div></div>
+    <div class="tl-item"><div class="date">2026 · 02</div><div class="ttl">永劫无间 × 西泠印社「满江红」</div><div class="desc">"天下第一名社"理事亲刀篆金石印章；篆刻、碑拓、出版物多元形式。</div></div>
+    <div class="tl-item milestone"><div class="date">2026 · 04 · MILESTONE</div><div class="ttl">燕云十六声 × 河南曲剧 + 四川达州烧火龙</div><div class="desc">非遗曲剧创新演绎《千里送京娘》；"石桥烧火龙"漫天铁花注入开封皇宫镇守战玩法。</div></div>
+  </div>
+
+  <div class="insight">
+    <h4>三阶段演化逻辑</h4>
+    <p><b>阶段一（2020-2022）单点试水：</b>沙盒 UGC（我的世界）+ 省厅试点（梦幻西游山西）+ 旗舰品牌启动（永劫无间金乌纪）。打基础，未规模化。</p>
+    <p><b>阶段二（2023-2024）旗舰 IP 化：</b>金乌纪、筑梦山西、绮世绘影同步进入品牌化运营；省域文旅、博物馆、非遗大师各成体系。</p>
+    <p><b>阶段三（2025-2026）矩阵爆发：</b>逆水寒"100+ 非遗"百项级、燕云河西/河南曲剧/达州烧火龙、永劫无间上博/西泠印社、率土故宫观唐——年度密度由"单数"跳到"两位数"。</p>
+  </div>
+</section>
+
+<!-- 五 资产分布 -->
+<section>
+  <div class="sec-head">
+    <div class="sec-num">伍</div>
+    <h2 class="sec-title">阵 法 · <span class="red">文化资产分布</span></h2>
+    <span class="sec-en">Asset Type Distribution</span>
+  </div>
+
+  <p>53 条联动按文化资产类型分布，呈现<b style="color:var(--crimson)">「博物馆 + 非遗」双重头部结构</b>，与米哈游"非遗/海外/景区三足"形成鲜明区分。</p>
+
+  <div class="bars">
+    <div class="bar-row"><div class="name"><span class="tag tag-A">A 博物馆</span></div><div class="bar"><div class="fill" style="width:90%"></div></div><div class="val">17 条 · 32%</div></div>
+    <div class="bar-row"><div class="name"><span class="tag tag-C">C 非遗</span></div><div class="bar"><div class="fill" style="width:75%"></div></div><div class="val">14 条 · 26%</div></div>
+    <div class="bar-row b2"><div class="name"><span class="tag tag-F">F 海外/植入</span></div><div class="bar"><div class="fill" style="width:50%"></div></div><div class="val">9 条 · 17%</div></div>
+    <div class="bar-row b2"><div class="name"><span class="tag tag-B">B 景区/城市</span></div><div class="bar"><div class="fill" style="width:42%"></div></div><div class="val">8 条 · 15%</div></div>
+    <div class="bar-row"><div class="name"><span class="tag tag-D">D 戏曲艺术</span></div><div class="bar"><div class="fill" style="width:25%"></div></div><div class="val">5 条 · 9%</div></div>
+    <div class="bar-row b2"><div class="name"><span class="tag tag-E">E 官方机构</span></div><div class="bar"><div class="fill" style="width:15%"></div></div><div class="val">3 条 · 6%</div></div>
+  </div>
+
+  <h3>关键观察</h3>
+  <p>① <b style="color:var(--crimson)">博物馆类首居榜首（32%）</b>：与米哈游博物馆仅 5% 形成强烈反差。网易长青产品 2025 年集体转向博物馆合作。</p>
+  <p>② <b style="color:var(--azure)">海外文化几乎为零（仅 2 条）</b>：阴阳师日本平安京、第五人格维多利亚哥特属产品基因层。网易整体不做海外文化主题输出，专注本土深耕。</p>
+  <p>③ <b style="color:var(--jade)">戏曲合作行业领先</b>：晋剧/河南曲剧/闽南皮影/北京皮影 4 类——是同期厂商最丰富的戏曲矩阵。</p>
+</section>
+
+<!-- 六 兵器谱 -->
+<section>
+  <div class="sec-head">
+    <div class="sec-num">陆</div>
+    <h2 class="sec-title">兵 器 谱 · <span class="red">TOP15 联动速查</span></h2>
+    <span class="sec-en">Top Events Index</span>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>时间</th><th>产品</th><th>文化资产</th><th>类型</th><th>合作方</th><th>方法论印证</th></tr></thead>
+      <tbody>
+        <tr><td>2020 起</td><td>我的世界国服</td><td>三星堆博物馆 MOD</td><td><span class="tag tag-A">A</span></td><td>三星堆博物馆</td><td>沙盒 UGC 文化共创</td></tr>
+        <tr><td>2021.9</td><td>梦幻西游</td><td>山西省文旅厅 100 件文物</td><td><span class="tag tag-A">A</span> <span class="tag tag-E">E</span></td><td>山西省文旅厅</td><td>M1 省域文旅</td></tr>
+        <tr><td>2022 起</td><td>永劫无间</td><td>「金乌纪」文化企划</td><td><span class="tag tag-F">F</span></td><td>网易自有品牌</td><td>M2 旗舰 IP 化</td></tr>
+        <tr><td>2022.5</td><td>永劫无间</td><td>龙门石窟</td><td><span class="tag tag-A">A</span></td><td>龙门石窟研究院</td><td>M3 国家级博物馆</td></tr>
+        <tr><td>2024.1</td><td>阴阳师</td><td>南京云锦「飞龙在天」</td><td><span class="tag tag-C">C</span></td><td>非遗大师金文</td><td>M2 非遗矩阵</td></tr>
+        <tr><td>2024.4</td><td>天谕手游</td><td>谕剑争锋·龙泉宝剑</td><td><span class="tag tag-C">C</span></td><td>龙泉市政府</td><td>M4 大师亲授+实体证书</td></tr>
+        <tr><td>2024.10</td><td>梦幻西游</td><td>「筑梦山西」7 大文博 + 晋剧</td><td><span class="tag tag-A">A</span> <span class="tag tag-D">D</span></td><td>山西七大文博 + 晋剧</td><td>M1 省域 / M5 戏曲</td></tr>
+        <tr><td>2024.11</td><td>率土之滨</td><td>3 大博物馆 + 龙泉宝剑"锻宝练习生"</td><td><span class="tag tag-A">A</span> <span class="tag tag-C">C</span></td><td>武汉博 + 绵竹 + 曹操高陵 + 龙泉</td><td>M3 博物馆 / M4 玩家共创</td></tr>
+        <tr><td>2025.4</td><td>逆水寒手游</td><td>国风民俗季·闽南皮影/傩面/戏曲</td><td><span class="tag tag-C">C</span> <span class="tag tag-D">D</span></td><td>闽南非遗传承人</td><td>M2 非遗矩阵 / M5 戏曲</td></tr>
+        <tr><td>2025.6</td><td>逆水寒手游</td><td>100+ 项国家级非遗框架</td><td><span class="tag tag-C">C</span></td><td>多家非遗机构</td><td>M2 百项级矩阵革命</td></tr>
+        <tr><td>2025.7</td><td>燕云十六声</td><td>甘肃省文旅厅 + 河西走廊</td><td><span class="tag tag-B">B</span> <span class="tag tag-E">E</span></td><td>甘肃省文旅厅</td><td>M1 省域文旅</td></tr>
+        <tr><td>2025.8</td><td>永劫无间</td><td>上海博物馆「九州遗珍」</td><td><span class="tag tag-A">A</span></td><td>上海博物馆</td><td>M3 博物馆 / 金乌纪</td></tr>
+        <tr><td>2025.9-10</td><td>第五人格 + 率土之滨</td><td>故宫观唐</td><td><span class="tag tag-A">A</span></td><td>故宫观唐</td><td>M3 故宫通道</td></tr>
+        <tr><td>2026.2</td><td>永劫无间</td><td>西泠印社「满江红」</td><td><span class="tag tag-C">C</span></td><td>西泠印社 + 唐存才</td><td>M2 非遗 / 金乌纪延展</td></tr>
+        <tr><td>2026.4</td><td>燕云十六声</td><td>河南曲剧 + 四川达州烧火龙</td><td><span class="tag tag-D">D</span> <span class="tag tag-C">C</span></td><td>河南曲剧 + 达州文旅</td><td>M5 戏曲 / 非遗注入玩法</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 七 心法 -->
+<section>
+  <div class="sec-head">
+    <div class="sec-num">柒</div>
+    <h2 class="sec-title">心 法 · <span class="red">网易公式</span></h2>
+    <span class="sec-en">The Replicable Formula</span>
+  </div>
+
+  <div class="formula">
+    <div class="label">— 网 易 公 式 —</div>
+    <div class="f-text">
+      文化联动 = <b>省域文旅</b> × <b>百项矩阵</b> × <b>大师亲授</b><br>
+      × <b>戏曲入戏</b> × <b>UX 心法</b> × <b>长青深耕</b>
+    </div>
+  </div>
+
+  <h3>米哈游 vs 网易 · 两种范式的本质差异</h3>
+  <div class="compare2">
+    <div class="col">
+      <h4>米 哈 游 范 式</h4>
+      <p><b>定位：</b>面向全球的"文化转译者"</p>
+      <p><b>选材：</b>视觉强 + 故事性，含海外文化主题</p>
+      <p><b>组织：</b>纪录片 IP + 玩家共创双轮</p>
+      <p><b>背书：</b>UNESCO + 央媒国际语境</p>
+      <p><b>规模：</b>精选少数高价值合作</p>
+      <p class="label">优势 — 声量、出海、品牌调性</p>
+    </div>
+    <div class="col">
+      <h4>网 易 范 式</h4>
+      <p><b>定位：</b>扎根本土的"文化深耕者"</p>
+      <p><b>选材：</b>聚焦中国本土，覆盖广泛非遗</p>
+      <p><b>组织：</b>省域文旅 + 百项级矩阵 + 雷火 UX</p>
+      <p><b>背书：</b>省厅 + 央媒中文体系</p>
+      <p><b>规模：</b>规模化、矩阵化、长期主义</p>
+      <p class="label">优势 — 纵深、规模、官方亲近度</p>
+    </div>
+  </div>
+
+  <h3>三 条 启 示</h3>
+  <div class="triple">
+    <div class="card">
+      <div class="num">壹</div>
+      <h4>从「合作」升级到「关系」</h4>
+      <p>网易做省域、做百项级、做非遗大师亲授，本质上都是在"<b>建立关系</b>"——而非"<b>购买内容</b>"。文化联动一旦升级为长期关系，<b>边际成本下降</b>、谈判规模上升。</p>
+    </div>
+    <div class="card">
+      <div class="num">贰</div>
+      <h4>用品牌把文化合作收束</h4>
+      <p>"金乌纪""筑梦山西""国风民俗季""绮世绘影"——网易每个旗舰文化战略都<b>有名字、有 LOGO、有节奏</b>。这是把文化合作从"营销动作"升级为"<b>世界观品牌资产</b>"的关键。</p>
+    </div>
+    <div class="card">
+      <div class="num">叁</div>
+      <h4>把玩家变成「文化合伙人」</h4>
+      <p>玩家可获省政府颁发的<b>非遗实体证书</b>、可在游戏内<b>自建非遗博物馆</b>、可作为"锻宝练习生"赴龙泉古法铸剑——网易把游戏激励系统接入<b>真实社会身份认证</b>，这是行业内的开创性实践。</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>本卷基于「游戏 × 文化联动名录」主文档（2026-05-15）网易章节（10 款产品 53 条联动）的方法论提炼与案例佐证。</p>
+  <p class="next">— 卷 叁 预 告 · 叠 纸 × 库 洛 × 鹰 角 —</p>
+  <p style="color:#5a5448;margin-top:10px">© 内部研究用 · 数据来源以名录主文档及公开报道为准</p>
+</footer>
+
+</div>
+</body>
+</html>

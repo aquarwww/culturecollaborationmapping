@@ -1053,6 +1053,99 @@
     color: #b45309;
     background: #fffbeb;
   }
+
+  /* -- Tab: 洞察卡片 -- */
+  .insights-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    padding: 16px;
+    height: 100%;
+    overflow-y: auto;
+    align-content: start;
+  }
+
+  .insight-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: all .2s;
+    cursor: pointer;
+  }
+
+  .insight-card:hover {
+    border-color: var(--accent);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+
+  .ic-badge {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 800;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .ic1 .ic-badge { background: linear-gradient(135deg, #c9a449, #ff7eb3); }
+  .ic2 .ic-badge { background: linear-gradient(135deg, #c83128, #c89a3a); }
+  .ic3 .ic-badge { background: linear-gradient(135deg, #d4668e, #8b6fb0); }
+  .ic4 .ic-badge { background: linear-gradient(135deg, #d4a244, #5a7a8f); }
+  .ic5 .ic-badge { background: linear-gradient(135deg, #9b2020, #d4762a); }
+  .ic6 .ic-badge { background: linear-gradient(135deg, #00c8d4, #7c4dff); }
+
+  .ic-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .ic-body h4 {
+    font-size: 14px;
+    font-weight: 700;
+    margin: 0 0 3px;
+    color: var(--text-primary);
+  }
+
+  .ic-body p {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin: 0 0 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .ic-tag {
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .ic-arrow {
+    font-size: 16px;
+    color: var(--text-tertiary);
+    flex-shrink: 0;
+    transition: transform .2s;
+  }
+
+  .insight-card:hover .ic-arrow {
+    transform: translateX(3px);
+    color: var(--accent);
+  }
 </style>
 </head>
 <body>
@@ -1168,6 +1261,7 @@
       <button class="panel-tab active" data-tab="trend"><span class="tab-icon">🔥</span> 文化热度榜</button>
       <button class="panel-tab" data-tab="radar"><span class="tab-icon">📊</span> 效果对比</button>
       <button class="panel-tab" data-tab="cases"><span class="tab-icon">📑</span> 案例详情</button>
+      <button class="panel-tab" data-tab="insights"><span class="tab-icon">💡</span> 洞察</button>
     </div>
     <div class="panel-content">
       <div class="tab-pane active" id="pane-trend">
@@ -1178,6 +1272,64 @@
       </div>
       <div class="tab-pane" id="pane-cases">
         <div class="case-grid" id="caseGrid"></div>
+      </div>
+      <div class="tab-pane" id="pane-insights">
+        <div class="insights-container">
+          <a class="insight-card ic1" href="01_mihoyo_collaboration.html" target="_blank">
+            <div class="ic-badge">壹</div>
+            <div class="ic-body">
+              <h4>米哈游</h4>
+              <p>4款产品 · 40条联动 · 全球文化转译者</p>
+              <span class="ic-tag">纪录片IP + 玩家共创双轮</span>
+            </div>
+            <span class="ic-arrow">→</span>
+          </a>
+          <a class="insight-card ic2" href="02_netease_collaboration.html" target="_blank">
+            <div class="ic-badge">贰</div>
+            <div class="ic-body">
+              <h4>网易</h4>
+              <p>10款产品 · 53条联动 · 本土文化深耕者</p>
+              <span class="ic-tag">省域文旅 + 百项非遗矩阵</span>
+            </div>
+            <span class="ic-arrow">→</span>
+          </a>
+          <a class="insight-card ic3" href="03_papergames_collaboration.html" target="_blank">
+            <div class="ic-badge">叁</div>
+            <div class="ic-body">
+              <h4>叠纸游戏</h4>
+              <p>4款产品 · 11条联动 · 情感驱动+审美赋能</p>
+              <span class="ic-tag">女性向 × 非遗织梦</span>
+            </div>
+            <span class="ic-arrow">→</span>
+          </a>
+          <a class="insight-card ic4" href="04_hypergryph_collaboration.html" target="_blank">
+            <div class="ic-badge">肆</div>
+            <div class="ic-body">
+              <h4>鹰角网络</h4>
+              <p>1款产品 · 3条联动 · 少而精博物馆路线</p>
+              <span class="ic-tag">100%国家级机构</span>
+            </div>
+            <span class="ic-arrow">→</span>
+          </a>
+          <a class="insight-card ic5" href="05_supernatural_collaboration.html" target="_blank">
+            <div class="ic-badge">伍</div>
+            <div class="ic-body">
+              <h4>超自然行动组</h4>
+              <p>1款产品 · 4条联动 · 中式微恐×民俗新赛道</p>
+              <span class="ic-tag">50亿流水 · 民俗即玩法</span>
+            </div>
+            <span class="ic-arrow">→</span>
+          </a>
+          <a class="insight-card ic6" href="06_kurogames_collaboration.html" target="_blank">
+            <div class="ic-badge">陆</div>
+            <div class="ic-body">
+              <h4>库洛游戏</h4>
+              <p>2款产品 · 4条联动 · 科幻外壳东方内核</p>
+              <span class="ic-tag">中国国家地理战略合作</span>
+            </div>
+            <span class="ic-arrow">→</span>
+          </a>
+        </div>
       </div>
     </div>
   </div>
