@@ -347,16 +347,46 @@
     margin-bottom: 6px;
   }
 
-  input[type="range"] {
-    -webkit-appearance: none;
-    width: 100%;
-    height: 4px;
-    border-radius: 2px;
-    background: linear-gradient(to right, var(--accent), var(--accent));
-    outline: none;
+  .dual-range-wrapper {
+    position: relative;
+    height: 20px;
+    margin: 8px 0 4px;
   }
 
-  input[type="range"]::-webkit-slider-thumb {
+  .dual-range-track {
+    position: absolute;
+    top: 8px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    border-radius: 2px;
+    background: #e5e5ea;
+  }
+
+  .dual-range-track::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    height: 100%;
+    border-radius: 2px;
+    background: var(--accent);
+  }
+
+  .dual-range-input {
+    -webkit-appearance: none;
+    appearance: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 20px;
+    background: transparent;
+    pointer-events: none;
+    outline: none;
+    margin: 0;
+  }
+
+  .dual-range-input::-webkit-slider-thumb {
     -webkit-appearance: none;
     width: 16px;
     height: 16px;
@@ -365,6 +395,28 @@
     border: 2px solid #fff;
     box-shadow: 0 1px 4px rgba(0,0,0,.2);
     cursor: pointer;
+    pointer-events: all;
+    position: relative;
+    z-index: 2;
+  }
+
+  .dual-range-input::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,.2);
+    cursor: pointer;
+    pointer-events: all;
+  }
+
+  .time-ticks {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--text-tertiary);
+    padding: 0 2px;
   }
 
   /* ========== Canvas area ========== */
@@ -1089,7 +1141,14 @@
     <div class="time-section">
       <div class="time-label"><span class="icon">🕐</span> 时间范围</div>
       <div class="time-display" id="timeDisplay">2015 – 2026</div>
-      <input type="range" id="timeSlider" min="2015" max="2026" value="2026" step="1" oninput="handleTimeChange(this.value)">
+      <div class="dual-range-wrapper">
+        <div class="dual-range-track" id="rangeTrack"></div>
+        <input type="range" class="dual-range-input" id="timeSliderMin" min="2015" max="2026" value="2015" step="1" oninput="handleTimeRangeChange()">
+        <input type="range" class="dual-range-input" id="timeSliderMax" min="2015" max="2026" value="2026" step="1" oninput="handleTimeRangeChange()">
+      </div>
+      <div class="time-ticks">
+        <span>2015</span><span>2018</span><span>2021</span><span>2024</span><span>2026</span>
+      </div>
     </div>
   </aside>
 
@@ -1496,6 +1555,7 @@ allNodes.forEach(n => nodeMap[n.id] = n);
 let activeCultureTypes = new Set(cultureTypes);
 let activeGameGenres = new Set(gameGenres);
 let activeCompanies = new Set(gameCompanies);
+let currentMinYear = 2015;
 let currentMaxYear = 2026;
 let allFiltersOn = true;
 
@@ -1701,17 +1761,40 @@ function updateCultureFilterVisibility(linkedCultures) {
   });
 }
 
-function handleTimeChange(val) {
-  currentMaxYear = parseInt(val);
-  document.getElementById('timeDisplay').textContent = `2015 – ${currentMaxYear}`;
+function handleTimeRangeChange() {
+  const minSlider = document.getElementById('timeSliderMin');
+  const maxSlider = document.getElementById('timeSliderMax');
+  let minVal = parseInt(minSlider.value);
+  let maxVal = parseInt(maxSlider.value);
+  // 确保min不超过max
+  if (minVal > maxVal) {
+    const temp = minVal;
+    minVal = maxVal;
+    maxVal = temp;
+    minSlider.value = minVal;
+    maxSlider.value = maxVal;
+  }
+  currentMinYear = minVal;
+  currentMaxYear = maxVal;
+  document.getElementById('timeDisplay').textContent = `${currentMinYear} – ${currentMaxYear}`;
+  // 更新轨道高亮区域
+  updateRangeTrack();
   updateAll();
 }
 
+function updateRangeTrack() {
+  const track = document.getElementById('rangeTrack');
+  const min = 2015, max = 2026;
+  const left = ((currentMinYear - min) / (max - min)) * 100;
+  const right = ((currentMaxYear - min) / (max - min)) * 100;
+  track.style.background = `linear-gradient(to right, #e5e5ea ${left}%, var(--accent) ${left}%, var(--accent) ${right}%, #e5e5ea ${right}%)`;
+}
+
 function getFiltered() {
-  const vis = cultureNodes.filter(n => activeCultureTypes.has(n.category) && n.year <= currentMaxYear);
-  const vg  = gameNodes.filter(n => activeGameGenres.has(n.genre) && activeCompanies.has(gameCompanyMap[n.id]) && n.year <= currentMaxYear);
+  const vis = cultureNodes.filter(n => activeCultureTypes.has(n.category) && n.year >= currentMinYear && n.year <= currentMaxYear);
+  const vg  = gameNodes.filter(n => activeGameGenres.has(n.genre) && activeCompanies.has(gameCompanyMap[n.id]) && n.year >= currentMinYear && n.year <= currentMaxYear);
   const ids = new Set([...vis,...vg].map(n=>n.id));
-  const vl  = links.filter(l => ids.has(l.source) && ids.has(l.target) && l.year <= currentMaxYear);
+  const vl  = links.filter(l => ids.has(l.source) && ids.has(l.target) && l.year >= currentMinYear && l.year <= currentMaxYear);
   const linked = new Set();
   vl.forEach(l => { linked.add(l.source); linked.add(l.target); });
   // 合并同源链接用于力导向图（取最高rating和最大depth）
@@ -2452,6 +2535,7 @@ function showCaseDetail(d, sourceId, targetId) {
 function init() {
   initFilters();
   initGraphEvents();
+  updateRangeTrack();
   updateAll();
 
   window.addEventListener('resize', () => {
