@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>超自然行动组 · 文化联动深度分析 | 鬼门档案</title>
+<style>
+  /* ============ 中式微恐 · 暗纹设计系统 ============ */
+  :root{
+    --bg-1:#0a0908;
+    --bg-2:#12100d;
+    --bg-3:#1a1612;
+    --bg-card:#14110e;
+    --paper:#e8e0d0;
+    --bone:#c4baa8;
+    --line:rgba(232,224,208,.07);
+    --line-strong:rgba(232,224,208,.14);
+    --ash:#7a7060;
+
+    --blood:#9b2020;
+    --blood-2:#c83838;
+    --blood-dim:rgba(155,32,32,.15);
+    --ember:#d4762a;
+    --ember-2:#e8a04a;
+    --jade:#3a7a5a;
+    --jade-2:#5aaa7a;
+    --bone-light:#f0e8d8;
+
+    --shadow:0 8px 30px rgba(0,0,0,.6);
+    --shadow-lg:0 20px 50px rgba(0,0,0,.75);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:"PingFang SC","Source Han Sans SC","Microsoft YaHei",sans-serif;
+    color:var(--paper);background:var(--bg-1);
+    line-height:1.85;font-size:15px;overflow-x:hidden;position:relative;
+    -webkit-font-smoothing:antialiased;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:
+      radial-gradient(ellipse 900px 600px at 80% 5%, rgba(155,32,32,.06), transparent 50%),
+      radial-gradient(ellipse 700px 500px at 10% 60%, rgba(212,118,42,.04), transparent 50%),
+      radial-gradient(ellipse 800px 500px at 50% 95%, rgba(58,122,90,.04), transparent 50%);
+  }
+  body::after{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.3;
+    background-image:
+      radial-gradient(1px 1px at 20% 30%, rgba(155,32,32,.4), transparent),
+      radial-gradient(1px 1px at 70% 70%, rgba(212,118,42,.3), transparent),
+      radial-gradient(1.5px 1.5px at 45% 50%, rgba(232,224,208,.15), transparent);
+    background-size:400px 400px;
+    animation:flicker 6s ease-in-out infinite alternate;
+  }
+  @keyframes flicker{from{opacity:.2} to{opacity:.4}}
+
+  .wrap{max-width:1100px;margin:0 auto;padding:60px 36px;position:relative;z-index:1}
+
+  /* ============ Hero ============ */
+  .hero{
+    position:relative;margin-bottom:70px;padding:0;
+    border:1px solid var(--line-strong);background:var(--bg-2);
+    overflow:hidden;box-shadow:var(--shadow-lg);
+  }
+  .hero::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg, transparent, var(--blood), var(--ember), transparent)}
+  .hero::after{content:"";position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg, transparent, var(--blood-dim), transparent)}
+  .corner{position:absolute;width:50px;height:50px;pointer-events:none;opacity:.6}
+  .corner.tl{top:16px;left:16px;border-top:1.5px solid var(--ember);border-left:1.5px solid var(--ember)}
+  .corner.br{bottom:16px;right:16px;border-bottom:1.5px solid var(--ember);border-right:1.5px solid var(--ember)}
+
+  .hero-inner{padding:52px 52px 44px;position:relative;z-index:2}
+  .top-line{display:flex;align-items:center;gap:14px;margin-bottom:22px;font-size:10px;letter-spacing:5px;color:var(--ash);font-weight:600;text-transform:uppercase}
+  .top-line .dot{width:8px;height:8px;background:var(--blood);border-radius:50%;box-shadow:0 0 8px rgba(155,32,32,.6)}
+  .top-line .bar{flex:0 0 30px;height:1px;background:var(--ember)}
+
+  h1.title{font-size:48px;font-weight:900;letter-spacing:4px;color:var(--paper);line-height:1.1;margin:0 0 8px}
+  h1.title .accent{color:var(--blood-2)}
+  .title-sub{font-size:14px;letter-spacing:6px;color:var(--ember);font-weight:600;margin:14px 0 6px;display:flex;align-items:center;gap:10px}
+  .title-sub::before,.title-sub::after{content:"";flex:0 0 24px;height:1px;background:var(--ember);opacity:.5}
+  .title-en{font-family:"Cormorant Garamond",serif;font-style:italic;color:var(--ash);font-size:13px;letter-spacing:3px;margin-bottom:24px}
+  .lede-hero{font-size:15px;line-height:2;color:var(--bone);max-width:700px;border-left:2px solid var(--blood);padding:8px 0 8px 20px}
+  .lede-hero b{color:var(--ember-2);font-weight:600}
+
+  .hero-stats{display:flex;gap:28px;margin-top:30px;padding-top:22px;border-top:1px solid var(--line-strong)}
+  .hero-stat .v{font-size:34px;font-weight:900;color:var(--ember-2);line-height:1}
+  .hero-stat .v small{font-size:14px;color:var(--ash);font-weight:400}
+  .hero-stat .l{font-size:11px;color:var(--ash);letter-spacing:3px;margin-top:6px}
+
+  /* ============ Section ============ */
+  section{margin:56px 0;position:relative;z-index:1}
+  .sec-head{display:flex;align-items:center;gap:16px;margin-bottom:6px;padding-bottom:14px;border-bottom:1px solid var(--line-strong);position:relative}
+  .sec-head::after{content:"";position:absolute;left:0;bottom:-1px;width:60px;height:2px;background:var(--blood)}
+  .sec-num{flex-shrink:0;width:42px;height:42px;background:transparent;color:var(--blood-2);border:1.5px solid var(--blood);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:900}
+  h2.sec-title{font-size:26px;letter-spacing:3px;color:var(--paper);font-weight:900}
+  .sec-en{margin-left:auto;font-style:italic;font-family:"Cormorant Garamond",serif;color:var(--ash);font-size:12px;letter-spacing:2px}
+
+  h3{font-size:19px;letter-spacing:2px;color:var(--ember-2);font-weight:700;margin:30px 0 12px;display:flex;align-items:center;gap:10px}
+  h3::before{content:"";width:10px;height:2px;background:var(--blood)}
+  h4{font-size:16px;color:var(--paper);margin:16px 0 10px;font-weight:700}
+  p{margin:10px 0;color:var(--bone)}
+
+  .lede{background:linear-gradient(135deg, rgba(155,32,32,.05), transparent 60%);border-left:2px solid var(--blood);padding:18px 24px;margin:16px 0 26px;font-size:15px;color:var(--bone);line-height:2}
+  .lede b{color:var(--ember-2);font-weight:600}
+
+  /* ============ Methods ============ */
+  .methods{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0}
+  .method{background:var(--bg-card);border:1px solid var(--line-strong);padding:26px 24px;position:relative;transition:all .3s;overflow:hidden}
+  .method:hover{transform:translateY(-2px);border-color:var(--ember)}
+  .method::before{content:"";position:absolute;top:0;left:0;width:100%;height:2px;background:var(--blood)}
+  .m2::before{background:var(--ember)}
+  .m3::before{background:var(--jade)}
+  .m4::before{background:var(--bone)}
+  .method .seal{width:36px;height:36px;margin-bottom:10px;background:transparent;color:var(--blood-2);border:1.5px solid var(--blood);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900}
+  .m2 .seal{color:var(--ember);border-color:var(--ember)}
+  .m3 .seal{color:var(--jade-2);border-color:var(--jade)}
+  .m4 .seal{color:var(--bone);border-color:var(--bone)}
+  .method h4{margin:0 0 10px;font-size:16px;letter-spacing:2px;font-weight:700}
+  .method .desc{font-size:13.5px;color:var(--bone);line-height:1.9}
+  .method .desc b{color:var(--blood-2);font-weight:600}
+  .m2 .desc b{color:var(--ember-2)} .m3 .desc b{color:var(--jade-2)} .m4 .desc b{color:var(--bone-light)}
+  .method .case{margin-top:12px;padding:12px 14px;background:rgba(232,224,208,.03);border-left:2px solid var(--blood);font-size:12.5px;color:var(--bone);line-height:1.9}
+  .m2 .case{border-left-color:var(--ember)} .m3 .case{border-left-color:var(--jade)} .m4 .case{border-left-color:var(--bone)}
+  .method .case b{color:var(--paper);font-weight:600}
+
+  /* ============ Case Card ============ */
+  .case-card{background:linear-gradient(135deg, var(--bg-card) 0%, var(--bg-3) 100%);border:1px solid var(--line-strong);padding:34px 36px;margin:24px 0;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+  .case-card::before{content:"";position:absolute;top:0;left:0;width:100px;height:2px;background:var(--blood)}
+  .case-card::after{content:"";position:absolute;bottom:-40px;right:-40px;width:160px;height:160px;background:radial-gradient(circle, rgba(155,32,32,.08), transparent 70%)}
+  .case-card .head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--line);position:relative;z-index:1}
+  .case-card .head h3{margin:0;color:var(--paper);font-size:21px;letter-spacing:2px;border:none;padding:0;flex:1;font-weight:900}
+  .case-card .head h3::before{display:none}
+  .case-card .stamp{background:transparent;color:var(--blood-2);padding:5px 12px;font-size:11px;font-weight:700;letter-spacing:2px;border:1.5px solid var(--blood);flex-shrink:0;margin-left:12px}
+  .case-card .desc-p{font-size:14.5px;color:var(--bone);line-height:2;position:relative;z-index:1}
+  .case-card .desc-p b{color:var(--ember-2);font-weight:600}
+  .case-card .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px;position:relative;z-index:1}
+  .case-card .col{background:rgba(232,224,208,.03);border:1px solid var(--line);padding:18px}
+  .case-card .col h5{font-size:12px;letter-spacing:3px;color:var(--ember);font-weight:700;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+  .case-card .col h5::before{content:"";width:6px;height:6px;background:var(--blood);border-radius:50%}
+  .case-card .col ul{list-style:none;font-size:13px;color:var(--bone)}
+  .case-card .col li{padding:5px 0 5px 16px;position:relative;line-height:1.85}
+  .case-card .col li::before{content:"";position:absolute;left:0;top:13px;width:8px;height:1px;background:var(--ember)}
+  .case-card .col li b{color:var(--paper);font-weight:600}
+  .case-card .quote{margin-top:18px;padding:16px 22px;background:linear-gradient(135deg, rgba(212,118,42,.05), transparent);border-left:3px solid var(--ember);color:var(--bone);font-size:14px;line-height:2;position:relative;z-index:1}
+  .case-card .quote b{color:var(--ember-2);font-weight:700}
+
+  /* ============ Timeline ============ */
+  .timeline{position:relative;padding-left:46px;margin:28px 0}
+  .timeline::before{content:"";position:absolute;left:14px;top:0;bottom:0;width:1px;background:linear-gradient(180deg, var(--blood), var(--ember), var(--jade))}
+  .tl-item{position:relative;margin-bottom:18px;padding:16px 20px;background:var(--bg-card);border:1px solid var(--line);transition:all .3s}
+  .tl-item:hover{transform:translateX(4px);border-color:var(--ember)}
+  .tl-item::before{content:"";position:absolute;left:-36px;top:20px;width:9px;height:9px;background:var(--bg-1);border:2px solid var(--ember);border-radius:50%}
+  .tl-item .date{color:var(--ember);font-weight:600;font-size:12px;letter-spacing:3px}
+  .tl-item .ttl{font-size:16px;font-weight:700;margin:4px 0 6px;color:var(--paper);letter-spacing:1px}
+  .tl-item .desc{color:var(--bone);font-size:13px;line-height:1.85}
+  .tl-item.milestone{background:linear-gradient(135deg, var(--bg-card), rgba(155,32,32,.08));border:1px solid rgba(155,32,32,.4)}
+  .tl-item.milestone::before{background:var(--blood);border-color:var(--bg-1);width:11px;height:11px;left:-37px;box-shadow:0 0 0 4px rgba(155,32,32,.2)}
+  .tl-item.milestone .ttl::after{content:" ⬥";color:var(--blood-2);font-size:12px}
+
+  /* ============ Bars ============ */
+  .bars{background:var(--bg-card);border:1px solid var(--line);padding:20px 22px;margin:18px 0}
+  .bar-row{display:grid;grid-template-columns:170px 1fr 90px;gap:14px;align-items:center;margin:10px 0;font-size:13.5px}
+  .bar-row .name{color:var(--paper);font-weight:600}
+  .bar-row .bar{background:rgba(232,224,208,.05);height:16px;position:relative}
+  .bar-row .bar .fill{height:100%;background:linear-gradient(90deg, var(--blood), var(--ember))}
+  .bar-row .val{text-align:right;color:var(--ember-2);font-weight:700}
+
+  .tag{display:inline-block;padding:3px 9px;font-size:11px;margin-right:4px;font-weight:600;letter-spacing:1px;border:1px solid;background:transparent}
+  .tag-A{color:var(--ember);border-color:var(--ember)}
+  .tag-C{color:var(--blood-2);border-color:var(--blood)}
+
+  /* Table */
+  .table-wrap{background:var(--bg-card);border:1px solid var(--line-strong);box-shadow:var(--shadow);overflow-x:auto;margin:20px 0}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  thead{background:var(--bg-3);border-bottom:2px solid var(--ember)}
+  thead th{color:var(--ember);padding:12px 14px;text-align:left;letter-spacing:2px;font-weight:700;font-size:11px}
+  tbody td{padding:12px 14px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line);color:var(--bone)}
+  tbody tr:hover{background:rgba(212,118,42,.04)}
+  tbody tr:last-child td{border-bottom:none}
+
+  /* Insight */
+  .insight{background:linear-gradient(135deg, rgba(155,32,32,.05), transparent);border:1px solid rgba(155,32,32,.25);padding:22px 26px;margin:20px 0;position:relative}
+  .insight::before{content:"";position:absolute;top:0;left:0;width:4px;height:100%;background:var(--blood)}
+  .insight h4{color:var(--blood-2);font-size:16px;letter-spacing:2px;margin-bottom:10px}
+  .insight p{font-size:14px;color:var(--bone);line-height:2}
+  .insight p b{color:var(--paper);font-weight:600}
+
+  /* Formula */
+  .formula{background:linear-gradient(135deg, rgba(155,32,32,.08), rgba(212,118,42,.06));border:1px solid var(--ember);padding:26px;margin:20px 0;text-align:center;position:relative}
+  .formula::before,.formula::after{content:"";position:absolute;width:18px;height:18px;border:1.5px solid var(--blood)}
+  .formula::before{top:-1px;left:-1px;border-right:none;border-bottom:none}
+  .formula::after{bottom:-1px;right:-1px;border-left:none;border-top:none}
+  .formula .f-text{font-size:19px;font-weight:800;letter-spacing:2px;color:var(--paper);line-height:1.8}
+  .formula .f-text b{color:var(--blood-2)}
+
+  footer{margin-top:70px;padding:26px 28px;text-align:center;background:var(--bg-card);border:1px solid var(--line);color:var(--ash);font-size:13px;letter-spacing:2px;position:relative}
+  footer::before{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);width:50px;height:2px;background:var(--blood)}
+  footer p{margin:6px 0}
+  footer .next{color:var(--ember-2);font-weight:600;font-size:14px;letter-spacing:3px}
+
+  @media(max-width:880px){.wrap{padding:32px 18px} h1.title{font-size:32px} .methods,.case-card .grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- Hero -->
+<header class="hero">
+  <span class="corner tl"></span><span class="corner br"></span>
+  <div class="hero-inner">
+    <div class="top-line"><span class="dot"></span><span>厂 商 深 度 分 析 · 卷 伍</span><span class="bar"></span><span>GIANT NETWORK</span></div>
+    <h1 class="title">超自然行动组 · <span class="accent">鬼门档案</span></h1>
+    <div class="title-sub">中 式 微 恐 × 非 遗 · 50 亿 新 赛 道</div>
+    <div class="title-en">Supernatural Action Group — Where Chinese Horror Meets Intangible Heritage</div>
+    <div class="lede-hero">
+      一款2025年上线的恐怖冒险手游，首年<b>流水超50亿</b>，营收增长72.69%。
+      超自然行动组开辟了行业全新赛道——<b>「中式微恐 × 非遗民俗」</b>，把傩戏、皮影、掐丝珐琅、敦煌艺术
+      融入恐怖叙事，用"恐惧"作为文化传播的情绪放大器。4条联动，每条都是"<b>首创</b>"。
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="v">50<small>亿+</small></div><div class="l">首 年 流 水</div></div>
+      <div class="hero-stat"><div class="v">4</div><div class="l">联 动 事 件</div></div>
+      <div class="hero-stat"><div class="v">72.69<small>%</small></div><div class="l">营 收 增 长</div></div>
+      <div class="hero-stat"><div class="v">2806<small>万</small></div><div class="l">抖 音 点 赞</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- 一 战略定位 -->
+<section>
+  <div class="sec-head"><div class="sec-num">壹</div><h2 class="sec-title">战略定位</h2><span class="sec-en">Strategic Positioning</span></div>
+
+  <p class="lede">
+    超自然行动组的核心创新在于发现了一个<b>被忽略的品类-文化交叉点</b>：中国传统民俗中大量"<b>鬼神、面具、仪式</b>"元素，
+    天然适配恐怖冒险品类。傩面具的诡异美感、皮影戏的光影恐惧、楼兰古城的神秘叙事——这些都是"<b>文化即内容</b>"的原生素材。
+    无需额外包装，民俗本身就是最好的恐怖故事。
+  </p>
+
+  <div class="insight">
+    <h4>⬥ 核心差异化：恐惧即传播</h4>
+    <p><b>传统路径：</b>非遗 → 美 → 审美共鸣 → 传播。适合换装/RPG。</p>
+    <p><b>超自然路径：</b>非遗 → 恐惧/神秘 → 情绪共鸣 → 传播。适合恐怖/冒险。</p>
+    <p>后者的传播效率可能更高——<b>恐惧是比美感更强烈的情绪放大器</b>，抖音2806万赞即为验证。</p>
+  </div>
+</section>
+
+<!-- 二 方法论 -->
+<section>
+  <div class="sec-head"><div class="sec-num">贰</div><h2 class="sec-title">四大核心方法论</h2><span class="sec-en">Four Core Principles</span></div>
+
+  <p class="lede">4条联动拆解为4式——超自然行动组的每一条方法论都是"<b>行业首创</b>"。</p>
+
+  <div class="methods">
+    <div class="method m1">
+      <div class="seal">壹</div>
+      <h4>民 俗 即 玩 法</h4>
+      <p class="desc">不是"民俗贴在游戏外面"，而是<b>民俗就是游戏机制本身</b>——傩面具是战斗道具、皮影是角色形态、楼兰古城是关卡地图。文化元素<b>深度嵌入核心玩法循环</b>，而非装饰性皮肤。</p>
+      <div class="case"><b>傩面具（2025.11）：</b>杨云霞第七代传人共创的面具成为<b>核心战斗道具</b><br><b>楼兰博物馆（2025.1）：</b>楼兰古城地图本身就是关卡——"古迹即玩法"</div>
+    </div>
+    <div class="method m2">
+      <div class="seal">贰</div>
+      <h4>传 承 人 深 度 共 创</h4>
+      <p class="desc">每一次非遗合作都由<b>国家级传承人亲自参与设计</b>——不是买版权贴牌，而是传承人<b>从概念到成品全流程介入</b>。杨云霞（傩面）、杜彩红（掐丝珐琅）、汪天稳（华县皮影）均为国家级代表性传承人。</p>
+      <div class="case"><b>杨云霞：</b>傩面具雕刻第七代传人，贵州省级非遗代表性传承人<br><b>汪天稳：</b>华县皮影国家级非遗代表性传承人<br><b>杜彩红：</b>掐丝珐琅工艺传承人</div>
+    </div>
+    <div class="method m3">
+      <div class="seal">叁</div>
+      <h4>免 费 策 略 · 口 碑 优 先</h4>
+      <p class="desc">掐丝珐琅武器设计在<b>妇女节免费赠送全服</b>——放弃付费收入，换取"<b>免费送非遗</b>"的口碑传播。南方都市报/中新网报道"免费策略口碑极佳"。这是用文化联动做<b>品牌投资</b>而非变现。</p>
+      <div class="case"><b>2026.3 妇女节：</b>掐丝珐琅融入武器设计，免费送全服——"非遗不是奢侈品，是礼物"</div>
+    </div>
+    <div class="method m4">
+      <div class="seal">肆</div>
+      <h4>博 物 馆 = 关 卡 设 计</h4>
+      <p class="desc">超自然行动组把博物馆合作做成了<b>游戏关卡设计的一部分</b>——楼兰博物馆 → 楼兰古城探险关卡；敦煌艺术馆 → 九色鹿/飞天主题时装+叙事。博物馆不是"贴牌方"，而是<b>内容共建方</b>。</p>
+      <div class="case"><b>楼兰博物馆（2025.1）：</b>"探秘精绝古城"——博物馆文物即游戏谜题<br><b>敦煌艺术馆（2025.9）：</b>九色鹿大金时装 + "跨越千年的敦煌艺术献礼"，抖音2806万赞</div>
+    </div>
+  </div>
+</section>
+
+<!-- 三 案例 -->
+<section>
+  <div class="sec-head"><div class="sec-num">叁</div><h2 class="sec-title">标杆案例深挖</h2><span class="sec-en">Case Deep Dive</span></div>
+
+  <div class="case-card">
+    <div class="head"><h3>案例 A · 傩面具第七代传人杨云霞共创：50亿流水背后的文化引擎</h3><span class="stamp">★ 品类首创</span></div>
+    <p class="desc-p">
+      2025年11月，超自然行动组邀请<b>傩面具雕刻第七代传人杨云霞</b>参与游戏核心道具设计——
+      傩面具成为游戏中最重要的战斗/变身机制之一。这不是皮肤联动，而是<b>非遗元素作为核心玩法</b>的行业首例。
+      同年游戏<b>流水超50亿</b>，巨人网络营收增长72.69%。
+    </p>
+    <div class="grid2">
+      <div class="col"><h5>合作深度</h5><ul>
+        <li><b>传承人级别：</b>杨云霞，傩面具雕刻第七代传人</li>
+        <li><b>深度共创：</b>从概念设计到最终呈现全流程参与</li>
+        <li><b>核心玩法绑定：</b>傩面具 = 战斗变身机制</li>
+        <li><b>限定皮肤：</b>传承人监修的限定角色皮肤</li>
+      </ul></div>
+      <div class="col"><h5>商业验证</h5><ul>
+        <li><b>流水：</b>2025年超50亿（百度百家号/同花顺数据）</li>
+        <li><b>增长：</b>巨人网络营收同比增长72.69%</li>
+        <li><b>媒体：</b>百度百家号/同花顺财经报道</li>
+        <li><b>验证：</b>"中式微恐+民俗"赛道商业可行性确立</li>
+      </ul></div>
+    </div>
+    <div class="quote">傩面具联动的颠覆性在于：<b>非遗不是"贴"在游戏上的装饰，而是游戏玩法本身</b>。当文化元素成为核心机制，玩家每一次战斗都是一次"非遗体验"——这比任何纪录片都高频。</div>
+  </div>
+
+  <div class="case-card">
+    <div class="head"><h3>案例 B · 敦煌艺术馆：抖音2806万赞的"反差出圈"</h3><span class="stamp">★ 流量标杆</span></div>
+    <p class="desc-p">
+      2025年9月，超自然行动组与<b>敦煌艺术馆</b>联动——"跨越千年的敦煌艺术献礼"推出九色鹿大金时装与新耀世时装。
+      一款恐怖游戏与敦煌的极致美学碰撞产生了<b>强烈反差感</b>，抖音相关话题获得<b>2806万赞</b>。
+      "敦煌美学 × 恐怖冒险"的反差本身成为传播爆点。
+    </p>
+    <div class="grid2">
+      <div class="col"><h5>联动内容</h5><ul>
+        <li><b>合作方：</b>敦煌艺术馆</li>
+        <li><b>产出：</b>九色鹿大金时装 + 新耀世时装</li>
+        <li><b>叙事包装：</b>"跨越千年的敦煌艺术献礼"</li>
+        <li><b>核心创意：</b>恐怖游戏中的敦煌极致美学反差</li>
+      </ul></div>
+      <div class="col"><h5>传播效果</h5><ul>
+        <li><b>抖音：</b>相关话题2806万赞</li>
+        <li><b>出圈逻辑：</b>"恐怖游戏做敦煌？"反差驱动好奇</li>
+        <li><b>巨人官网：</b>重点宣传案例</li>
+        <li><b>行业意义：</b>恐怖品类的文化联动天花板</li>
+      </ul></div>
+    </div>
+    <div class="quote">"反差即传播"——当品类标签与文化资产形成强烈反差时，<b>好奇心本身就是最好的传播动力</b>。没人预料到恐怖游戏会做敦煌，正因如此，所有人都想点进来看。</div>
+  </div>
+</section>
+
+<!-- 四 时间轴 -->
+<section>
+  <div class="sec-head"><div class="sec-num">肆</div><h2 class="sec-title">战略时间轴</h2><span class="sec-en">Timeline · 2025-2026</span></div>
+
+  <p class="lede">超自然行动组2025年上线，<b>首月即启动文化联动</b>——"上线即联动"的策略说明文化内容是<b>产品基因</b>而非后期补丁。</p>
+
+  <div class="timeline">
+    <div class="tl-item milestone">
+      <div class="date">2025 · 01</div>
+      <div class="ttl">楼兰博物馆「探秘精绝古城」</div>
+      <div class="desc">游戏上线初期即联动新疆若羌县楼兰博物馆。古迹即玩法——楼兰古城地图+小河公主元素。</div>
+    </div>
+    <div class="tl-item">
+      <div class="date">2025 · 09</div>
+      <div class="ttl">敦煌艺术馆「跨越千年的敦煌艺术献礼」</div>
+      <div class="desc">九色鹿大金时装+新耀世时装。抖音2806万赞。"恐怖×敦煌"反差出圈。</div>
+    </div>
+    <div class="tl-item milestone">
+      <div class="date">2025 · 11</div>
+      <div class="ttl">傩面具第七代传人杨云霞共创</div>
+      <div class="desc">掐丝珐琅+傩面具+华县皮影三重非遗。限定皮肤+传承人深度共创。流水超50亿。</div>
+    </div>
+    <div class="tl-item">
+      <div class="date">2026 · 03</div>
+      <div class="ttl">妇女节 · 掐丝珐琅/华县皮影免费送</div>
+      <div class="desc">杜彩红/汪天稳共创武器设计。妇女节全服免费赠送——"非遗是礼物"。南方都市报/中新网报道。</div>
+    </div>
+  </div>
+
+  <div class="insight">
+    <h4>⬥ 节奏观察</h4>
+    <p><b>上线即联动（2025.1）：</b>楼兰博物馆在游戏首月上线——说明文化联动在研发阶段就已规划，而非上线后临时决定。</p>
+    <p><b>密度极高（4条/14个月）：</b>对于一款新游来说，平均3.5个月一次文化联动。这个密度说明巨人网络将文化内容视为<b>核心内容供给</b>而非营销补充。</p>
+  </div>
+</section>
+
+<!-- 五 资产分布 -->
+<section>
+  <div class="sec-head"><div class="sec-num">伍</div><h2 class="sec-title">文化资产分布</h2><span class="sec-en">Asset Distribution</span></div>
+
+  <div class="bars">
+    <div class="bar-row"><div class="name"><span class="tag tag-C">非遗·傩/皮影/珐琅</span></div><div class="bar"><div class="fill" style="width:50%"></div></div><div class="val">2 条 · 50%</div></div>
+    <div class="bar-row"><div class="name"><span class="tag tag-A">博物馆/艺术馆</span></div><div class="bar"><div class="fill" style="width:50%"></div></div><div class="val">2 条 · 50%</div></div>
+  </div>
+
+  <h3>关键观察</h3>
+  <p>① <b style="color:var(--blood-2)">非遗选材偏"神秘/仪式"方向</b>：傩面具、华县皮影、掐丝珐琅——全部带有"<b>仪式感/神秘感</b>"属性，与恐怖品类高度匹配。不选"美"的非遗（如刺绣），选"神秘"的非遗。</p>
+  <p>② <b style="color:var(--ember-2)">博物馆选材偏"古文明/考古"方向</b>：楼兰（西域古文明）+ 敦煌（千年艺术）——都是自带"时间深度"和"未知感"的文化资产。</p>
+  <p>③ <b style="color:var(--jade-2)">100%中国文化，0%海外</b>：超自然行动组的恐怖叙事完全扎根中国民俗体系——这是一条被全行业忽略的"中式恐怖"文化赛道。</p>
+</section>
+
+<!-- 六 速查 -->
+<section>
+  <div class="sec-head"><div class="sec-num">陆</div><h2 class="sec-title">全量联动速查</h2><span class="sec-en">Complete Index</span></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>时间</th><th>文化资产</th><th>类型</th><th>合作方</th><th>核心亮点</th></tr></thead>
+      <tbody>
+        <tr><td>2025.1</td><td>楼兰博物馆「探秘精绝古城」</td><td><span class="tag tag-A">A</span></td><td>楼兰博物馆（新疆若羌县）</td><td>上线即联动；古迹即关卡</td></tr>
+        <tr><td>2025.9</td><td>敦煌艺术馆</td><td><span class="tag tag-A">A</span></td><td>敦煌艺术馆</td><td>抖音2806万赞；反差出圈</td></tr>
+        <tr><td>2025.11</td><td>非遗·傩戏+掐丝珐琅</td><td><span class="tag tag-C">C</span></td><td>杨云霞（傩面具第七代传人）</td><td>50亿流水；核心玩法绑定</td></tr>
+        <tr><td>2026.3</td><td>非遗·掐丝珐琅/华县皮影</td><td><span class="tag tag-C">C</span></td><td>杜彩红/汪天稳</td><td>妇女节免费送；口碑标杆</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 七 公式 -->
+<section>
+  <div class="sec-head"><div class="sec-num">柒</div><h2 class="sec-title">方法论提炼</h2><span class="sec-en">The Formula</span></div>
+
+  <div class="formula">
+    <div class="f-text">文化联动 = <b>民俗即玩法</b> × <b>传承人深度共创</b> × <b>反差出圈</b> × <b>免费口碑投资</b></div>
+  </div>
+
+  <h3>给行业的三条启示</h3>
+
+  <div class="insight">
+    <h4>启示 ① "恐怖/冒险"品类是中国民俗文化的天然载体</h4>
+    <p>傩戏、皮影、鬼神传说、古墓探险——中国民俗中大量"<b>神秘/仪式/恐惧</b>"元素长期被游戏行业忽略。超自然行动组证明：<b>恐怖品类做民俗非遗，比"美"的品类做民俗非遗更能出圈</b>——因为恐惧是更强烈的情绪放大器。</p>
+  </div>
+
+  <div class="insight" style="border-color:var(--ember)">
+    <h4 style="color:var(--ember-2)">启示 ② 文化元素应嵌入"核心玩法循环"而非装饰层</h4>
+    <p>绝大多数游戏的文化联动停留在"皮肤/外观/活动页"层面——玩家可以完全不接触文化内容也能正常游戏。超自然行动组的做法是<b>让文化成为玩法本身</b>：不戴傩面具就无法变身，不进楼兰古城就无法通关。这才是真正的"<b>文化基建</b>"。</p>
+  </div>
+
+  <div class="insight" style="border-color:var(--jade)">
+    <h4 style="color:var(--jade-2)">启示 ③ 新游的"文化联动"应在研发阶段前置规划</h4>
+    <p>超自然行动组2025年1月上线，同月即有楼兰博物馆联动——这不可能是"上线后临时找的合作"，必然是<b>研发阶段就与文化机构共同开发</b>。对新游来说，文化联动不该是"上线后的营销计划"，而是"<b>研发阶段的内容规划</b>"。</p>
+  </div>
+</section>
+
+<footer>
+  <p>本报告基于「游戏 × 文化联动追踪表v5」超自然行动组章节（1款产品 4条联动）的方法论提炼与案例佐证。</p>
+  <p class="next">⬥ 厂商深度分析系列 · 第五篇 · 巨人网络 · 超自然行动组 ⬥</p>
+  <p style="color:#5a5046;margin-top:10px">© 内部研究用 · 数据来源以名录主文档及公开报道为准</p>
+</footer>
+
+</div>
+</body>
+</html>
