@@ -521,10 +521,93 @@
   .tab-pane::-webkit-scrollbar { width: 3px; }
   .tab-pane::-webkit-scrollbar-thumb { background: #d1d1d6; border-radius: 2px; }
 
-  /* -- Tab1: 热度趋势 -- */
-  .trend-chart {
+  /* -- Tab1: 文化热度榜 -- */
+  .heat-ranking-container {
     width: 100%;
     height: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+    padding: 12px 16px;
+  }
+
+  .heat-ranking-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+
+  .heat-ranking-table th {
+    position: sticky;
+    top: 0;
+    background: var(--surface);
+    padding: 6px 10px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    border-bottom: 1.5px solid var(--border);
+    white-space: nowrap;
+  }
+
+  .heat-ranking-table td {
+    padding: 7px 10px;
+    border-bottom: 1px solid #f0f0f2;
+    vertical-align: middle;
+  }
+
+  .heat-ranking-table tr:hover td {
+    background: var(--bg);
+  }
+
+  .heat-rank-num {
+    font-weight: 700;
+    color: var(--accent);
+    min-width: 24px;
+    text-align: center;
+  }
+
+  .heat-rank-num.top3 {
+    color: #ff6b6b;
+  }
+
+  .heat-bar-cell {
+    min-width: 120px;
+  }
+
+  .heat-bar-bg {
+    height: 6px;
+    background: #f0f0f2;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .heat-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width .3s;
+  }
+
+  .heat-index-val {
+    font-weight: 700;
+    font-size: 13px;
+    min-width: 40px;
+  }
+
+  .heat-time-range {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    white-space: nowrap;
+  }
+
+  .heat-games {
+    font-size: 11px;
+    color: var(--text-secondary);
+    max-width: 280px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   /* -- Tab2: 效果对比 -- */
@@ -1021,13 +1104,13 @@
   <!-- Bottom Panel -->
   <div class="bottom-panel">
     <div class="panel-tabs">
-      <button class="panel-tab active" data-tab="trend"><span class="tab-icon">📈</span> 热度趋势</button>
+      <button class="panel-tab active" data-tab="trend"><span class="tab-icon">🔥</span> 文化热度榜</button>
       <button class="panel-tab" data-tab="radar"><span class="tab-icon">📊</span> 效果对比</button>
       <button class="panel-tab" data-tab="cases"><span class="tab-icon">📑</span> 案例详情</button>
     </div>
     <div class="panel-content">
       <div class="tab-pane active" id="pane-trend">
-        <canvas id="trendCanvas" class="trend-chart"></canvas>
+        <div class="heat-ranking-container" id="heatRankingContainer"></div>
       </div>
       <div class="tab-pane" id="pane-radar">
         <div class="radar-container" id="radarContainer"></div>
@@ -2065,100 +2148,78 @@ document.querySelectorAll('.panel-tab').forEach(tab => {
 });
 
 // ===================================================================
-// TAB 1: 热度趋势 (canvas line chart)
+// TAB 1: 文化热度榜
 // ===================================================================
 function renderTrend(data) {
-  const tc = document.getElementById('trendCanvas');
-  const pane = tc.parentElement;
-  const rect = pane.getBoundingClientRect();
-  const w = rect.width, h = rect.height;
-  tc.width = w * devicePixelRatio;
-  tc.height = h * devicePixelRatio;
-  tc.style.width = w + 'px';
-  tc.style.height = h + 'px';
-  const c = tc.getContext('2d');
-  c.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+  const container = document.getElementById('heatRankingContainer');
 
-  const years = [2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026];
-  const pad = { top:30, right:30, bottom:36, left:50 };
-  const cw = w - pad.left - pad.right;
-  const ch = h - pad.top - pad.bottom;
+  // 对当前可见的links做文化方向归类统计
+  const cultureClassified = {};
+  const cultureGames = {};
+  const cultureYears = {};
 
-  // Count links per year
-  const counts = {};
-  const ratingCounts = { S:{}, A:{}, B:{} };
-  years.forEach(y => {
-    counts[y] = links.filter(l => l.year <= y).length;
-    ['S','A','B'].forEach(r => {
-      ratingCounts[r][y] = links.filter(l => l.year <= y && l.rating === r).length;
-    });
-  });
-
-  const maxVal = Math.max(...Object.values(counts), 1);
-
-  // grid
-  c.strokeStyle = '#eee';
-  c.lineWidth = 1;
-  for (let i = 0; i <= 5; i++) {
-    const y = pad.top + ch * i / 5;
-    c.beginPath(); c.moveTo(pad.left, y); c.lineTo(pad.left+cw, y); c.stroke();
-    c.fillStyle = '#a1a1a6';
-    c.font = '11px -apple-system, sans-serif';
-    c.textAlign = 'right';
-    c.fillText(Math.round(maxVal * (5-i)/5), pad.left-8, y+4);
+  function classifyCulture(cNode) {
+    return cNode.category;
   }
 
-  // x labels
-  c.textAlign = 'center';
-  c.fillStyle = '#a1a1a6';
-  years.forEach((yr,i) => {
-    const x = pad.left + cw * i / (years.length-1);
-    c.fillText(yr, x, h - pad.bottom + 20);
+  // 统计每个文化类型的联动次数、涉及游戏、时间跨度
+  data.links.forEach(l => {
+    const cNode = nodeMap[l.source];
+    const gNode = nodeMap[l.target];
+    if (!cNode || !gNode || cNode.type !== 'culture') return;
+    const cat = cNode.category;
+    cultureClassified[cat] = (cultureClassified[cat] || 0) + 1;
+    if (!cultureGames[cat]) cultureGames[cat] = new Set();
+    cultureGames[cat].add(gNode.name);
+    if (!cultureYears[cat]) cultureYears[cat] = [];
+    cultureYears[cat].push(l.year);
   });
 
-  // draw lines
-  function drawLine(dataObj, color, label) {
-    c.beginPath();
-    c.strokeStyle = color;
-    c.lineWidth = 2.5;
-    c.lineJoin = 'round';
-    years.forEach((yr,i) => {
-      const x = pad.left + cw * i / (years.length-1);
-      const y = pad.top + ch * (1 - (dataObj[yr]||0)/maxVal);
-      i === 0 ? c.moveTo(x, y) : c.lineTo(x, y);
-    });
-    c.stroke();
+  // 计算热度指数
+  const heatData = Object.keys(cultureClassified).map(cat => {
+    const count = cultureClassified[cat];
+    const years = cultureYears[cat] || [];
+    const minY = Math.min(...years), maxY = Math.max(...years);
+    const yearSpan = maxY - minY + 1;
+    const spanFactor = Math.min(yearSpan / 8, 1.0);
+    const recentCount = years.filter(y => y >= 2025).length;
+    const recentFactor = years.length > 0 ? recentCount / years.length : 0;
+    const index = count * (0.4 + spanFactor * 0.3 + recentFactor * 0.3);
+    const games = [...cultureGames[cat]].sort().slice(0, 4);
+    return { cat, count, index: Math.round(index * 10) / 10, minY, maxY, games };
+  }).sort((a, b) => b.index - a.index);
 
-    // dots
-    years.forEach((yr,i) => {
-      const x = pad.left + cw * i / (years.length-1);
-      const y = pad.top + ch * (1 - (dataObj[yr]||0)/maxVal);
-      c.beginPath();
-      c.arc(x, y, 3.5, 0, Math.PI*2);
-      c.fillStyle = '#fff';
-      c.fill();
-      c.strokeStyle = color;
-      c.lineWidth = 2;
-      c.stroke();
-    });
+  if (heatData.length === 0) {
+    container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-tertiary)">暂无数据</div>';
+    return;
   }
 
-  drawLine(counts, '#0071e3', '总联动');
-  drawLine(ratingCounts.S, '#ff6b6b', 'S级');
-  drawLine(ratingCounts.A, '#ffa94d', 'A级');
+  const maxIndex = heatData[0].index;
+  const colors = ['#ff6b6b', '#ffa94d', '#51cf66', '#339af0', '#7c3aed', '#e64980', '#20c997', '#868e96', '#f76707', '#0ca678', '#845ef7', '#d6336c'];
 
-  // legend
-  const legends = [['总联动','#0071e3'],['S级','#ff6b6b'],['A级','#ffa94d']];
-  let lx = pad.left + 10;
-  legends.forEach(([lb,cl]) => {
-    c.fillStyle = cl;
-    c.fillRect(lx, 8, 16, 3);
-    c.fillStyle = '#6e6e73';
-    c.font = '11px -apple-system, sans-serif';
-    c.textAlign = 'left';
-    c.fillText(lb, lx+20, 13);
-    lx += 70;
+  let html = `<table class="heat-ranking-table">
+    <thead><tr>
+      <th>#</th><th>文化方向</th><th>联动次数</th><th>热度指数</th><th style="min-width:120px">指数可视化</th><th>时间跨度</th><th>代表游戏</th>
+    </tr></thead><tbody>`;
+
+  heatData.forEach((item, idx) => {
+    const barWidth = maxIndex > 0 ? (item.index / maxIndex * 100) : 0;
+    const color = colors[idx % colors.length];
+    const rankClass = idx < 3 ? ' top3' : '';
+    const gamesStr = item.games.join('、') + (cultureGames[item.cat].size > 4 ? ` 等${cultureGames[item.cat].size}款` : '');
+    html += `<tr>
+      <td class="heat-rank-num${rankClass}">${idx + 1}</td>
+      <td style="font-weight:500">${item.cat}</td>
+      <td style="text-align:center">${item.count}</td>
+      <td class="heat-index-val" style="color:${color}">${item.index}</td>
+      <td class="heat-bar-cell"><div class="heat-bar-bg"><div class="heat-bar-fill" style="width:${barWidth}%;background:${color}"></div></div></td>
+      <td class="heat-time-range">${item.minY}–${item.maxY}</td>
+      <td class="heat-games" title="${gamesStr}">${gamesStr}</td>
+    </tr>`;
   });
+
+  html += '</tbody></table>';
+  container.innerHTML = html;
 }
 
 // ===================================================================

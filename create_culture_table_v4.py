@@ -261,6 +261,152 @@ ws2.column_dimensions['E'].width = 14
 ws2.column_dimensions['F'].width = 50
 ws2.freeze_panes = 'A2'
 
+# ===== Sheet 3: 文化热度榜 =====
+ws3 = wb.create_sheet("文化热度榜")
+headers3 = ["排名", "文化方向(归类)", "联动次数", "热度指数", "时间范围", "涉及具体方向", "代表游戏(部分)"]
+
+for col, h in enumerate(headers3, 1):
+    cell = ws3.cell(row=1, column=col, value=h)
+    cell.font = header_font
+    cell.fill = PatternFill('solid', fgColor='C0504D')
+    cell.alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
+    cell.border = thin_border
+
+# 文化方向归类规则
+def classify_culture(direction):
+    d = direction.lower()
+    if any(k in d for k in ['非遗', '皮影', '傩', '刺绣', '蜀绣', '云锦', '缂丝', '叶雕', '花丝', '螺钿',
+                             '雕版', '剪纸', '珐琅', '景泰蓝', '木雕', '年画', '青瓷', '宝剑', '琵琶',
+                             '龙泉', '炭花', '火虎', '英歌', '醒狮', '簪花', '贝雕', '绣球', '漆器',
+                             '铸剑', '陶瓷', '丝绸', '琉璃', '木版', '手工艺', '寻古溯源', '守护传承',
+                             '造物大赛', '纪录片']):
+        if any(k in d for k in ['傩', '皮影', '秦腔', '曲剧', '京剧', '晋剧', '戏曲', '川剧', '昆曲']):
+            return '戏曲/皮影/傩戏'
+        if any(k in d for k in ['刺绣', '蜀绣', '云锦', '缂丝', '丝绸', '京绣', '杭缎', '服饰', '绣球', '贝雕', '簪花']):
+            return '非遗·传统服饰/织造'
+        if any(k in d for k in ['雕版', '螺钿', '珐琅', '景泰蓝', '花丝', '漆器', '木雕', '年画', '青瓷',
+                                 '宝剑', '铸剑', '陶瓷', '琉璃', '叶雕', '剪纸', '火虎', '炭花']):
+            return '非遗·传统工艺/手作'
+        if any(k in d for k in ['造物大赛', '100+', '31项', '系统化', '守护传承', '寻古溯源', '闪耀非遗', '数字非遗']):
+            return '非遗·系统化/系列品牌'
+        if any(k in d for k in ['醒狮', '英歌', '苗族', '白族', '柯尔克孜', '壮族', '民俗', '春节']):
+            return '民俗/少数民族非遗'
+        return '非遗·其他'
+    if any(k in d for k in ['敦煌']):
+        return '敦煌文化'
+    if any(k in d for k in ['博物馆', '文物', '国宝', '三星堆', '故宫', '国博', '上博', '南越王', '文交中心',
+                             '武侯祠', '彩灯', '甘博', '龙门', '版画', '电影资料馆', '音数协', '游戏博物馆']):
+        return '博物馆/文物'
+    if any(k in d for k in ['文旅', '景区', '山西古建', '河西', '开封', '乌镇', '张家界', '桂林', '黄龙',
+                             '黄山', '武夷山', '西溪', '遂昌', '汉中', '太原', '怀远', '上海艺术', '南京路',
+                             '许昌', '广元', '赤壁', '官渡', '剑阁', '洛阳', '牡丹', '文博会', '古建',
+                             '宋代市井', '丝路', '海丝']):
+        return '文旅联动'
+    if any(k in d for k in ['戏曲', '京剧', '秦腔', '曲剧', '皮影']):
+        return '戏曲/皮影/傩戏'
+    if any(k in d for k in ['北欧', '维京', '凯尔特']):
+        return '北欧/维京文化'
+    if any(k in d for k in ['日本', '武士', '妖怪', '对马']):
+        return '日本武士/妖怪文化'
+    if any(k in d for k in ['斯拉夫', '波兰']):
+        return '斯拉夫文化'
+    if any(k in d for k in ['西部', '拓荒']):
+        return '美国西部文化'
+    if any(k in d for k in ['埃及', '阿拉伯', '伊斯兰', '巴格达']):
+        return '古埃及/阿拉伯文化'
+    if any(k in d for k in ['多元部落', '考古', '全球多元', '万国']):
+        return '多元文明/考古'
+    if any(k in d for k in ['水墨', '国风', '东方美学', '华胥']):
+        return '东方美学/国风'
+    if any(k in d for k in ['体育', '奥运', '亚冬']):
+        return '体育文化'
+    if any(k in d for k in ['西游', '神话', '古典文学']):
+        return '古典文学/神话IP'
+    if any(k in d for k in ['武术', '李小龙']):
+        return '武术文化'
+    if any(k in d for k in ['中国邮政', '中国国家地理']):
+        return '国家级文化机构合作'
+    if any(k in d for k in ['综艺']):
+        return '综艺/衍生内容'
+    if any(k in d for k in ['大禹']):
+        return '文旅联动'
+    if any(k in d for k in ['苗族', '醒狮', '川剧']):
+        return '民俗/少数民族非遗'
+    if any(k in d for k in ['三国']):
+        return '博物馆/文物'
+    return '其他'
+
+# 统计
+culture_classified = {}
+culture_details = {}
+culture_games = {}
+culture_years = {}  # 记录每个类别的所有年份
+for row in data:
+    direction = row[4]
+    game_name = row[1]
+    time_str = row[6]  # 联动时间
+    category = classify_culture(direction)
+    culture_classified[category] = culture_classified.get(category, 0) + 1
+    if category not in culture_details:
+        culture_details[category] = set()
+    culture_details[category].add(direction)
+    if category not in culture_games:
+        culture_games[category] = set()
+    culture_games[category].add(game_name)
+    if category not in culture_years:
+        culture_years[category] = []
+    # 从时间字符串中提取年份
+    import re
+    years_found = re.findall(r'(20[12]\d)', time_str)
+    for y in years_found:
+        culture_years[category].append(int(y))
+
+# 计算热度指数
+# 公式：热度指数 = 联动次数 × (0.4 + 时间跨度系数×0.3 + 近期活跃系数×0.3)
+# 时间跨度系数 = min(跨越年数/8, 1)  （最大8年满分）
+# 近期活跃系数 = 近2年(2025-2026)联动次数 / 总联动次数
+def calc_heat_index(category):
+    count = culture_classified[category]
+    years = culture_years.get(category, [])
+    if not years:
+        return round(count * 0.4, 1)
+    year_span = max(years) - min(years) + 1
+    span_factor = min(year_span / 8, 1.0)
+    recent_count = sum(1 for y in years if y >= 2025)
+    recent_factor = recent_count / len(years) if years else 0
+    index = count * (0.4 + span_factor * 0.3 + recent_factor * 0.3)
+    return round(index, 1)
+
+# 按热度指数降序排列
+heat_scores = {cat: calc_heat_index(cat) for cat in culture_classified}
+sorted_cultures = sorted(heat_scores.items(), key=lambda x: x[1], reverse=True)
+
+for rank, (category, score) in enumerate(sorted_cultures, 1):
+    count = culture_classified[category]
+    years = sorted(set(culture_years.get(category, [])))
+    time_range = f"{min(years)}-{max(years)}" if years else "—"
+    details_str = "、".join(sorted(culture_details[category])[:6])
+    if len(culture_details[category]) > 6:
+        details_str += f" 等{len(culture_details[category])}项"
+    games_str = "、".join(sorted(culture_games[category])[:5])
+    if len(culture_games[category]) > 5:
+        games_str += f" 等{len(culture_games[category])}款"
+    row_data = [rank, category, count, score, time_range, details_str, games_str]
+    for col_idx, value in enumerate(row_data, 1):
+        cell = ws3.cell(row=rank + 1, column=col_idx, value=value)
+        cell.font = data_font
+        cell.alignment = wrap_align
+        cell.border = thin_border
+
+ws3.column_dimensions['A'].width = 6
+ws3.column_dimensions['B'].width = 24
+ws3.column_dimensions['C'].width = 10
+ws3.column_dimensions['D'].width = 10
+ws3.column_dimensions['E'].width = 14
+ws3.column_dimensions['F'].width = 55
+ws3.column_dimensions['G'].width = 45
+ws3.freeze_panes = 'A2'
+
 # Save
 output_path = "游戏文化联动追踪表v5_去腾讯版.xlsx"
 wb.save(output_path)
