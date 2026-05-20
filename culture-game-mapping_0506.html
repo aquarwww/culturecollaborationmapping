@@ -984,6 +984,20 @@
           <div class="filter-group" id="gameFilters"></div>
         </div>
       </div>
+
+      <!-- 游戏公司 -->
+      <div class="filter-section">
+        <div class="filter-section-header" onclick="toggleFilterSection(this)">
+          <h3><span class="icon">🏢</span> 游戏公司筛选器</h3>
+          <span class="collapse-arrow">▼</span>
+        </div>
+        <div class="filter-section-body">
+          <div class="filter-actions">
+            <button id="companyToggleBtn" onclick="event.stopPropagation(); toggleAllFilters('company')">全选</button>
+          </div>
+          <div class="filter-group" id="companyFilters"></div>
+        </div>
+      </div>
     </div>
 
     <!-- 时间范围 -->
@@ -1048,6 +1062,22 @@
 // ===================================================================
 const cultureTypes = ['非遗传承', '敦煌文化', '戏曲国粹', '博物馆/文物', '文旅联动', '少数民族文化', '古典文学/IP', '世界历史文明', '北欧/维京文化', '西部/拓荒文化', '东方美学/国风', '体育/官方机构'];
 const gameGenres   = ['武侠MMO', '开放世界RPG', '音舞/换装', '卡牌RPG', 'SLG策略', '派对竞技', '模拟经营', '动作冒险3A', 'MOBA', '恐怖冒险', '回合制MMO', '动作竞技', '动作RPG', '卡牌策略', '沙盒建造'];
+
+// 游戏公司映射
+const gameCompanyMap = {
+  'g1':'西山居', 'g2':'网易', 'g3':'椰岛游戏', 'g4':'网易', 'g5':'哔哩哔哩',
+  'g6':'鹰角网络', 'g7':'祖龙娱乐', 'g8':'叠纸游戏', 'g9':'网易', 'g10':'网易',
+  'g11':'巨人网络', 'g12':'米哈游', 'g13':'游戏科学', 'g14':'网易', 'g15':'网易',
+  'g16':'哔哩哔哩', 'g17':'灵犀互娱', 'g18':'网易', 'g19':'网易', 'g20':'育碧',
+  'g21':'SIE(索尼)', 'g22':'CDPR', 'g23':'Sucker Punch', 'g24':'Rockstar',
+  'g25':'Iron Gate', 'g26':'网易', 'g27':'灵犀互娱', 'g28':'独立工作室',
+  'g29':'网易', 'g30':'米哈游', 'g31':'叠纸游戏', 'g32':'完美世界', 'g33':'完美世界',
+  'g34':'巨人网络', 'g35':'库洛游戏', 'g36':'库洛游戏', 'g37':'莉莉丝',
+  'g38':'Guerrilla/Crystal Dynamics', 'g39':'光荣特库摩', 'g40':'Ninja Theory',
+  'g41':'米哈游', 'g42':'叠纸游戏', 'g43':'网易', 'g44':'游卡网络', 'g45':'吉比特/雷霆',
+  'g46':'吉比特/雷霆', 'g47':'三七互娱', 'g48':'英雄游戏', 'g49':'网易'
+};
+const gameCompanies = [...new Set(Object.values(gameCompanyMap))].sort();
 
 const cultureNodes = [
   { id:'c1',  name:'非遗·传统服饰/刺绣', type:'culture', category:'非遗传承', desc:'苏绣、蜀绣、湘绣、云锦、京绣、杭缎、缂丝、贝雕、壮族绣球等多项国家级非遗技艺。', year:2017 },
@@ -1374,6 +1404,7 @@ allNodes.forEach(n => nodeMap[n.id] = n);
 // ===================================================================
 let activeCultureTypes = new Set(cultureTypes);
 let activeGameGenres = new Set(gameGenres);
+let activeCompanies = new Set(gameCompanies);
 let currentMaxYear = 2026;
 let allFiltersOn = true;
 
@@ -1400,12 +1431,23 @@ function initFilters() {
       <label for="gf_${gg}">${gg}</label>
       <span class="count">${gCount[gg]||0}</span></div>`;
   });
+
+  const cpEl = document.getElementById('companyFilters');
+  const cpCount = {};
+  Object.values(gameCompanyMap).forEach(c => { cpCount[c] = (cpCount[c]||0)+1; });
+  gameCompanies.forEach(cp => {
+    cpEl.innerHTML += `<div class="filter-item">
+      <input type="checkbox" checked id="cpf_${cp}" data-type="company" data-value="${cp}" onchange="handleFilter(this)">
+      <label for="cpf_${cp}">${cp}</label>
+      <span class="count">${cpCount[cp]||0}</span></div>`;
+  });
 }
 
 function handleFilter(el) {
   const t = el.dataset.type, v = el.dataset.value;
   if (t === 'culture') el.checked ? activeCultureTypes.add(v) : activeCultureTypes.delete(v);
-  else el.checked ? activeGameGenres.add(v) : activeGameGenres.delete(v);
+  else if (t === 'game') el.checked ? activeGameGenres.add(v) : activeGameGenres.delete(v);
+  else if (t === 'company') el.checked ? activeCompanies.add(v) : activeCompanies.delete(v);
   syncLinkedFilters(t);
   updateAll();
 }
@@ -1417,24 +1459,25 @@ function toggleFilterSection(header) {
 }
 
 function toggleAllFilters(type) {
-  const containerId = type === 'culture' ? 'cultureFilters' : 'gameFilters';
+  const containerMap = { culture: 'cultureFilters', game: 'gameFilters', company: 'companyFilters' };
+  const containerId = containerMap[type];
   const checkboxes = document.getElementById(containerId).querySelectorAll('input[type="checkbox"]:not([disabled])');
   const allChecked = [...checkboxes].every(cb => cb.checked);
   if (allChecked) {
-    // 当前全选状态 -> 全部取消
     checkboxes.forEach(cb => {
       cb.checked = false;
       const v = cb.dataset.value;
       if (type === 'culture') activeCultureTypes.delete(v);
-      else activeGameGenres.delete(v);
+      else if (type === 'game') activeGameGenres.delete(v);
+      else activeCompanies.delete(v);
     });
   } else {
-    // 当前非全选 -> 全选(仅选可见的)
     checkboxes.forEach(cb => {
       cb.checked = true;
       const v = cb.dataset.value;
       if (type === 'culture') activeCultureTypes.add(v);
-      else activeGameGenres.add(v);
+      else if (type === 'game') activeGameGenres.add(v);
+      else activeCompanies.add(v);
     });
   }
   syncLinkedFilters(type);
@@ -1443,46 +1486,73 @@ function toggleAllFilters(type) {
 
 // 双向联动：根据一侧筛选结果，更新另一侧可见的选项
 function syncLinkedFilters(changedType) {
-  if (changedType === 'culture') {
-    // 文化筛选变了 -> 计算与选中文化有连线的游戏品类
+  if (changedType === 'company') {
+    // 公司筛选变了 -> 更新游戏品类和文化类型
+    const linkedGenres = getLinkedGenresByCompany();
+    updateGameFilterVisibility(linkedGenres);
+    const linkedCultures = getLinkedCulturesByVisibleGames();
+    updateCultureFilterVisibility(linkedCultures);
+  } else if (changedType === 'culture') {
+    // 文化筛选变了 -> 更新游戏品类
     const linkedGenres = getLinkedGameGenres();
     updateGameFilterVisibility(linkedGenres);
   } else {
-    // 游戏品类筛选变了 -> 计算与选中品类有连线的文化类型
+    // 游戏品类筛选变了 -> 更新文化类型
     const linkedCultures = getLinkedCultureTypes();
     updateCultureFilterVisibility(linkedCultures);
   }
 }
 
+function getLinkedGenresByCompany() {
+  if (activeCompanies.size === gameCompanies.length) return new Set(gameGenres);
+  const genres = new Set();
+  gameNodes.forEach(n => {
+    if (activeCompanies.has(gameCompanyMap[n.id])) genres.add(n.genre);
+  });
+  return genres;
+}
+
+function getLinkedCulturesByVisibleGames() {
+  // 基于当前可见的游戏节点（公司+品类过滤后），计算关联的文化类型
+  const visibleGameIds = new Set(gameNodes.filter(n =>
+    activeCompanies.has(gameCompanyMap[n.id]) && activeGameGenres.has(n.genre)
+  ).map(n => n.id));
+  if (visibleGameIds.size === gameNodes.length) return new Set(cultureTypes);
+  const linkedCultureIds = new Set();
+  links.forEach(l => {
+    if (visibleGameIds.has(l.target)) linkedCultureIds.add(l.source);
+    if (visibleGameIds.has(l.source)) linkedCultureIds.add(l.target);
+  });
+  const types = new Set();
+  cultureNodes.forEach(n => { if (linkedCultureIds.has(n.id)) types.add(n.category); });
+  return types;
+}
+
 function getLinkedGameGenres() {
-  // 如果文化全选，则显示所有游戏品类
   if (activeCultureTypes.size === cultureTypes.length) return new Set(gameGenres);
-  // 找到选中文化节点
   const selectedCultureIds = new Set(cultureNodes.filter(n => activeCultureTypes.has(n.category)).map(n => n.id));
-  // 找到与这些文化有连线的游戏节点
   const linkedGameIds = new Set();
   links.forEach(l => {
     if (selectedCultureIds.has(l.source)) linkedGameIds.add(l.target);
     if (selectedCultureIds.has(l.target)) linkedGameIds.add(l.source);
   });
-  // 获取这些游戏的品类
   const genres = new Set();
-  gameNodes.forEach(n => { if (linkedGameIds.has(n.id)) genres.add(n.genre); });
+  gameNodes.forEach(n => {
+    if (linkedGameIds.has(n.id) && activeCompanies.has(gameCompanyMap[n.id])) genres.add(n.genre);
+  });
   return genres;
 }
 
 function getLinkedCultureTypes() {
-  // 如果游戏品类全选，则显示所有文化类型
-  if (activeGameGenres.size === gameGenres.length) return new Set(cultureTypes);
-  // 找到选中品类的游戏节点
-  const selectedGameIds = new Set(gameNodes.filter(n => activeGameGenres.has(n.genre)).map(n => n.id));
-  // 找到与这些游戏有连线的文化节点
+  if (activeGameGenres.size === gameGenres.length && activeCompanies.size === gameCompanies.length) return new Set(cultureTypes);
+  const selectedGameIds = new Set(gameNodes.filter(n =>
+    activeGameGenres.has(n.genre) && activeCompanies.has(gameCompanyMap[n.id])
+  ).map(n => n.id));
   const linkedCultureIds = new Set();
   links.forEach(l => {
     if (selectedGameIds.has(l.target)) linkedCultureIds.add(l.source);
     if (selectedGameIds.has(l.source)) linkedCultureIds.add(l.target);
   });
-  // 获取这些文化的类型
   const types = new Set();
   cultureNodes.forEach(n => { if (linkedCultureIds.has(n.id)) types.add(n.category); });
   return types;
@@ -1548,7 +1618,7 @@ function handleTimeChange(val) {
 
 function getFiltered() {
   const vis = cultureNodes.filter(n => activeCultureTypes.has(n.category) && n.year <= currentMaxYear);
-  const vg  = gameNodes.filter(n => activeGameGenres.has(n.genre) && n.year <= currentMaxYear);
+  const vg  = gameNodes.filter(n => activeGameGenres.has(n.genre) && activeCompanies.has(gameCompanyMap[n.id]) && n.year <= currentMaxYear);
   const ids = new Set([...vis,...vg].map(n=>n.id));
   const vl  = links.filter(l => ids.has(l.source) && ids.has(l.target) && l.year <= currentMaxYear);
   const linked = new Set();
