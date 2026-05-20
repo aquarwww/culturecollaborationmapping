@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>鹰角网络 · 文化联动深度分析 | 罗德岛档案</title>
+<style>
+  /* ============ 鹰角美学 · 工业朋克×博物馆设计系统 ============ */
+  :root{
+    --bg-1:#0f1114;
+    --bg-2:#161a1e;
+    --bg-3:#1c2127;
+    --bg-card:#181c21;
+    --paper:#e2ddd4;
+    --line:rgba(226,221,212,.08);
+    --line-strong:rgba(226,221,212,.16);
+
+    --amber:#d4a244;
+    --amber-2:#e8c16a;
+    --amber-dim:rgba(212,162,68,.12);
+    --steel:#5a7a8f;
+    --steel-2:#7fa3b8;
+    --crimson:#c44040;
+    --bone:#ccc5b8;
+    --ash:#7a756c;
+    --ice:#4aadc4;
+
+    --shadow:0 8px 28px rgba(0,0,0,.5);
+    --shadow-lg:0 20px 50px rgba(0,0,0,.65);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:"PingFang SC","Source Han Sans SC","HarmonyOS Sans SC","Microsoft YaHei",sans-serif;
+    color:var(--paper);
+    background:var(--bg-1);
+    line-height:1.85;
+    font-size:15px;
+    overflow-x:hidden;
+    position:relative;
+    -webkit-font-smoothing:antialiased;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:
+      radial-gradient(ellipse 1000px 600px at 75% 5%, rgba(212,162,68,.06), transparent 50%),
+      radial-gradient(ellipse 800px 500px at 15% 50%, rgba(90,122,143,.06), transparent 50%),
+      radial-gradient(ellipse 900px 600px at 50% 95%, rgba(196,64,64,.04), transparent 50%);
+  }
+  body::after{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.4;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(226,221,212,.015) 2px, rgba(226,221,212,.015) 3px);
+    background-size:100% 3px;
+  }
+  .wrap{max-width:1100px;margin:0 auto;padding:60px 36px;position:relative;z-index:1}
+
+  /* ============ Hero · 作战简报风 ============ */
+  .hero{
+    position:relative;margin-bottom:70px;padding:0;
+    border:1px solid var(--line-strong);
+    background:var(--bg-2);
+    overflow:hidden;box-shadow:var(--shadow-lg);
+  }
+  .hero::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg, transparent, var(--amber), var(--crimson), transparent)}
+  .corner{position:absolute;width:60px;height:60px;pointer-events:none}
+  .corner.tl{top:14px;left:14px;border-top:1.5px solid var(--amber);border-left:1.5px solid var(--amber)}
+  .corner.br{bottom:14px;right:14px;border-bottom:1.5px solid var(--amber);border-right:1.5px solid var(--amber)}
+
+  .hero-inner{padding:52px 52px 44px;position:relative;z-index:2}
+  .top-line{
+    display:flex;align-items:center;gap:14px;margin-bottom:24px;
+    font-size:10px;letter-spacing:6px;color:var(--ash);font-weight:600;text-transform:uppercase;
+  }
+  .top-line .dot{width:6px;height:6px;background:var(--amber);border-radius:1px;transform:rotate(45deg)}
+  .top-line .bar{flex:0 0 36px;height:1px;background:var(--amber);opacity:.5}
+
+  h1.title{
+    font-size:52px;font-weight:900;letter-spacing:4px;color:var(--paper);line-height:1.1;margin:0 0 10px;
+  }
+  h1.title .accent{color:var(--amber)}
+  .title-sub{
+    font-size:14px;letter-spacing:8px;color:var(--amber);font-weight:600;margin:16px 0 6px;
+    display:flex;align-items:center;gap:12px;
+  }
+  .title-sub::before,.title-sub::after{content:"";flex:0 0 28px;height:1px;background:var(--amber);opacity:.4}
+  .title-en{
+    font-family:"Cormorant Garamond","Times New Roman",serif;
+    font-style:italic;color:var(--ash);font-size:13px;letter-spacing:3px;margin-bottom:26px;
+  }
+  .lede-hero{
+    font-size:15px;line-height:2;color:var(--bone);max-width:700px;
+    border-left:2px solid var(--amber);padding:8px 0 8px 20px;
+  }
+  .lede-hero b{color:var(--amber-2);font-weight:600}
+
+  .hero-stats{
+    display:flex;gap:28px;margin-top:32px;padding-top:24px;border-top:1px solid var(--line-strong);
+  }
+  .hero-stat .v{font-size:36px;font-weight:900;color:var(--amber-2);line-height:1}
+  .hero-stat .l{font-size:11px;color:var(--ash);letter-spacing:3px;margin-top:6px}
+
+  /* ============ Section ============ */
+  section{margin:60px 0;position:relative;z-index:1}
+  .sec-head{
+    display:flex;align-items:center;gap:18px;margin-bottom:6px;padding-bottom:16px;
+    border-bottom:1px solid var(--line-strong);position:relative;
+  }
+  .sec-head::after{content:"";position:absolute;left:0;bottom:-1px;width:70px;height:2px;background:var(--amber)}
+  .sec-num{
+    flex-shrink:0;width:44px;height:44px;
+    background:transparent;color:var(--amber);
+    border:1.5px solid var(--amber);
+    display:flex;align-items:center;justify-content:center;
+    font-size:18px;font-weight:900;
+  }
+  h2.sec-title{font-size:28px;letter-spacing:3px;color:var(--paper);font-weight:900}
+  h2.sec-title .red{color:var(--crimson)}
+  .sec-en{margin-left:auto;font-style:italic;font-family:"Cormorant Garamond",serif;color:var(--ash);font-size:12px;letter-spacing:3px}
+
+  h3{font-size:20px;letter-spacing:2px;color:var(--amber-2);font-weight:700;margin:32px 0 14px;display:flex;align-items:center;gap:12px}
+  h3::before{content:"";width:12px;height:2px;background:var(--amber)}
+  h4{font-size:16px;color:var(--paper);margin:18px 0 10px;font-weight:700;letter-spacing:1px}
+  p{margin:10px 0;color:var(--bone)}
+
+  .lede{
+    background:linear-gradient(135deg, rgba(212,162,68,.05), transparent 60%);
+    border-left:2px solid var(--amber);
+    padding:20px 26px;margin:18px 0 28px;font-size:15px;color:var(--bone);line-height:2;
+  }
+  .lede b{color:var(--amber-2);font-weight:600}
+
+  /* ============ Method Cards ============ */
+  .methods{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin:28px 0}
+  .method{
+    background:var(--bg-card);border:1px solid var(--line-strong);
+    padding:26px 22px;position:relative;transition:all .3s;overflow:hidden;
+  }
+  .method:hover{transform:translateY(-3px);border-color:var(--amber)}
+  .method::before{content:"";position:absolute;top:0;left:0;width:100%;height:2px;background:var(--amber)}
+  .m2::before{background:var(--steel)}
+  .m3::before{background:var(--crimson)}
+  .method .seal{
+    width:36px;height:36px;flex-shrink:0;margin-bottom:12px;
+    background:transparent;color:var(--amber);border:1.5px solid var(--amber);
+    display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;
+  }
+  .m2 .seal{color:var(--steel);border-color:var(--steel)}
+  .m3 .seal{color:var(--crimson);border-color:var(--crimson)}
+  .method h4{margin:0 0 10px;font-size:17px;color:var(--paper);letter-spacing:2px;font-weight:700}
+  .method .desc{font-size:13.5px;color:var(--bone);line-height:1.9}
+  .method .desc b{color:var(--amber-2);font-weight:600}
+  .m2 .desc b{color:var(--steel-2)}
+  .m3 .desc b{color:var(--crimson)}
+  .method .case{
+    margin-top:14px;padding:12px 14px;background:rgba(226,221,212,.03);
+    border-left:2px solid var(--amber);font-size:12.5px;color:var(--bone);line-height:1.9;
+  }
+  .m2 .case{border-left-color:var(--steel)}
+  .m3 .case{border-left-color:var(--crimson)}
+  .method .case b{color:var(--paper);font-weight:600}
+
+  /* ============ Case Card ============ */
+  .case-card{
+    background:linear-gradient(135deg, var(--bg-card) 0%, var(--bg-3) 100%);
+    border:1px solid var(--line-strong);padding:36px 38px;margin:24px 0;
+    position:relative;overflow:hidden;box-shadow:var(--shadow);
+  }
+  .case-card::before{content:"";position:absolute;top:0;left:0;width:120px;height:2px;background:var(--amber)}
+  .case-card .head{
+    display:flex;justify-content:space-between;align-items:flex-start;
+    margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--line);position:relative;z-index:1;
+  }
+  .case-card .head h3{margin:0;color:var(--paper);font-size:22px;letter-spacing:2px;border:none;padding:0;flex:1;font-weight:900}
+  .case-card .head h3::before{display:none}
+  .case-card .stamp{
+    background:transparent;color:var(--amber);padding:6px 14px;font-size:11px;font-weight:700;
+    letter-spacing:3px;border:1.5px solid var(--amber);flex-shrink:0;margin-left:14px;
+  }
+  .case-card .desc-p{font-size:15px;color:var(--bone);line-height:2;position:relative;z-index:1}
+  .case-card .desc-p b{color:var(--amber-2);font-weight:600}
+  .case-card .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px;position:relative;z-index:1}
+  .case-card .col{background:rgba(226,221,212,.03);border:1px solid var(--line);padding:20px}
+  .case-card .col h5{
+    font-size:13px;letter-spacing:3px;color:var(--amber);font-weight:700;margin-bottom:12px;
+    padding-bottom:10px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;
+  }
+  .case-card .col h5::before{content:"";width:6px;height:6px;background:var(--amber);border-radius:1px;transform:rotate(45deg)}
+  .case-card .col ul{list-style:none;font-size:13.5px;color:var(--bone)}
+  .case-card .col li{padding:6px 0 6px 16px;position:relative;line-height:1.85}
+  .case-card .col li::before{content:"";position:absolute;left:0;top:14px;width:8px;height:1px;background:var(--amber)}
+  .case-card .col li b{color:var(--paper);font-weight:600}
+  .case-card .quote{
+    margin-top:20px;padding:18px 24px;background:linear-gradient(135deg, rgba(212,162,68,.05), transparent);
+    border-left:3px solid var(--amber);color:var(--bone);font-size:14.5px;line-height:2;position:relative;z-index:1;
+  }
+  .case-card .quote b{color:var(--amber-2);font-weight:700}
+
+  /* ============ Timeline ============ */
+  .timeline{position:relative;padding-left:48px;margin:32px 0}
+  .timeline::before{content:"";position:absolute;left:14px;top:0;bottom:0;width:1px;background:linear-gradient(180deg, var(--amber), var(--steel), var(--crimson))}
+  .tl-item{
+    position:relative;margin-bottom:20px;padding:18px 22px;
+    background:var(--bg-card);border:1px solid var(--line);transition:all .3s;
+  }
+  .tl-item:hover{transform:translateX(5px);border-color:var(--amber)}
+  .tl-item::before{
+    content:"";position:absolute;left:-38px;top:22px;width:9px;height:9px;
+    background:var(--bg-1);border:2px solid var(--amber);border-radius:50%;
+  }
+  .tl-item .date{color:var(--amber);font-weight:600;font-size:12px;letter-spacing:3px}
+  .tl-item .ttl{font-size:17px;font-weight:700;margin:4px 0 8px;color:var(--paper);letter-spacing:1px}
+  .tl-item .desc{color:var(--bone);font-size:13px;line-height:1.9}
+  .tl-item.milestone{background:linear-gradient(135deg, var(--bg-card), rgba(212,162,68,.08));border:1px solid rgba(212,162,68,.4)}
+  .tl-item.milestone::before{background:var(--amber);border-color:var(--bg-1);width:11px;height:11px;left:-39px;box-shadow:0 0 0 4px rgba(212,162,68,.2)}
+  .tl-item.milestone .ttl::after{content:" ◆";color:var(--amber);font-size:12px}
+
+  /* ============ Bars ============ */
+  .bars{background:var(--bg-card);border:1px solid var(--line);padding:22px 24px;margin:20px 0}
+  .bar-row{display:grid;grid-template-columns:180px 1fr 100px;gap:14px;align-items:center;margin:12px 0;font-size:14px}
+  .bar-row .name{color:var(--paper);font-weight:600;letter-spacing:1px}
+  .bar-row .bar{background:rgba(226,221,212,.06);height:16px;position:relative}
+  .bar-row .bar .fill{height:100%;background:linear-gradient(90deg, var(--amber), var(--steel))}
+  .bar-row .val{text-align:right;color:var(--amber-2);font-weight:700;font-size:14px}
+
+  /* Tags */
+  .tag{display:inline-block;padding:3px 10px;font-size:11px;margin-right:4px;font-weight:600;letter-spacing:1px;border:1px solid;background:transparent}
+  .tag-A{color:var(--amber);border-color:var(--amber)}
+  .tag-C{color:var(--steel-2);border-color:var(--steel-2)}
+  .tag-D{color:var(--crimson);border-color:var(--crimson)}
+
+  /* ============ Table ============ */
+  .table-wrap{background:var(--bg-card);border:1px solid var(--line-strong);box-shadow:var(--shadow);overflow-x:auto;margin:22px 0}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  thead{background:var(--bg-3);border-bottom:2px solid var(--amber)}
+  thead th{color:var(--amber);padding:14px 16px;text-align:left;letter-spacing:2px;font-weight:700;font-size:12px}
+  tbody td{padding:14px 16px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line);color:var(--bone)}
+  tbody tr:hover{background:rgba(212,162,68,.04)}
+  tbody tr:last-child td{border-bottom:none}
+
+  /* ============ Insight ============ */
+  .insight{
+    background:linear-gradient(135deg, rgba(212,162,68,.06), transparent);
+    border:1px solid rgba(212,162,68,.3);padding:24px 28px;margin:22px 0;position:relative;
+  }
+  .insight::before{content:"";position:absolute;top:0;left:0;width:4px;height:100%;background:var(--amber)}
+  .insight h4{color:var(--amber);font-size:17px;letter-spacing:2px;margin-bottom:12px}
+  .insight p{font-size:14.5px;color:var(--bone);line-height:2}
+  .insight p b{color:var(--paper);font-weight:600}
+
+  /* Formula */
+  .formula{
+    background:linear-gradient(135deg, rgba(212,162,68,.08), rgba(90,122,143,.06));
+    border:1px solid var(--amber);padding:28px;margin:20px 0;text-align:center;position:relative;
+  }
+  .formula::before,.formula::after{content:"";position:absolute;width:20px;height:20px;border:1.5px solid var(--amber)}
+  .formula::before{top:-1px;left:-1px;border-right:none;border-bottom:none}
+  .formula::after{bottom:-1px;right:-1px;border-left:none;border-top:none}
+  .formula .f-text{font-size:20px;font-weight:800;letter-spacing:2px;color:var(--paper);line-height:1.8}
+  .formula .f-text b{color:var(--amber)}
+
+  /* Footer */
+  footer{
+    margin-top:80px;padding:28px 32px;text-align:center;
+    background:var(--bg-card);border:1px solid var(--line);color:var(--ash);font-size:13px;letter-spacing:2px;
+    position:relative;
+  }
+  footer::before{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);width:60px;height:2px;background:var(--amber)}
+  footer p{margin:8px 0}
+  footer .next{color:var(--amber-2);font-weight:600;font-size:14px;letter-spacing:3px}
+
+  @media (max-width:880px){
+    .wrap{padding:32px 18px}
+    h1.title{font-size:34px}
+    .methods,.case-card .grid2{grid-template-columns:1fr}
+    .bar-row{grid-template-columns:140px 1fr 80px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- Hero -->
+<header class="hero">
+  <span class="corner tl"></span>
+  <span class="corner br"></span>
+  <div class="hero-inner">
+    <div class="top-line">
+      <span class="dot"></span>
+      <span>厂 商 深 度 分 析 · 卷 肆</span>
+      <span class="bar"></span>
+      <span>HYPERGRYPH</span>
+    </div>
+    <h1 class="title">鹰角网络 · <span class="accent">罗德岛档案</span></h1>
+    <div class="title-sub">博 物 馆 即 战 场</div>
+    <div class="title-en">Hypergryph Cultural Crossover Methodology — Rhodes Island Archives</div>
+    <div class="lede-hero">
+      三条联动，三座国家级文化殿堂。鹰角以<b>「少而精、重而深」</b>为原则，
+      每一次文化合作都直接对标<b>国家级博物馆/文化机构</b>——不做轻量尝试，出手即重磅。
+      明日方舟用"塔防策略"这一非主流品类，证明了<b>「品类不限定文化联动的天花板」</b>。
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="v">1</div><div class="l">产　品</div></div>
+      <div class="hero-stat"><div class="v">3</div><div class="l">联 动 事 件</div></div>
+      <div class="hero-stat"><div class="v">3</div><div class="l">国家级机构</div></div>
+      <div class="hero-stat"><div class="v">100%</div><div class="l">博 物 馆 类</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- 一 战略定位 -->
+<section>
+  <div class="sec-head">
+    <div class="sec-num">壹</div>
+    <h2 class="sec-title">战略定位</h2>
+    <span class="sec-en">Strategic Positioning</span>
+  </div>
+
+  <p class="lede">
+    鹰角是头部厂商中文化联动数量最少但<b>命中率最高</b>的——3条联动全部为<b>国家级博物馆/文化机构</b>合作。
+    不同于米哈游的"广覆盖"和网易的"矩阵化"，鹰角走的是<b>「重度精品路线」</b>：每一次合作都与游戏内核心版本/活动深度绑定，
+    把"联动"做成"<b>游戏内容的一部分</b>"而非外挂式营销。
+  </p>
+
+  <div class="insight">
+    <h4>◆ 鹰角的核心差异化</h4>
+    <p><b>数量极少（3条）但质量极高</b>：南越王博物院（当天下午门票即告罄，日均超2万人）、中国国家博物馆（民族音乐合作）、中国电影资料馆（"留影烁今"干员走进经典电影）。</p>
+    <p><b>100%博物馆/文化机构类</b>：不做非遗、不做文旅、不做轻量合作——只做最重量级的国家级文化殿堂。</p>
+    <p><b>每次合作都创造「线下现象」</b>：南越王博物院当天下午门票告罄 → 证明游戏用户的线下文化消费力。</p>
+  </div>
+</section>
+
+<!-- 二 方法论 -->
+<section>
+  <div class="sec-head">
+    <div class="sec-num">贰</div>
+    <h2 class="sec-title">三大核心<span class="red">方法论</span></h2>
+    <span class="sec-en">Three Core Principles</span>
+  </div>
+
+  <p class="lede">基于3条联动事件的分析，鹰角的打法可拆解为三条极具辨识度的方法论。</p>
+
+  <div class="methods">
+    <div class="method m1">
+      <div class="seal">壹</div>
+      <h4>只做国家级</h4>
+      <p class="desc">鹰角的合作方选择标准极高——<b>南越王博物院</b>（国家一级博物馆）、<b>中国国家博物馆</b>（国家最高文物机构）、<b>中国电影资料馆</b>（国家级电影文化机构）。不做省级、不做地方、不做商业代理——直接对标最高级别。</p>
+      <div class="case"><b>逻辑：</b>宁可少做，也不降级。每一次合作都要能在"机构级别"维度站住行业制高点。</div>
+    </div>
+    <div class="method m2">
+      <div class="seal">贰</div>
+      <h4>线下即爆点</h4>
+      <p class="desc">鹰角的文化联动<b>核心场景在线下</b>——线下打卡、线下展览、线下演出。不依赖纯数字内容传播，而是制造"<b>博士穿校服排队</b>"的社交事件，用线下稀缺性驱动传播。</p>
+      <div class="case"><b>南越王（2024.1）：</b>当天下午门票告罄；日均超2万人；微博/广州日报热议"博士排队打卡"<br><b>效果：</b>线下真实事件 > 线上内容传播</div>
+    </div>
+    <div class="method m3">
+      <div class="seal">叁</div>
+      <h4>内容绑定角色</h4>
+      <p class="desc">每一次联动都与<b>游戏内特定角色/版本</b>深度绑定——"干员林"担任文物讲解、干员走进经典电影、民族音乐融入角色主题曲。不是"贴牌联动"，而是"<b>角色即文化载体</b>"。</p>
+      <div class="case"><b>电影资料馆（2024.12）：</b>"留影烁今"限时联动——干员走进经典电影瞬间<br><b>国博（2024）：</b>萨卡兹主题曲邀请民乐团演奏</div>
+    </div>
+  </div>
+</section>
+
+<!-- 三 案例 -->
+<section>
+  <div class="sec-head">
+    <div class="sec-num">叁</div>
+    <h2 class="sec-title">三大<span class="red">标杆案例</span>深挖</h2>
+    <span class="sec-en">Case Deep Dive</span>
+  </div>
+
+  <div class="case-card">
+    <div class="head"><h3>案例 A · 南越王博物院 ×「南境余音」：当天门票告罄的现象级线下</h3><span class="stamp">★ 线下标杆</span></div>
+    <p class="desc-p">
+      2024年1月28日至2月9日，明日方舟与<b>南越王博物院</b>联动——推出"南境余音"主题线下打卡活动，
+      干员"林"担任文物讲解。活动开始后<b>当天下午门票即告罄</b>，日均入馆超2万人。
+      广州日报报道"博士穿校服排队打卡"成为社交话题。
+    </p>
+    <div class="grid2">
+      <div class="col"><h5>动作要素</h5><ul>
+        <li><b>国家一级博物馆：</b>南越王博物院（广州）</li>
+        <li><b>角色绑定：</b>干员"林"担任文物讲解员</li>
+        <li><b>线下打卡：</b>限时12天主题体验</li>
+        <li><b>纪录片：</b>配套文化纪录片传播</li>
+      </ul></div>
+      <div class="col"><h5>破圈数据</h5><ul>
+        <li><b>门票告罄：</b>活动当天下午即售罄</li>
+        <li><b>日均2万+：</b>博物馆日均入馆人数暴涨</li>
+        <li><b>广州日报：</b>专题报道"游戏玩家涌入博物馆"</li>
+        <li><b>微博热议：</b>"博士穿校服排队"成话题</li>
+      </ul></div>
+    </div>
+    <div class="quote">南越王联动的核心启示：<b>游戏用户的线下文化消费力被严重低估</b>。当联动制造了足够的"稀缺感"和"仪式感"，玩家不仅愿意线下参与，还能创造超越游戏圈的社会话题。</div>
+  </div>
+
+  <div class="case-card">
+    <div class="head"><h3>案例 B · 中国国家博物馆 × 民族音乐合作</h3><span class="stamp">★ 最高级别</span></div>
+    <p class="desc-p">
+      2024年，明日方舟与<b>中国国家博物馆</b>进行线下联动，萨卡兹主题曲邀请<b>民乐团</b>演奏，
+      将中国民族音乐融入游戏角色主题音乐中。这是"塔防策略"品类与<b>国家最高级别文物机构</b>的首次合作。
+    </p>
+    <div class="grid2">
+      <div class="col"><h5>合作深度</h5><ul>
+        <li><b>机构级别：</b>中国国家博物馆（国家最高文物机构）</li>
+        <li><b>音乐共创：</b>民乐团参与角色主题曲演奏</li>
+        <li><b>线下活动：</b>国博内主题活动</li>
+        <li><b>角色融合：</b>萨卡兹世界观与民族音乐结合</li>
+      </ul></div>
+      <div class="col"><h5>关键意义</h5><ul>
+        <li>证明"塔防策略"品类可触达最高级别文化机构</li>
+        <li>鹰角持续深化"博物馆合作"已成品牌传统</li>
+        <li>民乐融合为游戏音乐开辟文化维度</li>
+        <li>"游戏×国博"的行业先例性价值</li>
+      </ul></div>
+    </div>
+  </div>
+
+  <div class="case-card">
+    <div class="head"><h3>案例 C · 中国电影资料馆「留影烁今」</h3><span class="stamp">★ 创意标杆</span></div>
+    <p class="desc-p">
+      2024年12月，明日方舟与<b>中国电影资料馆</b>联动——"留影烁今"限时活动中，
+      罗德岛舰船<b>驶入光影长河</b>，干员们走进<b>经典电影瞬间</b>。
+      这是国家级电影文化机构首次与游戏深度联动，开创了"<b>游戏角色 × 经典电影场景</b>"的全新创意形式。
+    </p>
+    <div class="grid2">
+      <div class="col"><h5>创意价值</h5><ul>
+        <li><b>形式创新：</b>干员"走进"经典电影瞬间——行业首创</li>
+        <li><b>世界观融合：</b>罗德岛舰船驶入"光影长河"</li>
+        <li><b>限时联动：</b>制造稀缺性和事件感</li>
+        <li><b>国家级机构：</b>中国电影资料馆</li>
+      </ul></div>
+      <div class="col"><h5>行业意义</h5><ul>
+        <li>开辟"游戏 × 电影文化"跨界新赛道</li>
+        <li>证明"经典电影"可作为文化联动资产</li>
+        <li>鹰角B站官方动态获高互动</li>
+        <li>与南越王/国博形成"博物馆三连"品牌认知</li>
+      </ul></div>
+    </div>
+    <div class="quote">"留影烁今"的核心洞察：<b>文化联动不必局限于"传统文化"</b>——电影是20世纪最重要的文化遗产形式之一，将游戏角色融入经典电影场景，本质上是在做"影像文化的数字化活化"。</div>
+  </div>
+</section>
+
+<!-- 四 时间轴 -->
+<section>
+  <div class="sec-head">
+    <div class="sec-num">肆</div>
+    <h2 class="sec-title">战略时间轴</h2>
+    <span class="sec-en">Timeline · 2024</span>
+  </div>
+
+  <p class="lede">鹰角的文化联动集中在<b>2024年</b>——一年内完成三座国家级机构的密集合作，呈现"<b>蓄力后集中爆发</b>"的战略节奏。</p>
+
+  <div class="timeline">
+    <div class="tl-item milestone">
+      <div class="date">2024 · 01-02</div>
+      <div class="ttl">明日方舟 ×南越王博物院「南境余音」</div>
+      <div class="desc">当天下午门票告罄；日均超2万人；广州日报/微博热议。鹰角文化联动"出道即巅峰"。</div>
+    </div>
+    <div class="tl-item">
+      <div class="date">2024</div>
+      <div class="ttl">明日方舟 × 中国国家博物馆 · 民族音乐</div>
+      <div class="desc">萨卡兹主题曲邀请民乐团演奏；国博线下活动。触达国家最高文物机构。</div>
+    </div>
+    <div class="tl-item milestone">
+      <div class="date">2024 · 12</div>
+      <div class="ttl">明日方舟 × 中国电影资料馆「留影烁今」</div>
+      <div class="desc">"干员走进经典电影瞬间"——形式创新；鹰角官方B站高互动。完成"博物馆三连"。</div>
+    </div>
+  </div>
+
+  <div class="insight">
+    <h4>◆ 战略节奏观察</h4>
+    <p><b>2024年之前：</b>鹰角几乎不做文化联动——产品以内容深度和世界观自洽为核心，"不联动"本身就是品牌调性的一部分。</p>
+    <p><b>2024年爆发：</b>一年内三座国家级机构——南越王 → 国博 → 电影资料馆。节奏密集但每一步都是"重量级首次"。</p>
+    <p><b>启示：</b>鹰角证明了"<b>不做则已，做则做到顶级</b>"的打法同样有效。少量重磅合作形成的品牌印象，可能比大量轻量合作更清晰。</p>
+  </div>
+</section>
+
+<!-- 五 资产分布 -->
+<section>
+  <div class="sec-head">
+    <div class="sec-num">伍</div>
+    <h2 class="sec-title">文化资产分布</h2>
+    <span class="sec-en">Asset Distribution</span>
+  </div>
+
+  <p>鹰角3条联动的资产分布极度集中——<b style="color:var(--amber)">100% 博物馆/国家级文化机构</b>，这在全行业中独一无二。</p>
+
+  <div class="bars">
+    <div class="bar-row"><div class="name"><span class="tag tag-A">A 博物馆</span></div><div class="bar"><div class="fill" style="width:67%"></div></div><div class="val">2 条 · 67%</div></div>
+    <div class="bar-row"><div class="name"><span class="tag tag-D">D 电影/文化机构</span></div><div class="bar"><div class="fill" style="width:33%"></div></div><div class="val">1 条 · 33%</div></div>
+  </div>
+
+  <h3>与其他厂商的对比</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>厂商</th><th>联动总数</th><th>博物馆占比</th><th>核心策略</th></tr></thead>
+      <tbody>
+        <tr><td>鹰角网络</td><td>3 条</td><td style="color:var(--amber)"><b>100%</b></td><td>只做国家级，少而精</td></tr>
+        <tr><td>网易</td><td>53 条</td><td>32%</td><td>博物馆+非遗双重头部</td></tr>
+        <tr><td>米哈游</td><td>40 条</td><td>5%</td><td>非遗/海外/景区三足鼎立</td></tr>
+        <tr><td>叠纸</td><td>11 条</td><td>18%</td><td>非遗服饰+情感驱动</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 六 速查 -->
+<section>
+  <div class="sec-head">
+    <div class="sec-num">陆</div>
+    <h2 class="sec-title">全量联动<span class="red">速查</span></h2>
+    <span class="sec-en">Complete Index</span>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>时间</th><th>产品</th><th>文化资产</th><th>类型</th><th>合作方</th><th>核心亮点</th></tr></thead>
+      <tbody>
+        <tr><td>2024.1-2</td><td>明日方舟</td><td>南越王博物院「南境余音」</td><td><span class="tag tag-A">A</span></td><td>南越王博物院</td><td>当天门票告罄；日均超2万人</td></tr>
+        <tr><td>2024</td><td>明日方舟</td><td>中国国家博物馆 · 民族音乐</td><td><span class="tag tag-A">A</span></td><td>中国国家博物馆</td><td>民乐团演奏萨卡兹主题曲</td></tr>
+        <tr><td>2024.12</td><td>明日方舟</td><td>中国电影资料馆「留影烁今」</td><td><span class="tag tag-D">D</span></td><td>中国电影资料馆</td><td>干员走进经典电影瞬间</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 七 公式 -->
+<section>
+  <div class="sec-head">
+    <div class="sec-num">柒</div>
+    <h2 class="sec-title">方法论提炼</h2>
+    <span class="sec-en">The Formula</span>
+  </div>
+
+  <div class="formula">
+    <div class="f-text">文化联动 = <b>国家级机构</b> × <b>线下稀缺事件</b> × <b>角色深度绑定</b></div>
+  </div>
+
+  <h3>给行业的三条启示</h3>
+
+  <div class="insight">
+    <h4>启示 ① 「少而精」是一种有效的品牌策略</h4>
+    <p>鹰角用3条联动建立了"<b>博物馆合作已成明日方舟传统</b>"的行业认知——证明文化联动不需要"堆数量"，<b>持续做同一件事做到极致</b>，就能形成品牌记忆。</p>
+  </div>
+
+  <div class="insight" style="border-color:var(--steel)">
+    <h4 style="color:var(--steel-2)">启示 ② 线下「稀缺事件」的传播价值被低估</h4>
+    <p>"当天门票告罄""博士穿校服排队"——这些<b>线下真实事件</b>产生的传播力和品牌信任度，远超线上数字内容。鹰角证明了：<b>制造一个不可复制的线下瞬间，胜过十篇线上推文</b>。</p>
+  </div>
+
+  <div class="insight" style="border-color:var(--crimson)">
+    <h4 style="color:var(--crimson)">启示 ③ 品类不限定文化联动的天花板</h4>
+    <p>"塔防策略"是一个相对小众的品类，但明日方舟用3次国家级博物馆合作证明：<b>用户对文化内容的需求与游戏品类无关</b>——关键在于产品是否建立了"世界观深度"和"用户文化认同"。</p>
+  </div>
+</section>
+
+<footer>
+  <p>本报告基于「游戏 × 文化联动追踪表v5」鹰角网络章节（1款产品 3条联动）的方法论提炼与案例佐证。</p>
+  <p class="next">◆ 厂商深度分析系列 · 第四篇 · 鹰角网络 ◆</p>
+  <p style="color:#5a5448;margin-top:10px">© 内部研究用 · 数据来源以名录主文档及公开报道为准</p>
+</footer>
+
+</div>
+</body>
+</html>
