@@ -1077,7 +1077,7 @@ const gameCompanyMap = {
   'g41':'米哈游', 'g42':'叠纸游戏', 'g43':'网易', 'g44':'游卡网络', 'g45':'吉比特/雷霆',
   'g46':'吉比特/雷霆', 'g47':'三七互娱', 'g48':'英雄游戏', 'g49':'网易'
 };
-const gameCompanies = [...new Set(Object.values(gameCompanyMap))].sort();
+const gameCompanies = [...new Set(Object.values(gameCompanyMap))].sort((a,b) => a.localeCompare(b, 'zh-CN'));
 
 const cultureNodes = [
   { id:'c1',  name:'非遗·传统服饰/刺绣', type:'culture', category:'非遗传承', desc:'苏绣、蜀绣、湘绣、云锦、京绣、杭缎、缂丝、贝雕、壮族绣球等多项国家级非遗技艺。', year:2017 },
@@ -1435,10 +1435,10 @@ function initFilters() {
   const cpEl = document.getElementById('companyFilters');
   const cpCount = {};
   Object.values(gameCompanyMap).forEach(c => { cpCount[c] = (cpCount[c]||0)+1; });
-  gameCompanies.forEach(cp => {
+  gameCompanies.forEach((cp, idx) => {
     cpEl.innerHTML += `<div class="filter-item">
-      <input type="checkbox" checked id="cpf_${cp}" data-type="company" data-value="${cp}" onchange="handleFilter(this)">
-      <label for="cpf_${cp}">${cp}</label>
+      <input type="checkbox" checked id="cpf_${idx}" data-type="company" data-value="${cp}" onchange="handleFilter(this)">
+      <label for="cpf_${idx}">${cp}</label>
       <span class="count">${cpCount[cp]||0}</span></div>`;
   });
 }
