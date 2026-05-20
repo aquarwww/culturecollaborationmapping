@@ -45,7 +45,7 @@
   .app {
     display: grid;
     grid-template-columns: 260px 1fr;
-    grid-template-rows: 52px 1fr 280px;
+    grid-template-rows: 52px 1fr 6px 280px;
     height: 100vh;
     width: 100vw;
   }
@@ -95,6 +95,237 @@
     gap: 20px;
   }
 
+  /* ========== Search ========== */
+  .header-search {
+    position: relative;
+    flex: 0 1 320px;
+    margin: 0 20px;
+  }
+
+  .search-input-wrapper {
+    display: flex;
+    align-items: center;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 0 14px;
+    height: 34px;
+    transition: border-color .2s, box-shadow .2s;
+  }
+
+  .search-input-wrapper:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0,113,227,.1);
+  }
+
+  .search-icon {
+    font-size: 14px;
+    color: var(--text-tertiary);
+    margin-right: 8px;
+    flex-shrink: 0;
+  }
+
+  .search-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 13px;
+    font-family: var(--font);
+    color: var(--text-primary);
+    outline: none;
+  }
+
+  .search-input::placeholder {
+    color: var(--text-tertiary);
+  }
+
+  .search-clear {
+    display: none;
+    width: 18px;
+    height: 18px;
+    border: none;
+    background: #d1d1d6;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 12px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-left: 6px;
+    line-height: 1;
+  }
+
+  .search-clear.show {
+    display: flex;
+  }
+
+  /* 搜索结果下拉 */
+  .search-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    width: 460px;
+    max-height: 420px;
+    overflow-y: auto;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow-lg);
+    z-index: 100;
+    padding: 6px 0;
+  }
+
+  .search-dropdown.show {
+    display: block;
+  }
+
+  .search-dropdown::-webkit-scrollbar { width: 4px; }
+  .search-dropdown::-webkit-scrollbar-thumb { background: #d1d1d6; border-radius: 2px; }
+
+  .search-result-group {
+    padding: 4px 12px 2px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    color: var(--text-tertiary);
+  }
+
+  .search-result-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 14px;
+    cursor: pointer;
+    transition: background .1s;
+    border-radius: 6px;
+    margin: 0 6px;
+  }
+
+  .search-result-item:hover,
+  .search-result-item.active {
+    background: var(--accent-light);
+  }
+
+  .search-result-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+
+  .search-result-icon.culture {
+    background: #f3e8ff;
+  }
+
+  .search-result-icon.game {
+    background: #dbeafe;
+  }
+
+  .search-result-icon.link {
+    background: #fef3c7;
+  }
+
+  .search-result-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .search-result-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .search-result-name mark {
+    background: #fef08a;
+    color: inherit;
+    border-radius: 2px;
+    padding: 0 1px;
+  }
+
+  .search-result-meta {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .search-result-badge {
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+
+  .search-result-actions {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .search-action-btn {
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all .12s;
+    white-space: nowrap;
+  }
+
+  .search-action-btn:hover {
+    background: var(--accent-light);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .search-action-btn.primary {
+    background: var(--accent-light);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .search-action-btn.primary:hover {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  /* 搜索跳转高亮动画 */
+  @keyframes searchHighlightFlash {
+    0% { background-color: #fef08a; }
+    50% { background-color: #fde047; }
+    100% { background-color: transparent; }
+  }
+
+  .search-nav-highlight {
+    animation: searchHighlightFlash 2s ease-out forwards;
+  }
+
+  .heat-ranking-table tr.search-nav-highlight td {
+    animation: searchHighlightFlash 2s ease-out forwards;
+  }
+
+  .search-empty {
+    padding: 24px;
+    text-align: center;
+    color: var(--text-tertiary);
+    font-size: 13px;
+  }
+
   .header-stat {
     display: flex;
     align-items: center;
@@ -111,7 +342,7 @@
 
   /* ========== Sidebar ========== */
   .sidebar {
-    grid-row: 2 / 4;
+    grid-row: 2 / 5;
     background: var(--surface);
     border-right: 1px solid var(--border);
     display: flex;
@@ -497,6 +728,37 @@
     color: var(--text-secondary);
   }
 
+  /* ========== Resize Handle ========== */
+  .resize-handle {
+    grid-column: 2 / -1;
+    height: 6px;
+    cursor: row-resize;
+    background: transparent;
+    position: relative;
+    z-index: 15;
+    user-select: none;
+    flex-shrink: 0;
+  }
+
+  .resize-handle::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 4px;
+    border-radius: 2px;
+    background: #d1d1d6;
+    transition: background 0.2s, width 0.2s;
+  }
+
+  .resize-handle:hover::before,
+  .resize-handle.active::before {
+    background: var(--accent);
+    width: 56px;
+  }
+
   /* ========== Bottom Panel ========== */
   .bottom-panel {
     grid-column: 2 / -1;
@@ -540,6 +802,61 @@
   }
 
   .panel-tab .tab-icon { font-size: 15px; }
+
+  /* 面板展开到大尺寸时的样式增强 */
+  .bottom-panel.expanded .panel-tab {
+    padding: 14px 24px;
+    font-size: 15px;
+  }
+
+  .bottom-panel.expanded .panel-tab .tab-icon {
+    font-size: 18px;
+  }
+
+  .bottom-panel.expanded .heat-ranking-table {
+    font-size: 14px;
+  }
+
+  .bottom-panel.expanded .heat-ranking-table th {
+    font-size: 12px;
+    padding: 10px 14px;
+  }
+
+  .bottom-panel.expanded .heat-ranking-table td {
+    padding: 10px 14px;
+  }
+
+  .bottom-panel.expanded .compare-card {
+    padding: 18px 20px;
+  }
+
+  .bottom-panel.expanded .compare-name {
+    font-size: 15px;
+  }
+
+  .bottom-panel.expanded .bar-label {
+    font-size: 13px;
+  }
+
+  .bottom-panel.expanded .case-pair {
+    font-size: 15px;
+  }
+
+  .bottom-panel.expanded .case-note {
+    font-size: 13px;
+  }
+
+  .bottom-panel.expanded .culture-group-name {
+    font-size: 16px;
+  }
+
+  .bottom-panel.expanded .insight-card .ic-body h4 {
+    font-size: 18px;
+  }
+
+  .bottom-panel.expanded .insight-card .ic-body p {
+    font-size: 14px;
+  }
 
   .panel-content {
     flex: 1;
@@ -1145,6 +1462,14 @@
       <div class="header-divider"></div>
       <span class="header-subtitle">全球文化资产 · 游戏产品联动关系网络</span>
     </div>
+    <div class="header-search" id="headerSearch">
+      <div class="search-input-wrapper">
+        <span class="search-icon">🔍</span>
+        <input class="search-input" id="searchInput" type="text" placeholder="搜索文化主题、游戏、公司..." autocomplete="off">
+        <button class="search-clear" id="searchClear" onclick="clearSearch()">×</button>
+      </div>
+      <div class="search-dropdown" id="searchDropdown"></div>
+    </div>
     <div class="header-stats">
       <div class="header-stat"><strong id="hCulture">31</strong> 文化主题</div>
       <div class="header-stat"><strong id="hGame">49</strong> 游戏产品</div>
@@ -1240,8 +1565,11 @@
     </div>
   </div>
 
+  <!-- Resize Handle -->
+  <div class="resize-handle" id="resizeHandle"></div>
+
   <!-- Bottom Panel -->
-  <div class="bottom-panel">
+  <div class="bottom-panel" id="bottomPanel">
     <div class="panel-tabs">
       <button class="panel-tab active" data-tab="trend"><span class="tab-icon">🔥</span> 文化热度榜</button>
       <button class="panel-tab" data-tab="radar"><span class="tab-icon">📊</span> 效果对比</button>
@@ -1969,7 +2297,7 @@ let dragging = null, panning = false, panStart = {x:0,y:0}, panOffset = {x:0,y:0
 let hoveredNode = null, hoveredEdge = null;
 let simTimer = null;
 
-function initForceGraph(data) {
+function initForceGraph(data, softRestart) {
   canvas = document.getElementById('graphCanvas');
   ctx = canvas.getContext('2d');
   const rect = canvas.parentElement.getBoundingClientRect();
@@ -2000,6 +2328,16 @@ function initForceGraph(data) {
     };
   });
 
+  // softRestart模式下：将旧节点位置均匀分散到新画布中心区域
+  if (softRestart) {
+    graphNodes.forEach(n => {
+      n.x = W/2 + (Math.random()-0.5) * W * 0.5;
+      n.y = H/2 + (Math.random()-0.5) * H * 0.5;
+      n.vx = 0;
+      n.vy = 0;
+    });
+  }
+
   const nodeIdx = {};
   graphNodes.forEach((n,i) => nodeIdx[n.id] = i);
 
@@ -2016,8 +2354,10 @@ function initForceGraph(data) {
   // Run simulation
   if (simTimer) cancelAnimationFrame(simTimer);
   let tickCount = 0;
-  const maxTicks = 400;
-  const alpha0 = 1;
+  // softRestart：更多tick、更低初始alpha，让运动更缓慢平滑
+  const maxTicks = softRestart ? 600 : 400;
+  const alpha0 = softRestart ? 0.4 : 1;
+  const damping = softRestart ? 0.45 : 0.6;
 
   function tick() {
     tickCount++;
@@ -2064,8 +2404,8 @@ function initForceGraph(data) {
     // integrate
     graphNodes.forEach(n => {
       if (n === dragging) return;
-      n.vx *= 0.6;
-      n.vy *= 0.6;
+      n.vx *= damping;
+      n.vy *= damping;
       n.x += n.vx;
       n.y += n.vy;
       n.x = Math.max(n.r, Math.min(W - n.r, n.x));
@@ -2110,6 +2450,7 @@ function drawGraph() {
   // draw nodes — minimal, soft style
   graphNodes.forEach(n => {
     const isHover = n === hoveredNode;
+    const isSearchHighlight = n === highlightedSearchNode;
     const isAdjacent = hoveredNode && graphEdges.some(e =>
       (graphNodes[e.source] === hoveredNode && graphNodes[e.target] === n) ||
       (graphNodes[e.target] === hoveredNode && graphNodes[e.source] === n));
@@ -2118,22 +2459,20 @@ function drawGraph() {
     ctx.globalAlpha = isFaded ? 0.2 : 1;
 
     // subtle shadow
-    ctx.shadowColor = 'rgba(0,0,0,.06)';
-    ctx.shadowBlur = isHover ? 12 : 4;
-    ctx.shadowOffsetY = 1;
+    ctx.shadowColor = isSearchHighlight ? 'rgba(0,113,227,.4)' : 'rgba(0,0,0,.06)';
+    ctx.shadowBlur = isSearchHighlight ? 16 : (isHover ? 12 : 4);
+    ctx.shadowOffsetY = isSearchHighlight ? 0 : 1;
 
-    const r = isHover ? n.r * 1.08 : n.r;
+    const r = (isHover || isSearchHighlight) ? n.r * 1.12 : n.r;
     if (n.type === 'culture') {
-      // soft circle — unified purple tone
       ctx.beginPath();
       ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
-      ctx.fillStyle = isHover ? '#c4b0e8' : '#d4c5f0';
+      ctx.fillStyle = isSearchHighlight ? '#a78bfa' : (isHover ? '#c4b0e8' : '#d4c5f0');
       ctx.fill();
-      ctx.lineWidth = isHover ? 2 : 1.5;
-      ctx.strokeStyle = isHover ? '#9b7dd4' : '#d4c5f0';
+      ctx.lineWidth = isSearchHighlight ? 3 : (isHover ? 2 : 1.5);
+      ctx.strokeStyle = isSearchHighlight ? '#7c3aed' : (isHover ? '#9b7dd4' : '#d4c5f0');
       ctx.stroke();
     } else {
-      // soft rounded rect — unified blue tone
       const s = r * 1.5;
       const rr = 6;
       const x0 = n.x - s/2, y0 = n.y - s/2;
@@ -2148,10 +2487,10 @@ function drawGraph() {
       ctx.lineTo(x0, y0+rr);
       ctx.arcTo(x0, y0, x0+rr, y0, rr);
       ctx.closePath();
-      ctx.fillStyle = isHover ? '#b0ccf0' : '#c5daf0';
+      ctx.fillStyle = isSearchHighlight ? '#93c5fd' : (isHover ? '#b0ccf0' : '#c5daf0');
       ctx.fill();
-      ctx.lineWidth = isHover ? 2 : 1.5;
-      ctx.strokeStyle = isHover ? '#7aabe8' : '#c5daf0';
+      ctx.lineWidth = isSearchHighlight ? 3 : (isHover ? 2 : 1.5);
+      ctx.strokeStyle = isSearchHighlight ? '#2563eb' : (isHover ? '#7aabe8' : '#c5daf0');
       ctx.stroke();
     }
 
@@ -2667,15 +3006,681 @@ function showCaseDetail(d, sourceId, targetId) {
 }
 
 // ===================================================================
+// SEARCH
+// ===================================================================
+let searchActiveIndex = -1;
+let searchResults = [];
+let highlightedSearchNode = null;
+
+function search(query) {
+  const q = query.toLowerCase().trim();
+  if (!q) return [];
+
+  const results = [];
+
+  // 1. 名称匹配（优先级最高）
+  allNodes.forEach(n => {
+    if (n.name.toLowerCase().includes(q)) {
+      results.push({ type: 'node', node: n, matchField: 'name', score: 100 });
+    }
+  });
+
+  // 2. 分类/品类匹配
+  allNodes.forEach(n => {
+    const cat = (n.category || n.genre || '').toLowerCase();
+    if (cat.includes(q) && !results.find(r => r.node?.id === n.id)) {
+      results.push({ type: 'node', node: n, matchField: 'category', score: 80 });
+    }
+  });
+
+  // 3. 公司名匹配
+  gameCompanies.forEach(company => {
+    if (company.toLowerCase().includes(q)) {
+      gameNodes.forEach(g => {
+        if (gameCompanyMap[g.id] === company && !results.find(r => r.node?.id === g.id)) {
+          results.push({ type: 'node', node: g, matchField: 'company', company, score: 70 });
+        }
+      });
+    }
+  });
+
+  // 4. 描述匹配
+  allNodes.forEach(n => {
+    if (n.desc.toLowerCase().includes(q) && !results.find(r => r.node?.id === n.id)) {
+      results.push({ type: 'node', node: n, matchField: 'desc', score: 60 });
+    }
+  });
+
+  // 5. 联动备注匹配
+  links.forEach(l => {
+    if (l.note.toLowerCase().includes(q)) {
+      results.push({ type: 'link', link: l, score: 50 });
+    }
+  });
+
+  return results.sort((a, b) => b.score - a.score).slice(0, 12);
+}
+
+function highlightText(text, query) {
+  if (!query) return text;
+  const idx = text.toLowerCase().indexOf(query.toLowerCase());
+  if (idx === -1) return text;
+  return text.slice(0, idx) + '<mark>' + text.slice(idx, idx + query.length) + '</mark>' + text.slice(idx + query.length);
+}
+
+function renderSearchResults(results, query) {
+  const dropdown = document.getElementById('searchDropdown');
+  if (results.length === 0) {
+    dropdown.innerHTML = '<div class="search-empty">没有找到相关结果</div>';
+    dropdown.classList.add('show');
+    return;
+  }
+
+  // 分组
+  const nodeResults = results.filter(r => r.type === 'node');
+  const linkResults = results.filter(r => r.type === 'link');
+
+  let html = '';
+
+  if (nodeResults.length > 0) {
+    html += '<div class="search-result-group">文化主题 / 游戏产品</div>';
+    nodeResults.forEach((r, idx) => {
+      const n = r.node;
+      const icon = n.type === 'culture' ? '🏛' : '🎮';
+      const iconClass = n.type === 'culture' ? 'culture' : 'game';
+      const badge = n.type === 'culture' ? n.category : n.genre;
+      const badgeBg = n.type === 'culture' ? '#f3e8ff' : '#dbeafe';
+      const badgeColor = n.type === 'culture' ? '#7c3aed' : '#2563eb';
+      let meta = '';
+      if (r.matchField === 'company') meta = r.company;
+      else if (r.matchField === 'category') meta = badge;
+      else if (r.matchField === 'desc') meta = n.desc.slice(0, 40) + '...';
+      else meta = n.type === 'game' ? (gameCompanyMap[n.id] || '') + ' · ' + n.genre : n.category;
+
+      // 构建二级操作按钮
+      const actions = SearchNavigation.getActionsForNode(n);
+
+      html += `<div class="search-result-item" data-index="${idx}" data-type="node" data-id="${n.id}"
+        onmouseenter="searchActiveIndex=${idx}" onclick="handleSearchClick('node','${n.id}')">
+        <div class="search-result-icon ${iconClass}">${icon}</div>
+        <div class="search-result-body">
+          <div class="search-result-name">${highlightText(n.name, query)}</div>
+          <div class="search-result-meta">${meta}</div>
+        </div>
+        <span class="search-result-badge" style="background:${badgeBg};color:${badgeColor}">${badge}</span>
+        <div class="search-result-actions">${actions}</div>
+      </div>`;
+    });
+  }
+
+  if (linkResults.length > 0) {
+    html += '<div class="search-result-group" style="margin-top:6px">联动关系</div>';
+    linkResults.forEach((r, idx) => {
+      const l = r.link;
+      const sn = nodeMap[l.source], tn = nodeMap[l.target];
+      if (!sn || !tn) return;
+      const globalIdx = nodeResults.length + idx;
+
+      // 联动关系的二级操作按钮
+      const actions = SearchNavigation.getActionsForLink(l);
+
+      html += `<div class="search-result-item" data-index="${globalIdx}" data-type="link" data-source="${l.source}" data-target="${l.target}"
+        onmouseenter="searchActiveIndex=${globalIdx}" onclick="handleSearchClick('link','${l.source}','${l.target}')">
+        <div class="search-result-icon link">🔗</div>
+        <div class="search-result-body">
+          <div class="search-result-name">${sn.name} ↔ ${tn.name}</div>
+          <div class="search-result-meta">${highlightText(l.note.slice(0, 50), query)}</div>
+        </div>
+        <span class="search-result-badge" style="background:${ratingColors[l.rating]};color:#fff">${l.rating}</span>
+        <div class="search-result-actions">${actions}</div>
+      </div>`;
+    });
+  }
+
+  dropdown.innerHTML = html;
+  dropdown.classList.add('show');
+}
+
+// ===================================================================
+// SearchNavigation 模块 — 搜索结果的多目的地跳转（解耦设计）
+// ===================================================================
+const SearchNavigation = (() => {
+  const PANEL_EXPAND_HEIGHT = 420; // 跳转tab时面板展开的最小高度
+  const HIGHLIGHT_DURATION = 2000; // 高亮持续时间 ms
+
+  // ---- 公共：切换到指定tab ----
+  function switchToTab(tabName) {
+    document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    const targetTab = document.querySelector(`.panel-tab[data-tab="${tabName}"]`);
+    if (targetTab) targetTab.classList.add('active');
+    const targetPane = document.getElementById('pane-' + tabName);
+    if (targetPane) targetPane.classList.add('active');
+    // 触发tab内容渲染
+    const d = getFiltered();
+    if (tabName === 'trend') renderTrend(d);
+    if (tabName === 'radar') renderRadar(d);
+    if (tabName === 'cases') renderCases(d);
+  }
+
+  // ---- 公共：确保面板展开到至少指定高度 ----
+  function ensurePanelExpanded(minHeight) {
+    minHeight = minHeight || PANEL_EXPAND_HEIGHT;
+    if (panelHeight < minHeight) {
+      panelHeight = minHeight;
+      updateGridRows(panelHeight);
+      resizeGraphAfterPanel(true);
+    }
+  }
+
+  // ---- 公共：为元素添加高亮动画 ----
+  function flashHighlight(el) {
+    if (!el) return;
+    el.classList.remove('search-nav-highlight');
+    // 触发reflow以重启动画
+    void el.offsetWidth;
+    el.classList.add('search-nav-highlight');
+    setTimeout(() => el.classList.remove('search-nav-highlight'), HIGHLIGHT_DURATION);
+  }
+
+  // ---- 公共：滚动到目标元素 ----
+  function scrollToElement(el, container) {
+    if (!el) return;
+    const parent = container || el.closest('.tab-pane') || el.parentElement;
+    if (parent) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+
+  // ==== 导航动作：跳转到热度榜 ====
+  function navigateToTrend(nodeId) {
+    closeSearchDropdown();
+    ensurePanelExpanded();
+    switchToTab('trend');
+    // 延迟一帧等DOM渲染完成后定位
+    requestAnimationFrame(() => {
+      const node = nodeMap[nodeId];
+      if (!node) return;
+      // 热度榜按category分组，找到对应行
+      const category = node.type === 'culture' ? node.category : node.genre;
+      const rows = document.querySelectorAll('#heatRankingContainer .heat-ranking-table tbody tr');
+      for (const row of rows) {
+        const catCell = row.querySelector('td:nth-child(2)');
+        if (catCell && catCell.textContent.trim() === category) {
+          scrollToElement(row);
+          flashHighlight(row);
+          return;
+        }
+      }
+      // 如果是游戏节点，在"代表游戏"列中找
+      if (node.type === 'game') {
+        for (const row of rows) {
+          const gamesCell = row.querySelector('.heat-games');
+          if (gamesCell && gamesCell.textContent.includes(node.name)) {
+            scrollToElement(row);
+            flashHighlight(row);
+            return;
+          }
+        }
+      }
+    });
+  }
+
+  // ==== 导航动作：跳转到案例详情 ====
+  function navigateToCases(cultureId) {
+    closeSearchDropdown();
+    ensurePanelExpanded();
+    switchToTab('cases');
+    // 展开该文化的二级面板
+    requestAnimationFrame(() => {
+      openCultureGroup(cultureId);
+      // 高亮整个案例区域
+      setTimeout(() => {
+        const caseGrid = document.getElementById('caseGrid');
+        if (caseGrid && caseGrid.firstElementChild) {
+          flashHighlight(caseGrid.firstElementChild);
+        }
+      }, 100);
+    });
+  }
+
+  // ==== 导航动作：跳转到案例详情（指定联动） ====
+  function navigateToCaseDetail(sourceId, targetId) {
+    closeSearchDropdown();
+    ensurePanelExpanded();
+    switchToTab('cases');
+    requestAnimationFrame(() => {
+      // 先展开该文化主题的二级面板
+      const cultureId = nodeMap[sourceId] && nodeMap[sourceId].type === 'culture' ? sourceId : targetId;
+      openCultureGroup(cultureId);
+      // 在渲染完成后高亮对应联动卡片
+      setTimeout(() => {
+        const gameId = cultureId === sourceId ? targetId : sourceId;
+        const cards = document.querySelectorAll('#caseGrid .case-card, #caseGrid [data-target]');
+        for (const card of cards) {
+          if (card.dataset.target === gameId || card.textContent.includes(nodeMap[gameId]?.name)) {
+            scrollToElement(card);
+            flashHighlight(card);
+            return;
+          }
+        }
+        // fallback: 高亮第一个元素
+        const caseGrid = document.getElementById('caseGrid');
+        if (caseGrid && caseGrid.firstElementChild) {
+          flashHighlight(caseGrid.firstElementChild);
+        }
+      }, 150);
+    });
+  }
+
+  // ==== 导航动作：跳转到效果对比 ====
+  function navigateToRadar(gameId) {
+    closeSearchDropdown();
+    ensurePanelExpanded();
+    switchToTab('radar');
+    requestAnimationFrame(() => {
+      // 对比tab是卡片列表，找到对应游戏卡片
+      const cards = document.querySelectorAll('#radarContainer > *');
+      const gameName = nodeMap[gameId]?.name;
+      if (!gameName) return;
+      for (const card of cards) {
+        if (card.textContent.includes(gameName)) {
+          scrollToElement(card);
+          flashHighlight(card);
+          return;
+        }
+      }
+    });
+  }
+
+  // ==== 生成操作按钮HTML ====
+  function getActionsForNode(node) {
+    let btns = '';
+    // 所有节点都有"图谱定位"（默认点击行为，用primary样式标注）
+    btns += `<button class="search-action-btn primary" onclick="event.stopPropagation();handleSearchClick('node','${node.id}')" title="在图谱中定位">图谱</button>`;
+
+    if (node.type === 'culture') {
+      btns += `<button class="search-action-btn" onclick="event.stopPropagation();SearchNavigation.navigateToCases('${node.id}')" title="查看该文化的联动案例">案例</button>`;
+      btns += `<button class="search-action-btn" onclick="event.stopPropagation();SearchNavigation.navigateToTrend('${node.id}')" title="在热度榜中查看">热度</button>`;
+    } else if (node.type === 'game') {
+      btns += `<button class="search-action-btn" onclick="event.stopPropagation();SearchNavigation.navigateToRadar('${node.id}')" title="查看效果对比">对比</button>`;
+      btns += `<button class="search-action-btn" onclick="event.stopPropagation();SearchNavigation.navigateToTrend('${node.id}')" title="在热度榜中查看">热度</button>`;
+    }
+    return btns;
+  }
+
+  function getActionsForLink(link) {
+    let btns = '';
+    btns += `<button class="search-action-btn primary" onclick="event.stopPropagation();handleSearchClick('link','${link.source}','${link.target}')" title="在图谱中定位">图谱</button>`;
+    btns += `<button class="search-action-btn" onclick="event.stopPropagation();SearchNavigation.navigateToCaseDetail('${link.source}','${link.target}')" title="查看案例详情">案例</button>`;
+    return btns;
+  }
+
+  // 暴露公共接口
+  return {
+    switchToTab,
+    ensurePanelExpanded,
+    flashHighlight,
+    scrollToElement,
+    navigateToTrend,
+    navigateToCases,
+    navigateToCaseDetail,
+    navigateToRadar,
+    getActionsForNode,
+    getActionsForLink
+  };
+})();
+
+function handleSearchClick(type, id, targetId) {
+  closeSearchDropdown();
+
+  if (type === 'node') {
+    focusGraphNode(id);
+  } else if (type === 'link') {
+    focusGraphLink(id, targetId);
+  }
+}
+
+function focusGraphNode(nodeId) {
+  // 确保力导向图可见（面板不要是全屏状态）
+  const maxH = getPanelMaxHeight();
+  if (panelHeight > maxH * 0.85) {
+    panelHeight = PANEL_DEFAULT_HEIGHT;
+    updateGridRows(panelHeight);
+    resizeGraphAfterPanel(true);
+    // 等待力仿真完成后再定位
+    setTimeout(() => doFocusNode(nodeId), 800);
+  } else {
+    doFocusNode(nodeId);
+  }
+}
+
+function doFocusNode(nodeId) {
+  const node = graphNodes.find(n => n.id === nodeId);
+  if (!node) return;
+
+  // 计算缩放和偏移，让节点居中
+  const targetScale = 1.5;
+  const targetOffsetX = W / 2 - node.x * targetScale;
+  const targetOffsetY = H / 2 - node.y * targetScale;
+
+  // 动画过渡
+  const startScale = scale, startOX = offsetX, startOY = offsetY;
+  const duration = 400;
+  const startTime = performance.now();
+
+  highlightedSearchNode = node;
+
+  function animate(now) {
+    const t = Math.min((now - startTime) / duration, 1);
+    const ease = 1 - Math.pow(1 - t, 3); // easeOutCubic
+    scale = startScale + (targetScale - startScale) * ease;
+    offsetX = startOX + (targetOffsetX - startOX) * ease;
+    offsetY = startOY + (targetOffsetY - startOY) * ease;
+    drawGraph();
+    if (t < 1) requestAnimationFrame(animate);
+    else {
+      // 动画结束后闪烁高亮
+      flashNode(node);
+    }
+  }
+  requestAnimationFrame(animate);
+}
+
+function focusGraphLink(sourceId, targetId) {
+  const maxH = getPanelMaxHeight();
+  if (panelHeight > maxH * 0.85) {
+    panelHeight = PANEL_DEFAULT_HEIGHT;
+    updateGridRows(panelHeight);
+    resizeGraphAfterPanel(true);
+    setTimeout(() => doFocusLink(sourceId, targetId), 800);
+  } else {
+    doFocusLink(sourceId, targetId);
+  }
+}
+
+function doFocusLink(sourceId, targetId) {
+  const sNode = graphNodes.find(n => n.id === sourceId);
+  const tNode = graphNodes.find(n => n.id === targetId);
+  if (!sNode || !tNode) return;
+
+  // 以两节点中心点为焦点
+  const cx = (sNode.x + tNode.x) / 2;
+  const cy = (sNode.y + tNode.y) / 2;
+  const targetScale = 1.4;
+  const targetOffsetX = W / 2 - cx * targetScale;
+  const targetOffsetY = H / 2 - cy * targetScale;
+
+  const startScale = scale, startOX = offsetX, startOY = offsetY;
+  const duration = 400;
+  const startTime = performance.now();
+
+  highlightedSearchNode = sNode; // 高亮source节点
+
+  function animate(now) {
+    const t = Math.min((now - startTime) / duration, 1);
+    const ease = 1 - Math.pow(1 - t, 3);
+    scale = startScale + (targetScale - startScale) * ease;
+    offsetX = startOX + (targetOffsetX - startOX) * ease;
+    offsetY = startOY + (targetOffsetY - startOY) * ease;
+    drawGraph();
+    if (t < 1) requestAnimationFrame(animate);
+    else flashNode(sNode);
+  }
+  requestAnimationFrame(animate);
+}
+
+function flashNode(node) {
+  let count = 0;
+  const interval = setInterval(() => {
+    count++;
+    highlightedSearchNode = count % 2 === 0 ? node : null;
+    drawGraph();
+    if (count >= 6) {
+      clearInterval(interval);
+      highlightedSearchNode = node;
+      drawGraph();
+      // 3秒后取消高亮
+      setTimeout(() => { highlightedSearchNode = null; drawGraph(); }, 3000);
+    }
+  }, 200);
+}
+
+function clearSearch() {
+  const input = document.getElementById('searchInput');
+  input.value = '';
+  document.getElementById('searchClear').classList.remove('show');
+  closeSearchDropdown();
+  highlightedSearchNode = null;
+  drawGraph();
+}
+
+function closeSearchDropdown() {
+  document.getElementById('searchDropdown').classList.remove('show');
+  searchActiveIndex = -1;
+  searchResults = [];
+}
+
+function initSearch() {
+  const input = document.getElementById('searchInput');
+  const clearBtn = document.getElementById('searchClear');
+  let debounceTimer = null;
+
+  input.addEventListener('input', () => {
+    const q = input.value.trim();
+    clearBtn.classList.toggle('show', q.length > 0);
+
+    if (debounceTimer) clearTimeout(debounceTimer);
+    if (!q) {
+      closeSearchDropdown();
+      return;
+    }
+
+    debounceTimer = setTimeout(() => {
+      searchResults = search(q);
+      searchActiveIndex = -1;
+      renderSearchResults(searchResults, q);
+    }, 150);
+  });
+
+  input.addEventListener('keydown', (e) => {
+    const dropdown = document.getElementById('searchDropdown');
+    if (!dropdown.classList.contains('show')) return;
+
+    const items = dropdown.querySelectorAll('.search-result-item');
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      searchActiveIndex = Math.min(searchActiveIndex + 1, items.length - 1);
+      items.forEach((it, i) => it.classList.toggle('active', i === searchActiveIndex));
+      if (items[searchActiveIndex]) items[searchActiveIndex].scrollIntoView({ block: 'nearest' });
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      searchActiveIndex = Math.max(searchActiveIndex - 1, 0);
+      items.forEach((it, i) => it.classList.toggle('active', i === searchActiveIndex));
+      if (items[searchActiveIndex]) items[searchActiveIndex].scrollIntoView({ block: 'nearest' });
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (searchActiveIndex >= 0 && items[searchActiveIndex]) {
+        items[searchActiveIndex].click();
+      }
+    } else if (e.key === 'Escape') {
+      closeSearchDropdown();
+      input.blur();
+    }
+  });
+
+  input.addEventListener('focus', () => {
+    if (input.value.trim() && searchResults.length > 0) {
+      renderSearchResults(searchResults, input.value.trim());
+    }
+  });
+
+  // 点击外部关闭
+  document.addEventListener('click', (e) => {
+    if (!document.getElementById('headerSearch').contains(e.target)) {
+      closeSearchDropdown();
+    }
+  });
+}
+
+// ===================================================================
+// RESIZABLE BOTTOM PANEL
+// ===================================================================
+const PANEL_MIN_HEIGHT = 200;
+const PANEL_DEFAULT_HEIGHT = 280;
+const SNAP_THRESHOLD = 200; // 距顶部200px以内自动吸附全屏
+let panelHeight = PANEL_DEFAULT_HEIGHT;
+let isResizingPanel = false;
+let resizeStartY = 0;
+let resizeStartHeight = 0;
+
+function getPanelMaxHeight() {
+  return window.innerHeight - 52 - 6; // 减去header和handle高度
+}
+
+function updateGridRows(h) {
+  document.querySelector('.app').style.gridTemplateRows = `52px 1fr 6px ${h}px`;
+  // 面板高度超过窗口50%时，应用expanded样式
+  const panel = document.getElementById('bottomPanel');
+  if (panel) {
+    if (h > window.innerHeight * 0.5) {
+      panel.classList.add('expanded');
+    } else {
+      panel.classList.remove('expanded');
+    }
+  }
+}
+
+let panelWasFullscreen = false; // 追踪面板是否曾经为全屏状态
+
+function resizeGraphAfterPanel(rescaleNodes) {
+  const rect = canvas.parentElement.getBoundingClientRect();
+  const oldW = W, oldH = H;
+  W = rect.width; H = rect.height;
+
+  // 当图区高度极小（面板全屏），标记状态
+  if (H < 30) {
+    panelWasFullscreen = true;
+    // 不重绘canvas（区域太小没意义）
+    return;
+  }
+
+  canvas.width = W * devicePixelRatio;
+  canvas.height = H * devicePixelRatio;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+
+  // 如果从全屏恢复，直接重新运行力仿真（柔和重启模式）
+  if (rescaleNodes && panelWasFullscreen) {
+    panelWasFullscreen = false;
+    scale = 1; offsetX = 0; offsetY = 0;
+    const d = getFiltered();
+    initForceGraph(d, true);
+    return;
+  }
+
+  // 正常缩放节点位置
+  if (rescaleNodes && oldH > 30 && Math.abs(H - oldH) > 20) {
+    const scaleY = H / oldH;
+    const scaleX = W / oldW;
+    graphNodes.forEach(n => {
+      n.x = Math.max(n.r, Math.min(W - n.r, n.x * scaleX));
+      n.y = Math.max(n.r, Math.min(H - n.r, n.y * scaleY));
+    });
+  }
+  drawGraph();
+}
+
+function initResizeHandle() {
+  const handle = document.getElementById('resizeHandle');
+
+  handle.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    isResizingPanel = true;
+    resizeStartY = e.clientY;
+    resizeStartHeight = panelHeight;
+    handle.classList.add('active');
+    document.body.style.cursor = 'row-resize';
+    document.body.style.userSelect = 'none';
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!isResizingPanel) return;
+    e.preventDefault();
+    const delta = resizeStartY - e.clientY; // 向上拖=正
+    let newHeight = resizeStartHeight + delta;
+    const maxH = getPanelMaxHeight();
+
+    // 吸附阈值：当面板顶部距离窗口顶部（header下方）小于SNAP_THRESHOLD时，自动吸附到全屏
+    const panelTop = window.innerHeight - newHeight - 6; // 面板上边缘距窗口顶部
+    const headerBottom = 52;
+    if (panelTop - headerBottom < SNAP_THRESHOLD && newHeight > maxH * 0.7) {
+      newHeight = maxH;
+    }
+
+    newHeight = Math.min(maxH, Math.max(PANEL_MIN_HEIGHT, newHeight));
+    panelHeight = newHeight;
+    updateGridRows(panelHeight);
+    resizeGraphAfterPanel(false);
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (!isResizingPanel) return;
+    isResizingPanel = false;
+    handle.classList.remove('active');
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+    // mouseup时缩放节点位置以适应新画布
+    resizeGraphAfterPanel(true);
+    // 保存到localStorage
+    localStorage.setItem('panelHeight', panelHeight);
+  });
+
+  // 双击拖拽条：全屏/恢复默认
+  handle.addEventListener('dblclick', () => {
+    const maxH = getPanelMaxHeight();
+    if (panelHeight >= maxH - 10) {
+      // 当前是全屏，恢复默认
+      panelHeight = PANEL_DEFAULT_HEIGHT;
+    } else {
+      // 当前非全屏，展开到全屏
+      panelHeight = maxH;
+    }
+    updateGridRows(panelHeight);
+    resizeGraphAfterPanel(true);
+    localStorage.setItem('panelHeight', panelHeight);
+  });
+
+  // 恢复上次保存的高度
+  const saved = localStorage.getItem('panelHeight');
+  if (saved) {
+    const h = parseInt(saved);
+    if (h >= PANEL_MIN_HEIGHT && h <= getPanelMaxHeight()) {
+      panelHeight = h;
+      updateGridRows(panelHeight);
+    }
+  }
+}
+
+// ===================================================================
 // INIT
 // ===================================================================
 function init() {
   initFilters();
   initGraphEvents();
+  initResizeHandle();
+  initSearch();
   updateRangeTrack();
   updateAll();
 
   window.addEventListener('resize', () => {
+    // 确保panel高度不超出新窗口范围
+    const maxH = getPanelMaxHeight();
+    if (panelHeight > maxH) {
+      panelHeight = maxH;
+      updateGridRows(panelHeight);
+    }
     const rect = canvas.parentElement.getBoundingClientRect();
     W = rect.width; H = rect.height;
     canvas.width = W * devicePixelRatio;
